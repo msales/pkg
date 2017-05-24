@@ -9,9 +9,13 @@
 
 A common stats package to abstract stats generation.
 
-## Docs
+## Overview
 
-Viewable online at [godoc.org][4].
+Install with:
+
+```go
+go get gopkg.in/msales/gostats.v1
+```
 
 ## License
 

@@ -12,6 +12,7 @@ const (
 )
 
 var (
+	// Null is the null Stats instance.
 	Null = &nullStats{}
 )
 

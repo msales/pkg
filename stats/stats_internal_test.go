@@ -2,6 +2,7 @@ package stats
 
 import (
 	"testing"
+
 	"github.com/stretchr/testify/assert"
 )
 
@@ -14,9 +15,9 @@ func TestTaggedStats_CollectTags(t *testing.T) {
 	}
 
 	tests := []struct {
-		tags map[string]string
+		tags     map[string]string
 		expected map[string]string
-	} {
+	}{
 		{
 			nil,
 			map[string]string{"test1": "foo", "test2": "bar"},
