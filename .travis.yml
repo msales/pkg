@@ -5,13 +5,12 @@ go:
   - 1.8
 
 before_install:
-  - go get -u github.com/FiloSottile/gvt
-  - go get github.com/mitchellh/gox
+  - go get -u github.com/golang/dep/cmd/dep
   - go get github.com/mattn/goveralls
   - go get golang.org/x/tools/cmd/cover
 
 script:
-  - gvt restore
+  - dep ensure
   - go vet $(go list ./... | grep -v /vendor/)
   - go test -cover $(go list ./... | grep -v /vendor/)
   - $HOME/gopath/bin/goveralls -service=travis-ci
