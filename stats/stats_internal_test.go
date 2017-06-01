@@ -1,10 +1,37 @@
 package stats
 
 import (
+	"context"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
+
+func TestWithStats(t *testing.T) {
+	ctx := WithStats(context.Background(), Null)
+
+	got := ctx.Value(ctxKey)
+
+	assert.Equal(t, Null, got)
+}
+
+func TestFromContext(t *testing.T) {
+	ctx := context.WithValue(context.Background(), ctxKey, Null)
+
+	got, ok := FromContext(ctx)
+
+	assert.True(t, ok)
+	assert.Equal(t, Null, got)
+}
+
+func TestFromContext_NotSet(t *testing.T) {
+	ctx := context.Background()
+
+	got, ok := FromContext(ctx)
+
+	assert.False(t, ok)
+	assert.Nil(t, got)
+}
 
 func TestTaggedStats_CollectTags(t *testing.T) {
 	stats := &TaggedStats{
