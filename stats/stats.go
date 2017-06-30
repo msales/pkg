@@ -42,6 +42,42 @@ func FromContext(ctx context.Context) (Stats, bool) {
 	return stats, ok
 }
 
+// Inc increments a count by the value.
+func Inc(ctx context.Context, name string, value int64, rate float32, tags map[string]string) error {
+	return withStats(ctx, func(s Stats) error {
+		return s.Inc(name, value, rate, tags)
+	})
+}
+
+// Dec decrements a count by the value.
+func Dec(ctx context.Context, name string, value int64, rate float32, tags map[string]string) error {
+	return withStats(ctx, func(s Stats) error {
+		return s.Dec(name, value, rate, tags)
+	})
+}
+
+// Gauge measures the value of a metric.
+func Gauge(ctx context.Context, name string, value float64, rate float32, tags map[string]string) error {
+	return withStats(ctx, func(s Stats) error {
+		return s.Gauge(name, value, rate, tags)
+	})
+}
+
+// Timing sends the value of a Duration.
+func Timing(ctx context.Context, name string, value time.Duration, rate float32, tags map[string]string) error {
+	return withStats(ctx, func(s Stats) error {
+		return s.Timing(name, value, rate, tags)
+	})
+}
+
+func withStats(ctx context.Context, fn func(s Stats) error) error {
+	if s, ok := FromContext(ctx); ok {
+		return fn(s)
+	} else {
+		return fn(Null)
+	}
+}
+
 type nullStats struct{}
 
 func (s nullStats) Inc(name string, value int64, rate float32, tags map[string]string) error {
