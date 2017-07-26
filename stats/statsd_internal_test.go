@@ -10,10 +10,10 @@ import (
 )
 
 func TestNewStatsd(t *testing.T) {
-	statsd, err := NewStatsd("127.0.0.1:1234", "test")
+	s, err := NewStatsd("127.0.0.1:1234", "test")
 	assert.NoError(t, err)
 
-	assert.IsType(t, &Statsd{}, statsd)
+	assert.IsType(t, &Statsd{}, s)
 }
 
 func TestStatsd_Inc(t *testing.T) {
@@ -21,11 +21,11 @@ func TestStatsd_Inc(t *testing.T) {
 	client, err := statsd.NewClientWithSender(sender, "test")
 	assert.NoError(t, err)
 
-	statsd := &Statsd{
+	s := &Statsd{
 		client: client,
 	}
 
-	statsd.Inc("test", 2, 1.0, map[string]string{"test": "test"})
+	s.Inc("test", 2, 1.0, map[string]string{"test": "test"})
 
 	sent := sender.GetSent()
 	assert.Len(t, sent, 1)
@@ -38,11 +38,11 @@ func TestStatsd_Dec(t *testing.T) {
 	client, err := statsd.NewClientWithSender(sender, "test")
 	assert.NoError(t, err)
 
-	statsd := &Statsd{
+	s := &Statsd{
 		client: client,
 	}
 
-	statsd.Dec("test", 2, 1.0, map[string]string{"test": "test"})
+	s.Dec("test", 2, 1.0, map[string]string{"test": "test"})
 
 	sent := sender.GetSent()
 	assert.Len(t, sent, 1)
@@ -55,11 +55,11 @@ func TestStatsd_Gauge(t *testing.T) {
 	client, err := statsd.NewClientWithSender(sender, "test")
 	assert.NoError(t, err)
 
-	statsd := &Statsd{
+	s := &Statsd{
 		client: client,
 	}
 
-	statsd.Gauge("test", 2.0, 1.0, map[string]string{"test": "test"})
+	s.Gauge("test", 2.0, 1.0, map[string]string{"test": "test"})
 
 	sent := sender.GetSent()
 	assert.Len(t, sent, 1)
@@ -72,11 +72,11 @@ func TestStatsd_Timing(t *testing.T) {
 	client, err := statsd.NewClientWithSender(sender, "test")
 	assert.NoError(t, err)
 
-	statsd := &Statsd{
+	s := &Statsd{
 		client: client,
 	}
 
-	statsd.Timing("test", time.Second, 1.0, map[string]string{"test": "test"})
+	s.Timing("test", time.Second, 1.0, map[string]string{"test": "test"})
 
 	sent := sender.GetSent()
 	assert.Len(t, sent, 1)
@@ -84,16 +84,93 @@ func TestStatsd_Timing(t *testing.T) {
 	assert.Equal(t, "1000", sent[0].Value)
 }
 
-func TestStatsd_FormatTags(t *testing.T) {
-	statsd := &Statsd{}
+func TestNewBufferedStatsd(t *testing.T) {
+	s, err := NewBufferedStatsd("127.0.0.1:1234", "test", nil)
+	assert.NoError(t, err)
+
+	assert.IsType(t, &BufferedStatsd{}, s)
+}
+
+func TestBufferedStatsd_Inc(t *testing.T) {
+	sender := statsdtest.NewRecordingSender()
+	client, err := statsd.NewClientWithSender(sender, "test")
+	assert.NoError(t, err)
+
+	s := &BufferedStatsd{
+		client: client,
+	}
+
+	s.Inc("test", 2, 1.0, map[string]string{"test": "test"})
+
+	sent := sender.GetSent()
+	assert.Len(t, sent, 1)
+	assert.Equal(t, "test.test,test=test", sent[0].Stat)
+	assert.Equal(t, "2", sent[0].Value)
+}
+
+
+
+func TestBufferedStatsd_Dec(t *testing.T) {
+	sender := statsdtest.NewRecordingSender()
+	client, err := statsd.NewClientWithSender(sender, "test")
+	assert.NoError(t, err)
+
+	s := &BufferedStatsd{
+		client: client,
+	}
+
+	s.Dec("test", 2, 1.0, map[string]string{"test": "test"})
+
+	sent := sender.GetSent()
+	assert.Len(t, sent, 1)
+	assert.Equal(t, "test.test,test=test", sent[0].Stat)
+	assert.Equal(t, "-2", sent[0].Value)
+}
+
+func TestBufferedStatsd_Gauge(t *testing.T) {
+	sender := statsdtest.NewRecordingSender()
+	client, err := statsd.NewClientWithSender(sender, "test")
+	assert.NoError(t, err)
+
+	s := &BufferedStatsd{
+		client: client,
+	}
+
+	s.Gauge("test", 2.0, 1.0, map[string]string{"test": "test"})
+
+	sent := sender.GetSent()
+	assert.Len(t, sent, 1)
+	assert.Equal(t, "test.test,test=test", sent[0].Stat)
+	assert.Equal(t, "2", sent[0].Value)
+}
+
+func TestBufferedStatsd_Timing(t *testing.T) {
+	sender := statsdtest.NewRecordingSender()
+	client, err := statsd.NewClientWithSender(sender, "test")
+	assert.NoError(t, err)
+
+	s := &BufferedStatsd{
+		client: client,
+	}
+
+	s.Timing("test", time.Second, 1.0, map[string]string{"test": "test"})
+
+	sent := sender.GetSent()
+	assert.Len(t, sent, 1)
+	assert.Equal(t, "test.test,test=test", sent[0].Stat)
+	assert.Equal(t, "1000", sent[0].Value)
+}
+
+func TestFormatTags(t *testing.T) {
 	tags := map[string]string{
 		"test": "test",
 		"foo":  "bar",
 	}
 
-	assert.Equal(t, "", statsd.formatTags(map[string]string{}))
+	assert.Equal(t, "", formatTags(nil))
+	assert.Equal(t, "", formatTags(map[string]string{}))
 
-	got := statsd.formatTags(tags)
+	got := formatTags(tags)
 	assert.Contains(t, got, ",test=test")
 	assert.Contains(t, got, ",foo=bar")
 }
