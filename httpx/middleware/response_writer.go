@@ -2,9 +2,6 @@ package middleware
 
 import (
 	"net/http"
-	"net"
-	"bufio"
-	"fmt"
 )
 
 // ResponseWriter is a wrapper around http.ResponseWriter that provides extra
