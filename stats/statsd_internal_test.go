@@ -108,8 +108,6 @@ func TestBufferedStatsd_Inc(t *testing.T) {
 	assert.Equal(t, "2", sent[0].Value)
 }
 
-
-
 func TestBufferedStatsd_Dec(t *testing.T) {
 	sender := statsdtest.NewRecordingSender()
 	client, err := statsd.NewClientWithSender(sender, "test")
