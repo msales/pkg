@@ -2,10 +2,8 @@ package log
 
 import "context"
 
-type key int
-
 const (
-	ctxKey key = iota
+	ctxKey = "pkg.logger"
 )
 
 var (

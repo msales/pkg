@@ -5,10 +5,8 @@ import (
 	"time"
 )
 
-type key int
-
 const (
-	ctxKey key = iota
+	ctxKey = "pkg.stats"
 )
 
 var (

@@ -2,11 +2,8 @@ package httpx
 
 import "context"
 
-// key used to store context values from within this package.
-type key int
-
 const (
-	requestIDKey = iota
+	requestIDKey = "pkg.requestId"
 )
 
 // WithRequestID inserts a RequestID into the context.
