@@ -14,7 +14,7 @@ A collection of Go packages.
 Install with:
 
 ```go
-go get gopkg.in/msales/pkg.v1
+go get github.com/msales/pkg
 ```
 
 ## License
