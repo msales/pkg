@@ -1,10 +1,10 @@
 package stats_test
 
 import (
-	"testing"
-	"github.com/msales/pkg/stats"
 	"context"
+	"github.com/msales/pkg/stats"
 	"github.com/stretchr/testify/mock"
+	"testing"
 )
 
 func TestTimer(t *testing.T) {

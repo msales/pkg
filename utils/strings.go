@@ -2,6 +2,8 @@ package utils
 
 import "strings"
 
+// SplitMap splits a slice of strings into a map of strings using
+// the given separator.
 func SplitMap(s []string, sep string) map[string]string {
 	if len(s) == 0 || sep == "" {
 		return nil

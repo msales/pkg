@@ -71,9 +71,8 @@ func Timing(ctx context.Context, name string, value time.Duration, rate float32,
 func withStats(ctx context.Context, fn func(s Stats) error) error {
 	if s, ok := FromContext(ctx); ok {
 		return fn(s)
-	} else {
-		return fn(Null)
 	}
+	return fn(Null)
 }
 
 type nullStats struct{}

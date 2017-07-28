@@ -10,8 +10,8 @@ import (
 
 func TestRealIP(t *testing.T) {
 	tests := []struct {
-		req  *http.Request
-		ip string
+		req *http.Request
+		ip  string
 	}{
 		{
 			&http.Request{RemoteAddr: "127.0.0.1"},

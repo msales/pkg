@@ -4,8 +4,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/mock"
 	"github.com/msales/pkg/stats"
+	"github.com/stretchr/testify/mock"
 )
 
 func TestTaggedStats_Inc(t *testing.T) {
