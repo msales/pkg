@@ -1,19 +1,19 @@
-package stats
+package stats_test
 
 import (
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/mock"
+	"github.com/msales/pkg/stats"
 )
 
 func TestTaggedStats_Inc(t *testing.T) {
 	m := new(MockStats)
 	m.On("Inc", "test", int64(1), float32(1), map[string]string{"foo": "bar", "global": "foobar"}).Return(nil)
 
-	stats := NewTaggedStats(m, map[string]string{"global": "foobar"})
-
-	stats.Inc("test", 1, 1.0, map[string]string{"foo": "bar"})
+	s := stats.NewTaggedStats(m, map[string]string{"global": "foobar"})
+	s.Inc("test", 1, 1.0, map[string]string{"foo": "bar"})
 
 	m.AssertExpectations(t)
 }
@@ -22,9 +22,8 @@ func TestTaggedStats_Dec(t *testing.T) {
 	m := new(MockStats)
 	m.On("Dec", "test", int64(1), float32(1), map[string]string{"foo": "bar", "global": "foobar"}).Return(nil)
 
-	stats := NewTaggedStats(m, map[string]string{"global": "foobar"})
-
-	stats.Dec("test", 1, 1.0, map[string]string{"foo": "bar"})
+	s := stats.NewTaggedStats(m, map[string]string{"global": "foobar"})
+	s.Dec("test", 1, 1.0, map[string]string{"foo": "bar"})
 
 	m.AssertExpectations(t)
 }
@@ -33,9 +32,8 @@ func TestTaggedStats_Gauge(t *testing.T) {
 	m := new(MockStats)
 	m.On("Gauge", "test", float64(1), float32(1), map[string]string{"foo": "bar", "global": "foobar"}).Return(nil)
 
-	stats := NewTaggedStats(m, map[string]string{"global": "foobar"})
-
-	stats.Gauge("test", 1.0, 1.0, map[string]string{"foo": "bar"})
+	s := stats.NewTaggedStats(m, map[string]string{"global": "foobar"})
+	s.Gauge("test", 1.0, 1.0, map[string]string{"foo": "bar"})
 
 	m.AssertExpectations(t)
 }
@@ -44,9 +42,8 @@ func TestTaggedStats_Timing(t *testing.T) {
 	m := new(MockStats)
 	m.On("Timing", "test", time.Millisecond, float32(1), map[string]string{"foo": "bar", "global": "foobar"}).Return(nil)
 
-	stats := NewTaggedStats(m, map[string]string{"global": "foobar"})
-
-	stats.Timing("test", time.Millisecond, 1.0, map[string]string{"foo": "bar"})
+	s := stats.NewTaggedStats(m, map[string]string{"global": "foobar"})
+	s.Timing("test", time.Millisecond, 1.0, map[string]string{"foo": "bar"})
 
 	m.AssertExpectations(t)
 }
