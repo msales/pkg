@@ -23,7 +23,6 @@ type decoder interface {
 type Item struct {
 	decoder    decoder
 	value      []byte
-	expiration time.Duration
 	err        error
 }
 
@@ -65,7 +64,7 @@ type Cache interface {
 	Get(key string) *Item
 
 	// GetMulti gets the items for the given keys.
-	GetMulti(keys []string) []*Item
+	GetMulti(keys []string) ([]*Item, error)
 
 	// Set sets the item in the cache.
 	Set(key string, value interface{}, expire time.Duration) error
@@ -104,7 +103,7 @@ func Get(ctx context.Context, key string) *Item {
 }
 
 // GetMulti gets the items for the given keys.
-func GetMulti(ctx context.Context, keys []string) []*Item {
+func GetMulti(ctx context.Context, keys []string) ([]*Item, error) {
 	c := getCache(ctx)
 	return c.GetMulti(keys)
 }
@@ -170,8 +169,8 @@ func (c nullCache) Get(key string) *Item {
 }
 
 // GetMulti gets the items for the given keys.
-func (c nullCache) GetMulti(keys []string) []*Item {
-	return []*Item{}
+func (c nullCache) GetMulti(keys []string) ([]*Item, error) {
+	return []*Item{}, nil
 }
 
 // Set sets the item in the cache.

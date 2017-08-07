@@ -22,7 +22,7 @@ func TestGet(t *testing.T) {
 
 func TestGetMulti(t *testing.T) {
 	m := new(MockCache)
-	m.On("GetMulti", []string{"test"}).Return([]*cache.Item{&cache.Item{}})
+	m.On("GetMulti", []string{"test"}).Return([]*cache.Item{&cache.Item{}}, nil)
 	ctx := cache.WithCache(context.Background(), m)
 
 	cache.GetMulti(ctx, []string{"test"})
@@ -115,7 +115,10 @@ func TestNullCache_GetFloat64(t *testing.T) {
 }
 
 func TestNullCache_GetMulti(t *testing.T) {
-	assert.Len(t, cache.Null.GetMulti([]string{"test"}), 0)
+	v, err := cache.Null.GetMulti([]string{"test"})
+
+	assert.NoError(t, err)
+	assert.Len(t, v, 0)
 }
 
 func TestNullCache_Set(t *testing.T) {
@@ -157,9 +160,9 @@ func (c *MockCache) Get(key string) *cache.Item {
 	return args.Get(0).(*cache.Item)
 }
 
-func (c *MockCache) GetMulti(keys []string) []*cache.Item {
+func (c *MockCache) GetMulti(keys []string) ([]*cache.Item, error) {
 	args := c.Called(keys)
-	return args.Get(0).([]*cache.Item)
+	return args.Get(0).([]*cache.Item), args.Error(1)
 }
 
 func (c *MockCache) Set(key string, value interface{}, expire time.Duration) error {

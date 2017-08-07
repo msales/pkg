@@ -8,7 +8,7 @@
 
 [[constraint]]
   branch = "master"
-  name = "github.com/bradfitz/gomemcache/memcache"
+  name = "github.com/bradfitz/gomemcache"
 
 [[constraint]]
   name = "github.com/stretchr/testify"
