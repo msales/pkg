@@ -11,7 +11,6 @@ import (
 func TestDebug(t *testing.T) {
 	m := new(MockLogger)
 	m.On("Debug", "test log", []interface{}{"foo", "bar"})
-
 	ctx := log.WithLogger(context.Background(), m)
 
 	log.Debug(ctx, "test log", "foo", "bar")
@@ -22,7 +21,6 @@ func TestDebug(t *testing.T) {
 func TestInfo(t *testing.T) {
 	m := new(MockLogger)
 	m.On("Info", "test log", []interface{}{"foo", "bar"})
-
 	ctx := log.WithLogger(context.Background(), m)
 
 	log.Info(ctx, "test log", "foo", "bar")
@@ -33,7 +31,6 @@ func TestInfo(t *testing.T) {
 func TestError(t *testing.T) {
 	m := new(MockLogger)
 	m.On("Error", "test log", []interface{}{"foo", "bar"})
-
 	ctx := log.WithLogger(context.Background(), m)
 
 	log.Error(ctx, "test log", "foo", "bar")

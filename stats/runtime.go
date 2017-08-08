@@ -5,9 +5,12 @@ import (
 	"time"
 )
 
+// DefaultRuntimeInterval is the default runtime ticker interval.
+var DefaultRuntimeInterval = 30 * time.Second
+
 // Runtime enters a loop, reporting runtime stats periodically.
 func Runtime(stats Stats) {
-	RuntimeEvery(stats, 30*time.Second)
+	RuntimeEvery(stats, DefaultRuntimeInterval)
 }
 
 // RuntimeEvery enters a loop, reporting runtime stats at the specified interval.

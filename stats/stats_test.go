@@ -4,9 +4,51 @@ import (
 	"testing"
 	"time"
 
+	"context"
+
 	"github.com/msales/pkg/stats"
 	"github.com/stretchr/testify/mock"
 )
+
+func TestInc(t *testing.T) {
+	m := new(MockStats)
+	m.On("Inc", "test", int64(1), float32(1.0), map[string]string(nil)).Return(nil)
+	ctx := stats.WithStats(context.Background(), m)
+
+	stats.Inc(ctx, "test", 1, 1.0, nil)
+
+	m.AssertExpectations(t)
+}
+
+func TestDec(t *testing.T) {
+	m := new(MockStats)
+	m.On("Dec", "test", int64(1), float32(1.0), map[string]string(nil)).Return(nil)
+	ctx := stats.WithStats(context.Background(), m)
+
+	stats.Dec(ctx, "test", 1, 1.0, nil)
+
+	m.AssertExpectations(t)
+}
+
+func TestGauge(t *testing.T) {
+	m := new(MockStats)
+	m.On("Gauge", "test", float64(1), float32(1.0), map[string]string(nil)).Return(nil)
+	ctx := stats.WithStats(context.Background(), m)
+
+	stats.Gauge(ctx, "test", 1, 1.0, nil)
+
+	m.AssertExpectations(t)
+}
+
+func TestTiming(t *testing.T) {
+	m := new(MockStats)
+	m.On("Timing", "test", time.Second, float32(1.0), map[string]string(nil)).Return(nil)
+	ctx := stats.WithStats(context.Background(), m)
+
+	stats.Timing(ctx, "test", time.Second, 1.0, nil)
+
+	m.AssertExpectations(t)
+}
 
 func TestTaggedStats_Inc(t *testing.T) {
 	m := new(MockStats)

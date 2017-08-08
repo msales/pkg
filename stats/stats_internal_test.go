@@ -33,6 +33,22 @@ func TestFromContext_NotSet(t *testing.T) {
 	assert.Nil(t, got)
 }
 
+func TestWithStatsFunc(t *testing.T) {
+	tests := []struct {
+		ctx    context.Context
+		expect Stats
+	}{
+		{context.Background(), Null},
+	}
+
+	for _, tt := range tests {
+		withStats(tt.ctx, func(s Stats) error {
+			assert.Equal(t, tt.expect, s)
+			return nil
+		})
+	}
+}
+
 func TestTaggedStats_CollectTags(t *testing.T) {
 	stats := &TaggedStats{
 		tags: map[string]string{
@@ -66,4 +82,13 @@ func TestTaggedStats_CollectTags(t *testing.T) {
 	for _, test := range tests {
 		assert.Equal(t, test.expected, stats.collectTags(test.tags))
 	}
+}
+
+func TestNullStats(t *testing.T) {
+	s := Null
+
+	assert.Nil(t, s.Inc("test", 1, 1.0, nil))
+	assert.Nil(t, s.Dec("test", 1, 1.0, nil))
+	assert.Nil(t, s.Gauge("test", 1.0, 1.0, nil))
+	assert.Nil(t, s.Timing("test", 0, 1.0, nil))
 }
