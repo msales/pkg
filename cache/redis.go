@@ -1,7 +1,7 @@
 package cache
 
 import (
-	"strconv"
+	"errors"
 	"time"
 
 	"github.com/go-redis/redis"
@@ -65,6 +65,10 @@ func NewRedis(uri string, opts ...RedisOptionsFunc) (Cache, error) {
 // Get gets the item for the given key.
 func (c redisCache) Get(key string) *Item {
 	b, err := c.client.Get(key).Bytes()
+	if err == redis.Nil {
+		err = ErrCacheMiss
+	}
+
 	return &Item{
 		decoder: c.decoder,
 		value:   b,
@@ -73,7 +77,7 @@ func (c redisCache) Get(key string) *Item {
 }
 
 // GetMulti gets the items for the given keys.
-func (c redisCache) GetMulti(keys []string) ([]*Item, error) {
+func (c redisCache) GetMulti(keys ...string) ([]*Item, error) {
 	val, err := c.client.MGet(keys...).Result()
 	if err != nil {
 		return nil, err
@@ -81,9 +85,17 @@ func (c redisCache) GetMulti(keys []string) ([]*Item, error) {
 
 	i := []*Item{}
 	for _, v := range val {
+		var err error = ErrCacheMiss
+		var b []byte
+		if v != nil {
+			b = []byte(v.(string))
+			err = nil
+		}
+
 		i = append(i, &Item{
 			decoder: c.decoder,
-			value:   []byte(v.(string)),
+			value:   b,
+			err:     err,
 		})
 	}
 
@@ -97,12 +109,18 @@ func (c redisCache) Set(key string, value interface{}, expire time.Duration) err
 
 // Add sets the item in the cache, but only if the key does not already exist.
 func (c redisCache) Add(key string, value interface{}, expire time.Duration) error {
-	return c.client.SetNX(key, value, expire).Err()
+	if !c.client.SetNX(key, value, expire).Val() {
+		return errors.New("redis: key already exists")
+	}
+	return nil
 }
 
 // Replace sets the item in the cache, but only if the key already exists.
 func (c redisCache) Replace(key string, value interface{}, expire time.Duration) error {
-	return c.client.SetXX(key, value, expire).Err()
+	if !c.client.SetXX(key, value, expire).Val() {
+		return errors.New("redis: key does not exist")
+	}
+	return nil
 }
 
 // Delete deletes the item with the given key.
@@ -118,22 +136,4 @@ func (c redisCache) Inc(key string, value uint64) (int64, error) {
 // Dec decrements a key by the value.
 func (c redisCache) Dec(key string, value uint64) (int64, error) {
 	return c.client.DecrBy(key, int64(value)).Result()
-}
-
-type stringDecoder struct{}
-
-func (d stringDecoder) Bool(v []byte) (bool, error) {
-	return string(v) == "1", nil
-}
-
-func (d stringDecoder) Int64(v []byte) (int64, error) {
-	return strconv.ParseInt(string(v), 10, 64)
-}
-
-func (d stringDecoder) Uint64(v []byte) (uint64, error) {
-	return strconv.ParseUint(string(v), 10, 64)
-}
-
-func (d stringDecoder) Float64(v []byte) (float64, error) {
-	return strconv.ParseFloat(string(v), 64)
 }

@@ -34,10 +34,10 @@ func TestFromContext_NotSet(t *testing.T) {
 }
 
 func TestGetCache(t *testing.T) {
-	tests := []struct{
-		ctx context.Context
+	tests := []struct {
+		ctx    context.Context
 		expect Cache
-	} {
+	}{
 		{context.Background(), Null},
 	}
 

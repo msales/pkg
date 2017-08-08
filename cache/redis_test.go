@@ -9,29 +9,31 @@ import (
 )
 
 var (
-	testMemcachedServer = "localhost:11211"
-	skipMemcache        = false
+	testRedisServer = "localhost:6379"
+	skipRedis       = false
 )
 
 func init() {
-	c, err := net.Dial("tcp", testMemcachedServer)
+	c, err := net.Dial("tcp", testRedisServer)
 	if err != nil {
-		skipMemcache = true
+		skipRedis = true
 		return
 	}
-	c.Write([]byte("flush_all\r\n"))
+	c.Write([]byte("SELECT 1\r\n"))
+	c.Write([]byte("FLUSHDB\r\n"))
 	c.Close()
 }
 
-func TestMemcacheCache(t *testing.T) {
-	if skipMemcache {
-		t.Skipf("skipping test; no running server at %s", testMemcachedServer)
+func TestRedisCache(t *testing.T) {
+	if skipRedis {
+		t.Skipf("skipping test; no running server at %s", testRedisServer)
 	}
 
-	c := cache.NewMemcache(testMemcachedServer)
+	c, err := cache.NewRedis("redis://" + testRedisServer + "/1")
+	assert.NoError(t, err)
 
 	// Set
-	err := c.Set("test", "foobar", 0)
+	err = c.Set("test", "foobar", 0)
 	assert.NoError(t, err)
 
 	// Get
@@ -44,7 +46,7 @@ func TestMemcacheCache(t *testing.T) {
 	// Add
 	err = c.Add("test1", "foobar", 0)
 	assert.NoError(t, err)
-	err = c.Add("test1", "foobat", 0)
+	err = c.Add("test1", "foobar", 0)
 	assert.Error(t, err)
 
 	// Replace

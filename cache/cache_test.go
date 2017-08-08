@@ -22,7 +22,7 @@ func TestGet(t *testing.T) {
 
 func TestGetMulti(t *testing.T) {
 	m := new(MockCache)
-	m.On("GetMulti", []string{"test"}).Return([]*cache.Item{&cache.Item{}}, nil)
+	m.On("GetMulti", []string{"test"}).Return([]*cache.Item{{}}, nil)
 	ctx := cache.WithCache(context.Background(), m)
 
 	cache.GetMulti(ctx, "test")

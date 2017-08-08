@@ -2,8 +2,8 @@ package cache
 
 import (
 	"context"
-	"time"
 	"errors"
+	"time"
 )
 
 const (
