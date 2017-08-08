@@ -34,7 +34,7 @@ func WithStats(ctx context.Context, stats Stats) context.Context {
 	return context.WithValue(ctx, ctxKey, stats)
 }
 
-// FromContext returns the instance Stats in the context.
+// FromContext returns the instance of Stats in the context.
 func FromContext(ctx context.Context) (Stats, bool) {
 	stats, ok := ctx.Value(ctxKey).(Stats)
 	return stats, ok

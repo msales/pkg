@@ -2,6 +2,12 @@
 
 
 [[projects]]
+  branch = "master"
+  name = "github.com/bradfitz/gomemcache"
+  packages = ["memcache"]
+  revision = "1952afaa557dc08e8e0d89eafab110fb501c1a2b"
+
+[[projects]]
   name = "github.com/cactus/go-statsd-client"
   packages = ["statsd","statsd/statsdtest"]
   revision = "91c326c3f7bd20f0226d3d1c289dd9f8ce28d33d"
@@ -12,6 +18,12 @@
   packages = ["spew"]
   revision = "346938d642f2ec3594ed81d874461961cd0faa76"
   version = "v1.1.0"
+
+[[projects]]
+  name = "github.com/go-redis/redis"
+  packages = [".","internal","internal/consistenthash","internal/hashtag","internal/pool","internal/proto"]
+  revision = "89515eebd1b5761486abd32d9e84a8f55dda7740"
+  version = "v6.5.6"
 
 [[projects]]
   name = "github.com/pmezard/go-difflib"
@@ -34,6 +46,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "e7f57644eecede687a1284ba8f175de1326586a123f84359f33524e990a0f663"
+  inputs-digest = "8e3ee3bfffcdb48c07875c6ad77dd371197c6eb56bc3eee74bd99dad35925cdb"
   solver-name = "gps-cdcl"
   solver-version = 1

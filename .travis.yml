@@ -3,6 +3,9 @@ sudo: false
 language: go
 go:
   - 1.8
+services:
+  - redis-server
+  - memcached
 
 before_install:
   - go get -u github.com/golang/dep/cmd/dep

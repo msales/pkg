@@ -13,7 +13,7 @@ A collection of Go packages.
 
 Install with:
 
-```go
+```shell
 go get github.com/msales/pkg
 ```
 
