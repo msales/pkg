@@ -11,6 +11,7 @@ const (
 )
 
 var (
+	// ErrCacheMiss means that a Get failed because the item wasn't present.
 	ErrCacheMiss = errors.New("cache: miss")
 
 	// Null is the null Cache instance.

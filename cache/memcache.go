@@ -8,14 +8,17 @@ import (
 	"github.com/bradfitz/gomemcache/memcache"
 )
 
+// MemcacheOptionsFunc represents an configuration function for Memcache.
 type MemcacheOptionsFunc func(*memcache.Client)
 
+// WithIdleConns configures the Memcache max idle connections.
 func WithIdleConns(size int) MemcacheOptionsFunc {
 	return func(c *memcache.Client) {
 		c.MaxIdleConns = size
 	}
 }
 
+// WithTimeout configures the Memcache read and write timeout.
 func WithTimeout(timeout time.Duration) MemcacheOptionsFunc {
 	return func(c *memcache.Client) {
 		c.Timeout = timeout
@@ -27,6 +30,7 @@ type memcacheCache struct {
 	decoder decoder
 }
 
+// NewMemcache create a new Memcache cache instance.
 func NewMemcache(uri string, opts ...MemcacheOptionsFunc) Cache {
 	c := memcache.New(uri)
 
