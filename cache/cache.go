@@ -3,6 +3,7 @@ package cache
 import (
 	"context"
 	"time"
+	"errors"
 )
 
 const (
@@ -10,53 +11,11 @@ const (
 )
 
 var (
+	ErrCacheMiss = errors.New("cache: miss")
+
 	// Null is the null Cache instance.
 	Null = &nullCache{}
 )
-
-type decoder interface {
-	Int64([]byte) (int64, error)
-	Float64([]byte) (float64, error)
-}
-
-// Item represents an item to be returned or stored in the cache
-type Item struct {
-	decoder    decoder
-	value      []byte
-	err        error
-}
-
-// Bytes gets the cache items value as bytes.
-func (i Item) Bytes() ([]byte, error) {
-	return i.value, i.err
-}
-
-// Bytes gets the cache items value as a string.
-func (i Item) String() (string, error) {
-	if i.err != nil {
-		return "", i.err
-	}
-
-	return string(i.value), nil
-}
-
-// Bytes gets the cache items value as an int64, or and error.
-func (i Item) Int64() (int64, error) {
-	if i.err != nil {
-		return 0, i.err
-	}
-
-	return i.decoder.Int64(i.value)
-}
-
-// Bytes gets the cache items value as a float64, or and error.
-func (i Item) Float64() (float64, error) {
-	if i.err != nil {
-		return 0, i.err
-	}
-
-	return i.decoder.Float64(i.value)
-}
 
 // Cache represents a cache instance.
 type Cache interface {
@@ -64,7 +23,7 @@ type Cache interface {
 	Get(key string) *Item
 
 	// GetMulti gets the items for the given keys.
-	GetMulti(keys []string) ([]*Item, error)
+	GetMulti(keys ...string) ([]*Item, error)
 
 	// Set sets the item in the cache.
 	Set(key string, value interface{}, expire time.Duration) error
@@ -103,9 +62,9 @@ func Get(ctx context.Context, key string) *Item {
 }
 
 // GetMulti gets the items for the given keys.
-func GetMulti(ctx context.Context, keys []string) ([]*Item, error) {
+func GetMulti(ctx context.Context, keys ...string) ([]*Item, error) {
 	c := getCache(ctx)
-	return c.GetMulti(keys)
+	return c.GetMulti(keys...)
 }
 
 // Set sets the item in the cache.
@@ -153,7 +112,15 @@ func getCache(ctx context.Context) Cache {
 
 type nullDecoder struct{}
 
+func (d nullDecoder) Bool(v []byte) (bool, error) {
+	return false, nil
+}
+
 func (d nullDecoder) Int64(v []byte) (int64, error) {
+	return 0, nil
+}
+
+func (d nullDecoder) Uint64(v []byte) (uint64, error) {
 	return 0, nil
 }
 
@@ -169,7 +136,7 @@ func (c nullCache) Get(key string) *Item {
 }
 
 // GetMulti gets the items for the given keys.
-func (c nullCache) GetMulti(keys []string) ([]*Item, error) {
+func (c nullCache) GetMulti(keys ...string) ([]*Item, error) {
 	return []*Item{}, nil
 }
 

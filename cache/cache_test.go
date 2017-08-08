@@ -25,7 +25,7 @@ func TestGetMulti(t *testing.T) {
 	m.On("GetMulti", []string{"test"}).Return([]*cache.Item{&cache.Item{}}, nil)
 	ctx := cache.WithCache(context.Background(), m)
 
-	cache.GetMulti(ctx, []string{"test"})
+	cache.GetMulti(ctx, "test")
 
 	m.AssertExpectations(t)
 }
@@ -98,12 +98,28 @@ func TestNullCache_Get(t *testing.T) {
 	assert.Equal(t, []byte{}, v)
 }
 
+func TestNullCache_GetBool(t *testing.T) {
+	i := cache.Null.Get("test")
+	b, err := i.Bool()
+
+	assert.NoError(t, err)
+	assert.Equal(t, false, b)
+}
+
 func TestNullCache_GetInt64(t *testing.T) {
 	i := cache.Null.Get("test")
 	b, err := i.Int64()
 
 	assert.NoError(t, err)
 	assert.Equal(t, int64(0), b)
+}
+
+func TestNullCache_GetUint64(t *testing.T) {
+	i := cache.Null.Get("test")
+	b, err := i.Uint64()
+
+	assert.NoError(t, err)
+	assert.Equal(t, uint64(0), b)
 }
 
 func TestNullCache_GetFloat64(t *testing.T) {
@@ -115,7 +131,7 @@ func TestNullCache_GetFloat64(t *testing.T) {
 }
 
 func TestNullCache_GetMulti(t *testing.T) {
-	v, err := cache.Null.GetMulti([]string{"test"})
+	v, err := cache.Null.GetMulti("test")
 
 	assert.NoError(t, err)
 	assert.Len(t, v, 0)
@@ -160,7 +176,7 @@ func (c *MockCache) Get(key string) *cache.Item {
 	return args.Get(0).(*cache.Item)
 }
 
-func (c *MockCache) GetMulti(keys []string) ([]*cache.Item, error) {
+func (c *MockCache) GetMulti(keys ...string) ([]*cache.Item, error) {
 	args := c.Called(keys)
 	return args.Get(0).([]*cache.Item), args.Error(1)
 }
