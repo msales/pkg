@@ -13,7 +13,7 @@ type Statsd struct {
 }
 
 // NewStatsd create a Statsd instance.
-func NewStatsd(addr, prefix string) (*Statsd, error) {
+func NewStatsd(addr, prefix string) (Stats, error) {
 	c, err := statsd.NewClient(addr, prefix)
 	if err != nil {
 		return nil, err
@@ -48,35 +48,48 @@ func (s Statsd) Timing(name string, value time.Duration, rate float32, tags map[
 	return s.client.TimingDuration(name, value, rate)
 }
 
-// FlushOptions represents options for flushing BufferedStatsd.
-//
-// If Interval is 0ms, defaults to 300ms.
-//
-// If Bytes is 0, defaults to 1432 bytes
-type FlushOptions struct {
-	Interval time.Duration
-	Bytes    int
+// BufferedStatsdFunc represents an configuration function for BufferedStatsd.
+type BufferedStatsdFunc func(*BufferedStatsd)
+
+// WithFlushInterval sets the maximum flushInterval for packet sending.
+// Defaults to 300ms.
+func WithFlushInterval(interval time.Duration) BufferedStatsdFunc {
+	return func(s *BufferedStatsd) {
+		s.flushInterval = interval
+	}
+}
+
+// WithFlushBytes sets the maximum udp packet size that will be sent.
+// Defaults to 1432 flushBytes.
+func WithFlushBytes(bytes int) BufferedStatsdFunc {
+	return func(s *BufferedStatsd) {
+		s.flushBytes = bytes
+	}
 }
 
 // BufferedStatsd represents a buffered statsd client.
 type BufferedStatsd struct {
 	client statsd.Statter
+
+	flushInterval time.Duration
+	flushBytes    int
 }
 
 // NewBufferedStatsd create a buffered Statsd instance.
-func NewBufferedStatsd(addr, prefix string, opts *FlushOptions) (*BufferedStatsd, error) {
-	if opts == nil {
-		opts = &FlushOptions{}
+func NewBufferedStatsd(addr, prefix string, opts ...BufferedStatsdFunc) (*BufferedStatsd, error) {
+	s := &BufferedStatsd{}
+
+	for _, o := range opts {
+		o(s)
 	}
 
-	c, err := statsd.NewBufferedClient(addr, prefix, opts.Interval, opts.Bytes)
+	c, err := statsd.NewBufferedClient(addr, prefix, s.flushInterval, s.flushBytes)
 	if err != nil {
 		return nil, err
 	}
+	s.client = c
 
-	return &BufferedStatsd{
-		client: c,
-	}, nil
+	return s, nil
 }
 
 // Inc increments a count by the value.
