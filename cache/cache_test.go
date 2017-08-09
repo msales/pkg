@@ -210,3 +210,54 @@ func (c *MockCache) Dec(key string, value uint64) (int64, error) {
 	args := c.Called(key, value)
 	return args.Get(0).(int64), args.Error(1)
 }
+
+func runCacheTests(t *testing.T, c cache.Cache) {
+	// Set
+	err := c.Set("test", "foobar", 0)
+	assert.NoError(t, err)
+
+	// Get
+	str, err := c.Get("test").String()
+	assert.NoError(t, err)
+	assert.Equal(t, "foobar", str)
+	_, err = c.Get("_").String()
+	assert.EqualError(t, err, cache.CacheMissError.Error())
+
+	// Add
+	err = c.Add("test1", "foobar", 0)
+	assert.NoError(t, err)
+	err = c.Add("test1", "foobar", 0)
+	assert.EqualError(t, err, cache.NotStoredError.Error())
+
+	// Replace
+	err = c.Replace("test1", "foobar", 0)
+	assert.NoError(t, err)
+	err = c.Replace("_", "foobar", 0)
+	assert.EqualError(t, err, cache.NotStoredError.Error())
+
+	// GetMulti
+	v, err := c.GetMulti("test", "test1", "_")
+	assert.NoError(t, err)
+	assert.Len(t, v, 3)
+	assert.EqualError(t, v[2].Err(), "cache: miss")
+
+	// Delete
+	err = c.Delete("test1")
+	assert.NoError(t, err)
+	_, err = c.Get("test1").String()
+	assert.Error(t, err)
+
+	// Inc
+	err = c.Set("test2", 1, 0)
+	assert.NoError(t, err)
+	i, err := c.Inc("test2", 1)
+	assert.NoError(t, err)
+	assert.Equal(t, int64(2), i)
+
+	// Dec
+	err = c.Set("test2", 1, 0)
+	assert.NoError(t, err)
+	i, err = c.Dec("test2", 1)
+	assert.NoError(t, err)
+	assert.Equal(t, int64(0), i)
+}

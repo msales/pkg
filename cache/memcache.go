@@ -50,7 +50,7 @@ func (c memcacheCache) Get(key string) *Item {
 	v, err := c.client.Get(key)
 	switch err {
 	case memcache.ErrCacheMiss:
-		err = ErrCacheMiss
+		err = CacheMissError
 	case nil:
 		b = v.Value
 	}
@@ -71,7 +71,7 @@ func (c memcacheCache) GetMulti(keys ...string) ([]*Item, error) {
 
 	i := []*Item{}
 	for _, k := range keys {
-		var err error = ErrCacheMiss
+		var err error = CacheMissError
 		var b []byte
 		if v, ok := val[k]; ok {
 			b = v.Value
@@ -109,11 +109,15 @@ func (c memcacheCache) Add(key string, value interface{}, expire time.Duration) 
 		return err
 	}
 
-	return c.client.Add(&memcache.Item{
+	err = c.client.Add(&memcache.Item{
 		Key:        key,
 		Value:      v,
 		Expiration: int32(expire.Seconds()),
 	})
+	if err == memcache.ErrNotStored {
+		return NotStoredError
+	}
+	return err
 }
 
 // Replace sets the item in the cache, but only if the key already exists.
@@ -123,11 +127,16 @@ func (c memcacheCache) Replace(key string, value interface{}, expire time.Durati
 		return err
 	}
 
-	return c.client.Replace(&memcache.Item{
+	err = c.client.Replace(&memcache.Item{
 		Key:        key,
 		Value:      v,
 		Expiration: int32(expire.Seconds()),
 	})
+
+	if err == memcache.ErrNotStored {
+		return NotStoredError
+	}
+	return err
 }
 
 // Delete deletes the item with the given key.
