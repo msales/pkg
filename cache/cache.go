@@ -11,12 +11,12 @@ const (
 )
 
 var (
-	// CacheMissError means that a Get failed because the item wasn't present.
-	CacheMissError = errors.New("cache: miss")
+	// ErrCacheMiss means that a Get failed because the item wasn't present.
+	ErrCacheMiss = errors.New("cache: miss")
 
-	// NotStoredError means the conditional write (Add or Replace) failed because
+	// ErrNotStored means the conditional write (Add or Replace) failed because
 	// the condition was not met.
-	NotStoredError = errors.New("cache: not stored")
+	ErrNotStored = errors.New("cache: not stored")
 
 	// Null is the null Cache instance.
 	Null = &nullCache{}

@@ -65,7 +65,7 @@ func NewRedis(uri string, opts ...RedisOptionsFunc) (Cache, error) {
 func (c redisCache) Get(key string) *Item {
 	b, err := c.client.Get(key).Bytes()
 	if err == redis.Nil {
-		err = CacheMissError
+		err = ErrCacheMiss
 	}
 
 	return &Item{
@@ -84,7 +84,7 @@ func (c redisCache) GetMulti(keys ...string) ([]*Item, error) {
 
 	i := []*Item{}
 	for _, v := range val {
-		var err error = CacheMissError
+		var err error = ErrCacheMiss
 		var b []byte
 		if v != nil {
 			b = []byte(v.(string))
@@ -109,7 +109,7 @@ func (c redisCache) Set(key string, value interface{}, expire time.Duration) err
 // Add sets the item in the cache, but only if the key does not already exist.
 func (c redisCache) Add(key string, value interface{}, expire time.Duration) error {
 	if !c.client.SetNX(key, value, expire).Val() {
-		return NotStoredError
+		return ErrNotStored
 	}
 	return nil
 }
@@ -117,7 +117,7 @@ func (c redisCache) Add(key string, value interface{}, expire time.Duration) err
 // Replace sets the item in the cache, but only if the key already exists.
 func (c redisCache) Replace(key string, value interface{}, expire time.Duration) error {
 	if !c.client.SetXX(key, value, expire).Val() {
-		return NotStoredError
+		return ErrNotStored
 	}
 	return nil
 }

@@ -221,19 +221,19 @@ func runCacheTests(t *testing.T, c cache.Cache) {
 	assert.NoError(t, err)
 	assert.Equal(t, "foobar", str)
 	_, err = c.Get("_").String()
-	assert.EqualError(t, err, cache.CacheMissError.Error())
+	assert.EqualError(t, err, cache.ErrCacheMiss.Error())
 
 	// Add
 	err = c.Add("test1", "foobar", 0)
 	assert.NoError(t, err)
 	err = c.Add("test1", "foobar", 0)
-	assert.EqualError(t, err, cache.NotStoredError.Error())
+	assert.EqualError(t, err, cache.ErrNotStored.Error())
 
 	// Replace
 	err = c.Replace("test1", "foobar", 0)
 	assert.NoError(t, err)
 	err = c.Replace("_", "foobar", 0)
-	assert.EqualError(t, err, cache.NotStoredError.Error())
+	assert.EqualError(t, err, cache.ErrNotStored.Error())
 
 	// GetMulti
 	v, err := c.GetMulti("test", "test1", "_")

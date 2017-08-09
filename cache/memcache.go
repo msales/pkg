@@ -53,7 +53,7 @@ func (c memcacheCache) Get(key string) *Item {
 	v, err := c.client.Get(key)
 	switch err {
 	case memcache.ErrCacheMiss:
-		err = CacheMissError
+		err = ErrCacheMiss
 	case nil:
 		b = v.Value
 	}
@@ -74,7 +74,7 @@ func (c memcacheCache) GetMulti(keys ...string) ([]*Item, error) {
 
 	i := []*Item{}
 	for _, k := range keys {
-		var err error = CacheMissError
+		var err error = ErrCacheMiss
 		var b []byte
 		if v, ok := val[k]; ok {
 			b = v.Value
@@ -118,7 +118,7 @@ func (c memcacheCache) Add(key string, value interface{}, expire time.Duration) 
 		Expiration: int32(expire.Seconds()),
 	})
 	if err == memcache.ErrNotStored {
-		return NotStoredError
+		return ErrNotStored
 	}
 	return err
 }
@@ -137,7 +137,7 @@ func (c memcacheCache) Replace(key string, value interface{}, expire time.Durati
 	})
 
 	if err == memcache.ErrNotStored {
-		return NotStoredError
+		return ErrNotStored
 	}
 	return err
 }
