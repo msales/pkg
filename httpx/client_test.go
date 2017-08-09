@@ -1,10 +1,10 @@
 package httpx_test
 
 import (
+	"bytes"
 	"net/http"
 	"net/http/httptest"
 	"testing"
-	"bytes"
 
 	"github.com/msales/pkg/httpx"
 	"github.com/stretchr/testify/assert"

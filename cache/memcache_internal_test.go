@@ -1,6 +1,7 @@
 package cache
 
 import (
+	"errors"
 	"testing"
 	"time"
 
@@ -30,6 +31,18 @@ func TestNewMemcache(t *testing.T) {
 	assert.Equal(t, 12, c.client.MaxIdleConns)
 }
 
+func TestEncoderError(t *testing.T) {
+	c := memcacheCache{
+		encoder: func(v interface{}) ([]byte, error) {
+			return nil, errors.New("test error")
+		},
+	}
+
+	assert.EqualError(t, c.Add("test", 1, 0), "test error")
+	assert.EqualError(t, c.Set("test", 1, 0), "test error")
+	assert.EqualError(t, c.Replace("test", 1, 0), "test error")
+}
+
 func TestByteEncode(t *testing.T) {
 	tests := []struct {
 		v      interface{}
@@ -46,7 +59,7 @@ func TestByteEncode(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		got, err := byteEncode(tt.v)
+		got, err := memcacheEncoder(tt.v)
 		assert.NoError(t, err)
 
 		assert.Equal(t, tt.expect, got)

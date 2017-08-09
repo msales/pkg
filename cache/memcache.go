@@ -26,7 +26,9 @@ func WithTimeout(timeout time.Duration) MemcacheOptionsFunc {
 }
 
 type memcacheCache struct {
-	client  *memcache.Client
+	client *memcache.Client
+
+	encoder func(v interface{}) ([]byte, error)
 	decoder decoder
 }
 
@@ -40,6 +42,7 @@ func NewMemcache(uri string, opts ...MemcacheOptionsFunc) Cache {
 
 	return &memcacheCache{
 		client:  c,
+		encoder: memcacheEncoder,
 		decoder: stringDecoder{},
 	}
 }
@@ -90,7 +93,7 @@ func (c memcacheCache) GetMulti(keys ...string) ([]*Item, error) {
 
 // Set sets the item in the cache.
 func (c memcacheCache) Set(key string, value interface{}, expire time.Duration) error {
-	v, err := byteEncode(value)
+	v, err := c.encoder(value)
 	if err != nil {
 		return err
 	}
@@ -104,7 +107,7 @@ func (c memcacheCache) Set(key string, value interface{}, expire time.Duration) 
 
 // Add sets the item in the cache, but only if the key does not already exist.
 func (c memcacheCache) Add(key string, value interface{}, expire time.Duration) error {
-	v, err := byteEncode(value)
+	v, err := c.encoder(value)
 	if err != nil {
 		return err
 	}
@@ -122,7 +125,7 @@ func (c memcacheCache) Add(key string, value interface{}, expire time.Duration) 
 
 // Replace sets the item in the cache, but only if the key already exists.
 func (c memcacheCache) Replace(key string, value interface{}, expire time.Duration) error {
-	v, err := byteEncode(value)
+	v, err := c.encoder(value)
 	if err != nil {
 		return err
 	}
@@ -156,7 +159,7 @@ func (c memcacheCache) Dec(key string, value uint64) (int64, error) {
 	return int64(v), err
 }
 
-func byteEncode(v interface{}) ([]byte, error) {
+func memcacheEncoder(v interface{}) ([]byte, error) {
 	switch v.(type) {
 	case bool:
 		if v.(bool) {
