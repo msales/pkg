@@ -2,11 +2,11 @@ package stats
 
 import (
 	"bytes"
+	"fmt"
+	"strings"
 	"time"
 
 	"github.com/msales/pkg/log"
-	"fmt"
-	"strings"
 )
 
 // Statsd represents a statsd client.

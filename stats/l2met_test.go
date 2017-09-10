@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/nrwiersma/pkg/stats"
+	"github.com/msales/pkg/stats"
 	"github.com/stretchr/testify/assert"
 )
 
