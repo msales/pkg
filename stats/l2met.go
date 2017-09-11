@@ -49,7 +49,7 @@ func (s L2met) Gauge(name string, value float64, rate float32, tags map[string]s
 
 // Timing sends the value of a Duration.
 func (s L2met) Timing(name string, value time.Duration, rate float32, tags map[string]string) error {
-	msg := s.formatL2metMetric(name, fmt.Sprintf("%v", value), "measure", tags)
+	msg := s.formatL2metMetric(name, fmt.Sprintf("%dms", int64(value/time.Millisecond)), "measure", tags)
 	s.log.Info(msg)
 
 	return nil

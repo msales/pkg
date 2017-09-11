@@ -39,9 +39,9 @@ func TestL2met_Timing(t *testing.T) {
 	l := &testLogger{}
 	s := stats.NewL2met(l, "test")
 
-	s.Timing("test", 2*time.Second, 1.0, map[string]string{"test": "test"})
+	s.Timing("test", 2*time.Second + 2*time.Microsecond, 1.0, map[string]string{"test": "test"})
 
-	assert.Equal(t, "test=test measure#test.test=2s", l.msg)
+	assert.Equal(t, "test=test measure#test.test=2000ms", l.msg)
 }
 
 type testLogger struct {
