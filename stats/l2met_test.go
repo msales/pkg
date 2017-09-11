@@ -32,7 +32,7 @@ func TestL2met_Gauge(t *testing.T) {
 
 	s.Gauge("test", 2.1, 1.0, map[string]string{"test": "test"})
 
-	assert.Equal(t, "test=test measure#test.test=2.1", l.msg)
+	assert.Equal(t, "test=test sample#test.test=2.1", l.msg)
 }
 
 func TestL2met_Timing(t *testing.T) {

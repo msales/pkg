@@ -41,7 +41,7 @@ func (s L2met) Dec(name string, value int64, rate float32, tags map[string]strin
 
 // Gauge measures the value of a metric.
 func (s L2met) Gauge(name string, value float64, rate float32, tags map[string]string) error {
-	msg := s.formatL2metMetric(name, fmt.Sprintf("%v", value), "measure", tags)
+	msg := s.formatL2metMetric(name, fmt.Sprintf("%v", value), "sample", tags)
 	s.log.Info(msg)
 
 	return nil
