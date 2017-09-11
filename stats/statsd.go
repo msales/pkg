@@ -26,25 +26,25 @@ func NewStatsd(addr, prefix string) (Stats, error) {
 
 // Inc increments a count by the value.
 func (s Statsd) Inc(name string, value int64, rate float32, tags map[string]string) error {
-	name += formatTags(tags)
+	name += formatStatsdTags(tags)
 	return s.client.Inc(name, value, rate)
 }
 
 // Dec decrements a count by the value.
 func (s Statsd) Dec(name string, value int64, rate float32, tags map[string]string) error {
-	name += formatTags(tags)
+	name += formatStatsdTags(tags)
 	return s.client.Dec(name, value, rate)
 }
 
 // Gauge measures the value of a metric.
 func (s Statsd) Gauge(name string, value float64, rate float32, tags map[string]string) error {
-	name += formatTags(tags)
+	name += formatStatsdTags(tags)
 	return s.client.Gauge(name, int64(value), rate)
 }
 
 // Timing sends the value of a Duration.
 func (s Statsd) Timing(name string, value time.Duration, rate float32, tags map[string]string) error {
-	name += formatTags(tags)
+	name += formatStatsdTags(tags)
 	return s.client.TimingDuration(name, value, rate)
 }
 
@@ -94,30 +94,30 @@ func NewBufferedStatsd(addr, prefix string, opts ...BufferedStatsdFunc) (*Buffer
 
 // Inc increments a count by the value.
 func (s BufferedStatsd) Inc(name string, value int64, rate float32, tags map[string]string) error {
-	name += formatTags(tags)
+	name += formatStatsdTags(tags)
 	return s.client.Inc(name, value, rate)
 }
 
 // Dec decrements a count by the value.
 func (s BufferedStatsd) Dec(name string, value int64, rate float32, tags map[string]string) error {
-	name += formatTags(tags)
+	name += formatStatsdTags(tags)
 	return s.client.Dec(name, value, rate)
 }
 
 // Gauge measures the value of a metric.
 func (s BufferedStatsd) Gauge(name string, value float64, rate float32, tags map[string]string) error {
-	name += formatTags(tags)
+	name += formatStatsdTags(tags)
 	return s.client.Gauge(name, int64(value), rate)
 }
 
 // Timing sends the value of a Duration.
 func (s BufferedStatsd) Timing(name string, value time.Duration, rate float32, tags map[string]string) error {
-	name += formatTags(tags)
+	name += formatStatsdTags(tags)
 	return s.client.TimingDuration(name, value, rate)
 }
 
-// formatTags formats into an InfluxDB style string
-func formatTags(tags map[string]string) string {
+// formatStatsdTags formats into an InfluxDB style string
+func formatStatsdTags(tags map[string]string) string {
 	if len(tags) == 0 {
 		return ""
 	}

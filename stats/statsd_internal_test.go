@@ -167,16 +167,16 @@ func TestBufferedStatsd_Timing(t *testing.T) {
 	assert.Equal(t, "1000", sent[0].Value)
 }
 
-func TestFormatTags(t *testing.T) {
+func TestFormatStatsdTags(t *testing.T) {
 	tags := map[string]string{
 		"test": "test",
 		"foo":  "bar",
 	}
 
-	assert.Equal(t, "", formatTags(nil))
-	assert.Equal(t, "", formatTags(map[string]string{}))
+	assert.Equal(t, "", formatStatsdTags(nil))
+	assert.Equal(t, "", formatStatsdTags(map[string]string{}))
 
-	got := formatTags(tags)
+	got := formatStatsdTags(tags)
 	assert.Contains(t, got, ",test=test")
 	assert.Contains(t, got, ",foo=bar")
 }
