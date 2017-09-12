@@ -84,7 +84,7 @@ func (c redisCache) GetMulti(keys ...string) ([]*Item, error) {
 
 	i := []*Item{}
 	for _, v := range val {
-		var err error = ErrCacheMiss
+		var err = ErrCacheMiss
 		var b []byte
 		if v != nil {
 			b = []byte(v.(string))

@@ -42,14 +42,14 @@ type MockLogger struct {
 	mock.Mock
 }
 
-func (m MockLogger) Debug(msg string, ctx ...interface{}) {
+func (m *MockLogger) Debug(msg string, ctx ...interface{}) {
 	m.Called(msg, ctx)
 }
 
-func (m MockLogger) Info(msg string, ctx ...interface{}) {
+func (m *MockLogger) Info(msg string, ctx ...interface{}) {
 	m.Called(msg, ctx)
 }
 
-func (m MockLogger) Error(msg string, ctx ...interface{}) {
+func (m *MockLogger) Error(msg string, ctx ...interface{}) {
 	m.Called(msg, ctx)
 }

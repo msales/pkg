@@ -6,8 +6,10 @@ import (
 	"time"
 )
 
+type key int
+
 const (
-	ctxKey = "pkg.cache"
+	ctxKey key = iota
 )
 
 var (

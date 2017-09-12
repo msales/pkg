@@ -9,13 +9,13 @@ import (
 	"github.com/msales/pkg/log"
 )
 
-// Statsd represents a statsd client.
+// L2met represents a l2met client.
 type L2met struct {
 	log    log.Logger
 	prefix string
 }
 
-// NewStatsd create a Statsd instance.
+// NewL2met create a l2met instance.
 func NewL2met(l log.Logger, prefix string) Stats {
 	return &L2met{
 		log:    l,
