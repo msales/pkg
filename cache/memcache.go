@@ -74,7 +74,7 @@ func (c memcacheCache) GetMulti(keys ...string) ([]*Item, error) {
 
 	i := []*Item{}
 	for _, k := range keys {
-		var err error = ErrCacheMiss
+		var err = ErrCacheMiss
 		var b []byte
 		if v, ok := val[k]; ok {
 			b = v.Value

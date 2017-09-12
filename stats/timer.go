@@ -5,6 +5,14 @@ import (
 	"time"
 )
 
+// Timer represents a timer.
+type Timer interface {
+	// Start starts the timer.
+	Start()
+	// Done stops the timer and submits the Timing metric.
+	Done()
+}
+
 type timer struct {
 	start time.Time
 	ctx   context.Context
@@ -14,7 +22,7 @@ type timer struct {
 }
 
 // Time is a shorthand for Timing.
-func Time(ctx context.Context, name string, rate float32, tags map[string]string) *timer {
+func Time(ctx context.Context, name string, rate float32, tags map[string]string) Timer {
 	t := &timer{ctx: ctx, name: name, rate: rate, tags: tags}
 	t.Start()
 	return t

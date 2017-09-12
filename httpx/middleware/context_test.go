@@ -13,9 +13,9 @@ import (
 func TestWithContext(t *testing.T) {
 	ctx := context.WithValue(context.Background(), "test", "test")
 
-	h := middleware.WithContext(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	h := middleware.WithContext(ctx, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, ctx, r.Context())
-	}), ctx)
+	}))
 
 	req, _ := http.NewRequest("GET", "/", nil)
 	resp := httptest.NewRecorder()
