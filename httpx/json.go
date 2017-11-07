@@ -6,9 +6,11 @@ import (
 )
 
 const (
+	// JSONContentType represents MIME type for JSON content.
 	JSONContentType = "application/json"
 )
 
+// WriteJSONResponse encodes json content to the ResponseWriter.
 func WriteJSONResponse(w http.ResponseWriter, code int, v interface{}) error {
 	raw, err := json.Marshal(v)
 	if err != nil {
