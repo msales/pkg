@@ -69,4 +69,5 @@ func (r *runtimeStats) send(stats Stats) {
 	stats.Gauge("runtime.memory.gc.last", float64(r.MemStats.LastGC), 1.0, nil)
 	stats.Gauge("runtime.memory.gc.next", float64(r.MemStats.NextGC), 1.0, nil)
 	stats.Gauge("runtime.memory.gc.count", float64(r.MemStats.NumGC), 1.0, nil)
+	stats.Timing("runtime.memory.gc.pause", time.Duration(r.MemStats.PauseTotalNs), 1.0, nil)
 }
