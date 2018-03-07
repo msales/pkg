@@ -11,6 +11,7 @@ import (
 func TestRuntime(t *testing.T) {
 	m := new(MockStats)
 	m.On("Gauge", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil)
+	m.On("Timing", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil)
 	stats.DefaultRuntimeInterval = time.Microsecond
 
 	go stats.Runtime(m)
