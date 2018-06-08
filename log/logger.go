@@ -1,6 +1,9 @@
 package log
 
-import "context"
+import (
+	"context"
+	"os"
+)
 
 type key int
 
@@ -53,6 +56,12 @@ func Error(ctx context.Context, msg string, pairs ...interface{}) {
 	withLogger(ctx, func(l Logger) {
 		l.Error(msg, pairs...)
 	})
+}
+
+// Fatal is equivalent to Error() followed by a call to os.Exit(1).
+func Fatal(ctx context.Context, msg string, pairs ...interface{}) {
+	Error(ctx, msg, pairs...)
+	os.Exit(1)
 }
 
 func withLogger(ctx context.Context, fn func(l Logger)) {
