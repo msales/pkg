@@ -2,23 +2,27 @@ sudo: false
 
 language: go
 go:
-  - 1.8
-  - 1.9
+  - "1.10"
+  - "1.x"
 
 services:
   - redis-server
   - memcached
 
 before_install:
-  - go get -u github.com/golang/dep/cmd/dep github.com/golang/lint/golint
+  - curl -L -s https://github.com/golang/dep/releases/download/v0.4.1/dep-linux-amd64 -o $GOPATH/bin/dep
+  - chmod +x $GOPATH/bin/dep
+  - go get -u github.com/golang/lint/golint
   - go get github.com/mattn/goveralls
   - go get golang.org/x/tools/cmd/cover
 
-script:
+install:
   - dep ensure
+
+script:
   - golint $(go list ./... | grep -v /vendor/)
-  - go vet $(go list ./... | grep -v /vendor/)
-  - go test -cover $(go list ./... | grep -v /vendor/)
+  - go vet ./...
+  - go test -cover ./...
   - $HOME/gopath/bin/goveralls -service=travis-ci
 
 notifications:
