@@ -3,6 +3,7 @@ package stats
 import (
 	"context"
 	"time"
+	"io"
 )
 
 type key int
@@ -18,6 +19,8 @@ var (
 
 // Stats represents a stats instance.
 type Stats interface {
+	io.Closer
+
 	// Inc increments a count by the value.
 	Inc(name string, value int64, rate float32, tags map[string]string) error
 
@@ -70,6 +73,13 @@ func Timing(ctx context.Context, name string, value time.Duration, rate float32,
 	})
 }
 
+// Close closes the client and flushes buffered stats, if applicable
+func Close(ctx context.Context) error {
+	return withStats(ctx, func(s Stats) error {
+		return s.Close()
+	})
+}
+
 func withStats(ctx context.Context, fn func(s Stats) error) error {
 	if s, ok := FromContext(ctx); ok {
 		return fn(s)
@@ -92,6 +102,10 @@ func (s nullStats) Gauge(name string, value float64, rate float32, tags map[stri
 }
 
 func (s nullStats) Timing(name string, value time.Duration, rate float32, tags map[string]string) error {
+	return nil
+}
+
+func (s nullStats) Close() error {
 	return nil
 }
 
@@ -127,6 +141,11 @@ func (s TaggedStats) Gauge(name string, value float64, rate float32, tags map[st
 // Timing sends the value of a Duration.
 func (s TaggedStats) Timing(name string, value time.Duration, rate float32, tags map[string]string) error {
 	return s.stats.Timing(name, value, rate, s.collectTags(tags))
+}
+
+// Close closes the client and flushes buffered stats, if applicable
+func (s TaggedStats) Close() error {
+	return s.stats.Close()
 }
 
 func (s TaggedStats) collectTags(tags map[string]string) map[string]string {

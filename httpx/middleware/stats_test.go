@@ -72,3 +72,8 @@ func (m *MockStats) Timing(name string, value time.Duration, rate float32, tags 
 	args := m.Called(name, value, rate, tags)
 	return args.Error(0)
 }
+
+func (m *MockStats) Close() error {
+	args := m.Called()
+	return args.Error(0)
+}

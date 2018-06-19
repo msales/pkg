@@ -48,6 +48,11 @@ func (s Statsd) Timing(name string, value time.Duration, rate float32, tags map[
 	return s.client.TimingDuration(name, value, rate)
 }
 
+// Close closes the client and flushes buffered stats, if applicable
+func (s Statsd) Close() error {
+	return s.client.Close()
+}
+
 // BufferedStatsdFunc represents an configuration function for BufferedStatsd.
 type BufferedStatsdFunc func(*BufferedStatsd)
 
@@ -114,6 +119,11 @@ func (s BufferedStatsd) Gauge(name string, value float64, rate float32, tags map
 func (s BufferedStatsd) Timing(name string, value time.Duration, rate float32, tags map[string]string) error {
 	name += formatStatsdTags(tags)
 	return s.client.TimingDuration(name, value, rate)
+}
+
+// Close closes the client and flushes buffered stats, if applicable
+func (s BufferedStatsd) Close() error {
+	return s.client.Close()
 }
 
 // formatStatsdTags formats into an InfluxDB style string

@@ -44,6 +44,15 @@ func TestL2met_Timing(t *testing.T) {
 	assert.Equal(t, "test=test measure#test.test=2000ms", l.msg)
 }
 
+func TestL2met_Close(t *testing.T) {
+	l := &testLogger{}
+	s := stats.NewL2met(l, "test")
+
+	err := s.Close()
+
+	assert.NoError(t, err)
+}
+
 type testLogger struct {
 	msg string
 	ctx []interface{}
