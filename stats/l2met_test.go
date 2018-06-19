@@ -50,7 +50,7 @@ func TestL2met_Close(t *testing.T) {
 
 	err := s.Close()
 
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 }
 
 type testLogger struct {

@@ -63,8 +63,8 @@ func TestClose(t *testing.T) {
 func TestTaggedStats_Inc(t *testing.T) {
 	m := new(MockStats)
 	m.On("Inc", "test", int64(1), float32(1), map[string]string{"foo": "bar", "global": "foobar"}).Return(nil)
-
 	s := stats.NewTaggedStats(m, map[string]string{"global": "foobar"})
+
 	s.Inc("test", 1, 1.0, map[string]string{"foo": "bar"})
 
 	m.AssertExpectations(t)
@@ -73,8 +73,8 @@ func TestTaggedStats_Inc(t *testing.T) {
 func TestTaggedStats_Dec(t *testing.T) {
 	m := new(MockStats)
 	m.On("Dec", "test", int64(1), float32(1), map[string]string{"foo": "bar", "global": "foobar"}).Return(nil)
-
 	s := stats.NewTaggedStats(m, map[string]string{"global": "foobar"})
+
 	s.Dec("test", 1, 1.0, map[string]string{"foo": "bar"})
 
 	m.AssertExpectations(t)
@@ -83,8 +83,8 @@ func TestTaggedStats_Dec(t *testing.T) {
 func TestTaggedStats_Gauge(t *testing.T) {
 	m := new(MockStats)
 	m.On("Gauge", "test", float64(1), float32(1), map[string]string{"foo": "bar", "global": "foobar"}).Return(nil)
-
 	s := stats.NewTaggedStats(m, map[string]string{"global": "foobar"})
+
 	s.Gauge("test", 1.0, 1.0, map[string]string{"foo": "bar"})
 
 	m.AssertExpectations(t)
@@ -93,8 +93,8 @@ func TestTaggedStats_Gauge(t *testing.T) {
 func TestTaggedStats_Timing(t *testing.T) {
 	m := new(MockStats)
 	m.On("Timing", "test", time.Millisecond, float32(1), map[string]string{"foo": "bar", "global": "foobar"}).Return(nil)
-
 	s := stats.NewTaggedStats(m, map[string]string{"global": "foobar"})
+
 	s.Timing("test", time.Millisecond, 1.0, map[string]string{"foo": "bar"})
 
 	m.AssertExpectations(t)
@@ -103,8 +103,8 @@ func TestTaggedStats_Timing(t *testing.T) {
 func TestTaggedStats_Close(t *testing.T) {
 	m := new(MockStats)
 	m.On("Close").Return(nil)
-
 	s := stats.NewTaggedStats(m, map[string]string{"global": "foobar"})
+	
 	s.Close()
 
 	m.AssertExpectations(t)
