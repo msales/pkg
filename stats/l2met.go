@@ -55,6 +55,11 @@ func (s L2met) Timing(name string, value time.Duration, rate float32, tags map[s
 	return nil
 }
 
+// Close closes the client and flushes buffered stats, if applicable
+func (s L2met) Close() error {
+	return nil
+}
+
 func (s L2met) formatL2metMetric(name, value, measure string, tags map[string]string) string {
 	if s.prefix != "" {
 		name = strings.Join([]string{s.prefix, name}, ".")
