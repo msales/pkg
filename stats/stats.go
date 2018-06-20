@@ -149,13 +149,15 @@ func (s TaggedStats) Close() error {
 }
 
 func (s TaggedStats) collectTags(tags map[string]string) map[string]string {
-	res := make(map[string]string)
-	for k, v := range s.tags {
-		res[k] = v
+	if tags == nil {
+		return s.tags
 	}
-	for k, v := range tags {
-		res[k] = v
+	
+	for k, v := range s.tags {
+		if _, ok := tags[k]; !ok {
+			tags[k] = v
+		}
 	}
 
-	return res
+	return tags
 }
