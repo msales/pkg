@@ -84,7 +84,7 @@ func TestTaggedStats_CollectTags(t *testing.T) {
 	}
 }
 
-func BenchmarkCollectTags(b *testing.B) {
+func BenchmarkTaggedStats_CollectTags(b *testing.B) {
 	tags := map[string]string{
 		"test1": "test",
 		"test2": "test",
