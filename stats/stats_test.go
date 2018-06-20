@@ -104,12 +104,11 @@ func TestTaggedStats_Close(t *testing.T) {
 	m := new(MockStats)
 	m.On("Close").Return(nil)
 	s := stats.NewTaggedStats(m, map[string]string{"global": "foobar"})
-	
+
 	s.Close()
 
 	m.AssertExpectations(t)
 }
-
 
 type MockStats struct {
 	mock.Mock

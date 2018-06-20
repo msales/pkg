@@ -84,6 +84,29 @@ func TestTaggedStats_CollectTags(t *testing.T) {
 	}
 }
 
+func BenchmarkTaggedStats_CollectTags(b *testing.B) {
+	tags := map[string]string{
+		"test1": "test",
+		"test2": "test",
+		"test3": "test",
+		"test4": "test",
+		"test5": "test",
+
+	}
+	addedTags := map[string]string{
+		"k1":  "v",
+		"k2":  "v",
+		"k3":  "v",
+		"k4":  "v",
+		"k5":  "v",
+	}
+	s := NewTaggedStats(Null, tags)
+
+	for n := 0; n < b.N; n++ {
+		s.collectTags(addedTags)
+	}
+}
+
 func TestNullStats(t *testing.T) {
 	s := Null
 
