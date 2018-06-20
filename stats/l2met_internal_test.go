@@ -21,3 +21,25 @@ func TestFormatL2metTags(t *testing.T) {
 	assert.Contains(t, got, "test=baz")
 	assert.Contains(t, got, "foo=bar")
 }
+
+func TestFormatL2metTags_Tags(t *testing.T) {
+	tags := Tags{}.
+		With("test", "test").
+		With("foo", "bar").
+		With("test", "test")
+
+	got := formatL2metTags([]interface{}{tags})
+	assert.Contains(t, got, "test=test")
+	assert.Contains(t, got, "foo=bar")
+}
+
+func TestFormatL2metTags_Uneven(t *testing.T) {
+	tags := []interface{}{
+		"test", "test",
+		"foo",
+	}
+
+	got := formatL2metTags(tags)
+	assert.Contains(t, got, "test=test")
+	assert.Contains(t, got, "foo=<nil>")
+}

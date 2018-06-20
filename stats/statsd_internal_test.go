@@ -182,3 +182,25 @@ func TestFormatStatsdTags(t *testing.T) {
 	assert.Contains(t, got, ",test=baz")
 	assert.Contains(t, got, ",foo=bar")
 }
+
+func TestFormatStatsdTags_Tags(t *testing.T) {
+	tags := Tags{}.
+		With("test", "test").
+		With("foo", "bar").
+		With("test", "test")
+
+	got := formatStatsdTags([]interface{}{tags})
+	assert.Contains(t, got, ",test=test")
+	assert.Contains(t, got, ",foo=bar")
+}
+
+func TestFormatStatsdTags_Uneven(t *testing.T) {
+	tags := []interface{}{
+		"test", "test",
+		"foo",
+	}
+
+	got := formatStatsdTags(tags)
+	assert.Contains(t, got, ",test=test")
+	assert.Contains(t, got, ",foo=<nil>")
+}
