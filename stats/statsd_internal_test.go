@@ -28,7 +28,7 @@ func TestStatsd_Inc(t *testing.T) {
 		client: client,
 	}
 
-	s.Inc("test", 2, 1.0, map[string]string{"test": "test"})
+	s.Inc("test", 2, 1.0, "test", "test")
 
 	sent := sender.GetSent()
 	assert.Len(t, sent, 1)
@@ -45,7 +45,7 @@ func TestStatsd_Dec(t *testing.T) {
 		client: client,
 	}
 
-	s.Dec("test", 2, 1.0, map[string]string{"test": "test"})
+	s.Dec("test", 2, 1.0, "test", "test")
 
 	sent := sender.GetSent()
 	assert.Len(t, sent, 1)
@@ -62,7 +62,7 @@ func TestStatsd_Gauge(t *testing.T) {
 		client: client,
 	}
 
-	s.Gauge("test", 2.0, 1.0, map[string]string{"test": "test"})
+	s.Gauge("test", 2.0, 1.0, "test", "test")
 
 	sent := sender.GetSent()
 	assert.Len(t, sent, 1)
@@ -79,7 +79,7 @@ func TestStatsd_Timing(t *testing.T) {
 		client: client,
 	}
 
-	s.Timing("test", time.Second, 1.0, map[string]string{"test": "test"})
+	s.Timing("test", time.Second, 1.0, "test", "test")
 
 	sent := sender.GetSent()
 	assert.Len(t, sent, 1)
@@ -108,7 +108,7 @@ func TestBufferedStatsd_Inc(t *testing.T) {
 		client: client,
 	}
 
-	s.Inc("test", 2, 1.0, map[string]string{"test": "test"})
+	s.Inc("test", 2, 1.0, "test", "test")
 
 	sent := sender.GetSent()
 	assert.Len(t, sent, 1)
@@ -125,7 +125,7 @@ func TestBufferedStatsd_Dec(t *testing.T) {
 		client: client,
 	}
 
-	s.Dec("test", 2, 1.0, map[string]string{"test": "test"})
+	s.Dec("test", 2, 1.0, "test", "test")
 
 	sent := sender.GetSent()
 	assert.Len(t, sent, 1)
@@ -142,7 +142,7 @@ func TestBufferedStatsd_Gauge(t *testing.T) {
 		client: client,
 	}
 
-	s.Gauge("test", 2.0, 1.0, map[string]string{"test": "test"})
+	s.Gauge("test", 2.0, 1.0, "test", "test")
 
 	sent := sender.GetSent()
 	assert.Len(t, sent, 1)
@@ -159,7 +159,7 @@ func TestBufferedStatsd_Timing(t *testing.T) {
 		client: client,
 	}
 
-	s.Timing("test", time.Second, 1.0, map[string]string{"test": "test"})
+	s.Timing("test", time.Second, 1.0, "test", "test")
 
 	sent := sender.GetSent()
 	assert.Len(t, sent, 1)
@@ -168,15 +168,17 @@ func TestBufferedStatsd_Timing(t *testing.T) {
 }
 
 func TestFormatStatsdTags(t *testing.T) {
-	tags := map[string]string{
-		"test": "test",
-		"foo":  "bar",
+	tags := []interface{}{
+		"test", "test",
+		"foo", "bar",
+		"test", "baz",
 	}
 
 	assert.Equal(t, "", formatStatsdTags(nil))
-	assert.Equal(t, "", formatStatsdTags(map[string]string{}))
+	assert.Equal(t, "", formatStatsdTags([]interface{}{}))
 
 	got := formatStatsdTags(tags)
-	assert.Contains(t, got, ",test=test")
+	assert.NotContains(t, got, ",test=test")
+	assert.Contains(t, got, ",test=baz")
 	assert.Contains(t, got, ",foo=bar")
 }

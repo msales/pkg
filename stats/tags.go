@@ -18,3 +18,16 @@ func (t Tags) Merge(t2 Tags) Tags {
 
 	return t
 }
+
+func (t Tags) toArray() []interface{} {
+	arr := make([]interface{}, len(t)*2)
+
+	i := 0
+	for k, v := range t {
+		arr[i] = k
+		arr[i+1] = v
+		i += 2
+	}
+
+	return arr
+}

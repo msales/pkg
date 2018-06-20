@@ -2,8 +2,8 @@ package stats
 
 import (
 	"context"
-	"time"
 	"io"
+	"time"
 )
 
 type key int
@@ -22,16 +22,16 @@ type Stats interface {
 	io.Closer
 
 	// Inc increments a count by the value.
-	Inc(name string, value int64, rate float32, tags map[string]string) error
+	Inc(name string, value int64, rate float32, tags ...interface{}) error
 
 	// Dec decrements a count by the value.
-	Dec(name string, value int64, rate float32, tags map[string]string) error
+	Dec(name string, value int64, rate float32, tags ...interface{}) error
 
 	// Gauge measures the value of a metric.
-	Gauge(name string, value float64, rate float32, tags map[string]string) error
+	Gauge(name string, value float64, rate float32, tags ...interface{}) error
 
 	// Timing sends the value of a Duration.
-	Timing(name string, value time.Duration, rate float32, tags map[string]string) error
+	Timing(name string, value time.Duration, rate float32, tags ...interface{}) error
 }
 
 // WithStats sets Stats in the context.
@@ -46,30 +46,30 @@ func FromContext(ctx context.Context) (Stats, bool) {
 }
 
 // Inc increments a count by the value.
-func Inc(ctx context.Context, name string, value int64, rate float32, tags map[string]string) error {
+func Inc(ctx context.Context, name string, value int64, rate float32, tags ...interface{}) error {
 	return withStats(ctx, func(s Stats) error {
-		return s.Inc(name, value, rate, tags)
+		return s.Inc(name, value, rate, tags...)
 	})
 }
 
 // Dec decrements a count by the value.
-func Dec(ctx context.Context, name string, value int64, rate float32, tags map[string]string) error {
+func Dec(ctx context.Context, name string, value int64, rate float32, tags ...interface{}) error {
 	return withStats(ctx, func(s Stats) error {
-		return s.Dec(name, value, rate, tags)
+		return s.Dec(name, value, rate, tags...)
 	})
 }
 
 // Gauge measures the value of a metric.
-func Gauge(ctx context.Context, name string, value float64, rate float32, tags map[string]string) error {
+func Gauge(ctx context.Context, name string, value float64, rate float32, tags ...interface{}) error {
 	return withStats(ctx, func(s Stats) error {
-		return s.Gauge(name, value, rate, tags)
+		return s.Gauge(name, value, rate, tags...)
 	})
 }
 
 // Timing sends the value of a Duration.
-func Timing(ctx context.Context, name string, value time.Duration, rate float32, tags map[string]string) error {
+func Timing(ctx context.Context, name string, value time.Duration, rate float32, tags ...interface{}) error {
 	return withStats(ctx, func(s Stats) error {
-		return s.Timing(name, value, rate, tags)
+		return s.Timing(name, value, rate, tags...)
 	})
 }
 
@@ -89,19 +89,19 @@ func withStats(ctx context.Context, fn func(s Stats) error) error {
 
 type nullStats struct{}
 
-func (s nullStats) Inc(name string, value int64, rate float32, tags map[string]string) error {
+func (s nullStats) Inc(name string, value int64, rate float32, tags ...interface{}) error {
 	return nil
 }
 
-func (s nullStats) Dec(name string, value int64, rate float32, tags map[string]string) error {
+func (s nullStats) Dec(name string, value int64, rate float32, tags ...interface{}) error {
 	return nil
 }
 
-func (s nullStats) Gauge(name string, value float64, rate float32, tags map[string]string) error {
+func (s nullStats) Gauge(name string, value float64, rate float32, tags ...interface{}) error {
 	return nil
 }
 
-func (s nullStats) Timing(name string, value time.Duration, rate float32, tags map[string]string) error {
+func (s nullStats) Timing(name string, value time.Duration, rate float32, tags ...interface{}) error {
 	return nil
 }
 
@@ -112,35 +112,35 @@ func (s nullStats) Close() error {
 // TaggedStats wraps a Stats instance applying tags to all metrics.
 type TaggedStats struct {
 	stats Stats
-	tags  map[string]string
+	tags  []interface{}
 }
 
 // NewTaggedStats creates a new TaggedStats instance.
-func NewTaggedStats(stats Stats, tags map[string]string) *TaggedStats {
+func NewTaggedStats(stats Stats, tags []interface{}) *TaggedStats {
 	return &TaggedStats{
 		stats: stats,
-		tags:  tags,
+		tags:  normalizeTags(tags),
 	}
 }
 
 // Inc increments a count by the value.
-func (s TaggedStats) Inc(name string, value int64, rate float32, tags map[string]string) error {
-	return s.stats.Inc(name, value, rate, s.collectTags(tags))
+func (s TaggedStats) Inc(name string, value int64, rate float32, tags ...interface{}) error {
+	return s.stats.Inc(name, value, rate, mergeTags(tags, s.tags)...)
 }
 
 // Dec decrements a count by the value.
-func (s TaggedStats) Dec(name string, value int64, rate float32, tags map[string]string) error {
-	return s.stats.Dec(name, value, rate, s.collectTags(tags))
+func (s TaggedStats) Dec(name string, value int64, rate float32, tags ...interface{}) error {
+	return s.stats.Dec(name, value, rate, mergeTags(tags, s.tags)...)
 }
 
 // Gauge measures the value of a metric.
-func (s TaggedStats) Gauge(name string, value float64, rate float32, tags map[string]string) error {
-	return s.stats.Gauge(name, value, rate, s.collectTags(tags))
+func (s TaggedStats) Gauge(name string, value float64, rate float32, tags ...interface{}) error {
+	return s.stats.Gauge(name, value, rate, mergeTags(tags, s.tags)...)
 }
 
 // Timing sends the value of a Duration.
-func (s TaggedStats) Timing(name string, value time.Duration, rate float32, tags map[string]string) error {
-	return s.stats.Timing(name, value, rate, s.collectTags(tags))
+func (s TaggedStats) Timing(name string, value time.Duration, rate float32, tags ...interface{}) error {
+	return s.stats.Timing(name, value, rate, mergeTags(tags, s.tags)...)
 }
 
 // Close closes the client and flushes buffered stats, if applicable
@@ -148,16 +148,27 @@ func (s TaggedStats) Close() error {
 	return s.stats.Close()
 }
 
-func (s TaggedStats) collectTags(tags map[string]string) map[string]string {
-	if tags == nil {
-		return s.tags
-	}
-	
-	for k, v := range s.tags {
-		if _, ok := tags[k]; !ok {
-			tags[k] = v
+func normalizeTags(tags []interface{}) []interface{} {
+	// If Tags was passed, then expand it
+	if len(tags) == 1 {
+		if ctxMap, ok := tags[0].(Tags); ok {
+			tags = ctxMap.toArray()
 		}
 	}
 
+	// tags needs to be event as it is a key/value pair
+	if len(tags)%2 != 0 {
+		tags = append(tags, nil)
+	}
+
 	return tags
+}
+
+func mergeTags(prefix, suffix []interface{}) []interface{} {
+	newTags := make([]interface{}, len(prefix)+len(suffix))
+
+	n := copy(newTags, prefix)
+	copy(newTags[n:], suffix)
+
+	return newTags
 }

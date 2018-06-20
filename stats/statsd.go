@@ -2,6 +2,7 @@ package stats
 
 import (
 	"bytes"
+	"fmt"
 	"time"
 
 	"github.com/cactus/go-statsd-client/statsd"
@@ -25,25 +26,25 @@ func NewStatsd(addr, prefix string) (Stats, error) {
 }
 
 // Inc increments a count by the value.
-func (s Statsd) Inc(name string, value int64, rate float32, tags map[string]string) error {
+func (s Statsd) Inc(name string, value int64, rate float32, tags ...interface{}) error {
 	name += formatStatsdTags(tags)
 	return s.client.Inc(name, value, rate)
 }
 
 // Dec decrements a count by the value.
-func (s Statsd) Dec(name string, value int64, rate float32, tags map[string]string) error {
+func (s Statsd) Dec(name string, value int64, rate float32, tags ...interface{}) error {
 	name += formatStatsdTags(tags)
 	return s.client.Dec(name, value, rate)
 }
 
 // Gauge measures the value of a metric.
-func (s Statsd) Gauge(name string, value float64, rate float32, tags map[string]string) error {
+func (s Statsd) Gauge(name string, value float64, rate float32, tags ...interface{}) error {
 	name += formatStatsdTags(tags)
 	return s.client.Gauge(name, int64(value), rate)
 }
 
 // Timing sends the value of a Duration.
-func (s Statsd) Timing(name string, value time.Duration, rate float32, tags map[string]string) error {
+func (s Statsd) Timing(name string, value time.Duration, rate float32, tags ...interface{}) error {
 	name += formatStatsdTags(tags)
 	return s.client.TimingDuration(name, value, rate)
 }
@@ -98,25 +99,25 @@ func NewBufferedStatsd(addr, prefix string, opts ...BufferedStatsdFunc) (*Buffer
 }
 
 // Inc increments a count by the value.
-func (s BufferedStatsd) Inc(name string, value int64, rate float32, tags map[string]string) error {
+func (s BufferedStatsd) Inc(name string, value int64, rate float32, tags ...interface{}) error {
 	name += formatStatsdTags(tags)
 	return s.client.Inc(name, value, rate)
 }
 
 // Dec decrements a count by the value.
-func (s BufferedStatsd) Dec(name string, value int64, rate float32, tags map[string]string) error {
+func (s BufferedStatsd) Dec(name string, value int64, rate float32, tags ...interface{}) error {
 	name += formatStatsdTags(tags)
 	return s.client.Dec(name, value, rate)
 }
 
 // Gauge measures the value of a metric.
-func (s BufferedStatsd) Gauge(name string, value float64, rate float32, tags map[string]string) error {
+func (s BufferedStatsd) Gauge(name string, value float64, rate float32, tags ...interface{}) error {
 	name += formatStatsdTags(tags)
 	return s.client.Gauge(name, int64(value), rate)
 }
 
 // Timing sends the value of a Duration.
-func (s BufferedStatsd) Timing(name string, value time.Duration, rate float32, tags map[string]string) error {
+func (s BufferedStatsd) Timing(name string, value time.Duration, rate float32, tags ...interface{}) error {
 	name += formatStatsdTags(tags)
 	return s.client.TimingDuration(name, value, rate)
 }
@@ -127,17 +128,14 @@ func (s BufferedStatsd) Close() error {
 }
 
 // formatStatsdTags formats into an InfluxDB style string
-func formatStatsdTags(tags map[string]string) string {
+func formatStatsdTags(tags []interface{}) string {
 	if len(tags) == 0 {
 		return ""
 	}
 
 	var buf bytes.Buffer
-	for k, v := range tags {
-		buf.WriteString(",")
-		buf.WriteString(k)
-		buf.WriteString("=")
-		buf.WriteString(v)
+	for i := 0; i < len(tags); i+= 2 {
+		buf.WriteString(fmt.Sprintf(",%v=%v", tags[i], tags[i+1]))
 	}
 
 	return buf.String()

@@ -49,61 +49,53 @@ func TestWithStatsFunc(t *testing.T) {
 	}
 }
 
-func TestTaggedStats_CollectTags(t *testing.T) {
-	stats := &TaggedStats{
-		tags: map[string]string{
-			"test1": "foo",
-			"test2": "bar",
-		},
+func TestMergeTags(t *testing.T) {
+	tags := []interface{}{
+		"test1", "foo",
+		"test2", "bar",
 	}
 
 	tests := []struct {
-		tags     map[string]string
-		expected map[string]string
+		tags     []interface{}
+		expected []interface{}
 	}{
 		{
 			nil,
-			map[string]string{"test1": "foo", "test2": "bar"},
+			[]interface{}{"test1", "foo", "test2", "bar"},
 		},
 		{
-			map[string]string{},
-			map[string]string{"test1": "foo", "test2": "bar"},
+			[]interface{}{},
+			[]interface{}{"test1", "foo", "test2", "bar"},
 		},
 		{
-			map[string]string{"foo": "bar", "baz": "bat"},
-			map[string]string{"test1": "foo", "test2": "bar", "foo": "bar", "baz": "bat"},
-		},
-		{
-			map[string]string{"foo": "bar", "test1": "bat"},
-			map[string]string{"test1": "bat", "test2": "bar", "foo": "bar"},
+			[]interface{}{"foo", "bar", "baz", "bat"},
+			[]interface{}{"test1", "foo", "test2", "bar", "foo", "bar", "baz", "bat"},
 		},
 	}
 
 	for _, test := range tests {
-		assert.Equal(t, test.expected, stats.collectTags(test.tags))
+		assert.Equal(t, test.expected, mergeTags(tags, test.tags))
 	}
 }
 
 func BenchmarkTaggedStats_CollectTags(b *testing.B) {
-	tags := map[string]string{
-		"test1": "test",
-		"test2": "test",
-		"test3": "test",
-		"test4": "test",
-		"test5": "test",
-
+	tags := []interface{}{
+		"test1", "test",
+		"test2", "test",
+		"test3", "test",
+		"test4", "test",
+		"test5", "test",
 	}
-	addedTags := map[string]string{
-		"k1":  "v",
-		"k2":  "v",
-		"k3":  "v",
-		"k4":  "v",
-		"k5":  "v",
+	addedTags := []interface{}{
+		"k1", "v",
+		"k2", "v",
+		"k3", "v",
+		"k4", "v",
+		"k5", "v",
 	}
-	s := NewTaggedStats(Null, tags)
 
 	for n := 0; n < b.N; n++ {
-		s.collectTags(addedTags)
+		mergeTags(tags, addedTags)
 	}
 }
 
