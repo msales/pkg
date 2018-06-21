@@ -18,11 +18,11 @@ type timer struct {
 	ctx   context.Context
 	name  string
 	rate  float32
-	tags  map[string]string
+	tags  []interface{}
 }
 
 // Time is a shorthand for Timing.
-func Time(ctx context.Context, name string, rate float32, tags map[string]string) Timer {
+func Time(ctx context.Context, name string, rate float32, tags ...interface{}) Timer {
 	t := &timer{ctx: ctx, name: name, rate: rate, tags: tags}
 	t.Start()
 	return t

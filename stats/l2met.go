@@ -24,7 +24,7 @@ func NewL2met(l log.Logger, prefix string) Stats {
 }
 
 // Inc increments a count by the value.
-func (s L2met) Inc(name string, value int64, rate float32, tags map[string]string) error {
+func (s L2met) Inc(name string, value int64, rate float32, tags ...interface{}) error {
 	msg := s.formatL2metMetric(name, fmt.Sprintf("%d", value), "count", tags)
 	s.log.Info(msg)
 
@@ -32,7 +32,7 @@ func (s L2met) Inc(name string, value int64, rate float32, tags map[string]strin
 }
 
 // Dec decrements a count by the value.
-func (s L2met) Dec(name string, value int64, rate float32, tags map[string]string) error {
+func (s L2met) Dec(name string, value int64, rate float32, tags ...interface{}) error {
 	msg := s.formatL2metMetric(name, fmt.Sprintf("-%d", value), "count", tags)
 	s.log.Info(msg)
 
@@ -40,7 +40,7 @@ func (s L2met) Dec(name string, value int64, rate float32, tags map[string]strin
 }
 
 // Gauge measures the value of a metric.
-func (s L2met) Gauge(name string, value float64, rate float32, tags map[string]string) error {
+func (s L2met) Gauge(name string, value float64, rate float32, tags ...interface{}) error {
 	msg := s.formatL2metMetric(name, fmt.Sprintf("%v", value), "sample", tags)
 	s.log.Info(msg)
 
@@ -48,7 +48,7 @@ func (s L2met) Gauge(name string, value float64, rate float32, tags map[string]s
 }
 
 // Timing sends the value of a Duration.
-func (s L2met) Timing(name string, value time.Duration, rate float32, tags map[string]string) error {
+func (s L2met) Timing(name string, value time.Duration, rate float32, tags ...interface{}) error {
 	msg := s.formatL2metMetric(name, fmt.Sprintf("%dms", int64(value/time.Millisecond)), "measure", tags)
 	s.log.Info(msg)
 
@@ -60,7 +60,7 @@ func (s L2met) Close() error {
 	return nil
 }
 
-func (s L2met) formatL2metMetric(name, value, measure string, tags map[string]string) string {
+func (s L2met) formatL2metMetric(name, value, measure string, tags []interface{}) string {
 	if s.prefix != "" {
 		name = strings.Join([]string{s.prefix, name}, ".")
 	}
@@ -77,17 +77,21 @@ func (s L2met) formatL2metMetric(name, value, measure string, tags map[string]st
 }
 
 // formatStatsdTags formats into an InfluxDB style string
-func formatL2metTags(tags map[string]string) string {
+func formatL2metTags(tags []interface{}) string {
 	if len(tags) == 0 {
 		return ""
 	}
 
+	tags = normalizeTags(tags)
+
+	tagMap := make(map[interface{}]interface{}, len(tags)/2)
+	for i := 0; i < len(tags); i += 2 {
+		tagMap[tags[i]] = tags[i+1]
+	}
+
 	var buf bytes.Buffer
-	for k, v := range tags {
-		buf.WriteString(k)
-		buf.WriteString("=")
-		buf.WriteString(v)
-		buf.WriteString(" ")
+	for k, v := range tagMap {
+		buf.WriteString(fmt.Sprintf("%v=%v ", k, v))
 	}
 
 	return buf.String()

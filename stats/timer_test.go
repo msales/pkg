@@ -12,7 +12,7 @@ func TestTimer(t *testing.T) {
 	m.On("Timing", "test", mock.Anything, float32(1.0), mock.Anything).Return(nil)
 
 	ctx := stats.WithStats(context.Background(), m)
-	ti := stats.Time(ctx, "test", 1.0, nil)
+	ti := stats.Time(ctx, "test", 1.0)
 	ti.Done()
 
 	m.AssertExpectations(t)
