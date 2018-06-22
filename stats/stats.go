@@ -149,16 +149,16 @@ func (s TaggedStats) Close() error {
 }
 
 func normalizeTags(tags []interface{}) []interface{} {
-	// If Tags was passed, then expand it
+	// If Tags object was passed, then expand it
 	if len(tags) == 1 {
 		if ctxMap, ok := tags[0].(Tags); ok {
 			tags = ctxMap.toArray()
 		}
 	}
 
-	// tags needs to be event as it is a key/value pair
+	// tags need to be even as they are key/value pairs
 	if len(tags)%2 != 0 {
-		tags = append(tags, nil)
+		panic("odd number of tags")
 	}
 
 	return tags
@@ -171,4 +171,10 @@ func mergeTags(prefix, suffix []interface{}) []interface{} {
 	copy(newTags[n:], suffix)
 
 	return newTags
+}
+
+func recoverFromUnhashableKey() {
+	if r := recover(); r != nil {
+		panic("invalid type of a tag key (slice, hash or a func)")
+	}
 }

@@ -133,6 +133,8 @@ func formatStatsdTags(tags []interface{}) string {
 		return ""
 	}
 
+	defer recoverFromUnhashableKey()
+
 	tags = normalizeTags(tags)
 
 	tagMap := make(map[interface{}]interface{}, len(tags)/2)
