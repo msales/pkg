@@ -116,7 +116,7 @@ type TaggedStats struct {
 }
 
 // NewTaggedStats creates a new TaggedStats instance.
-func NewTaggedStats(stats Stats, tags []interface{}) *TaggedStats {
+func NewTaggedStats(stats Stats, tags ...interface{}) *TaggedStats {
 	return &TaggedStats{
 		stats: stats,
 		tags:  normalizeTags(tags),
