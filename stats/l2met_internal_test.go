@@ -39,7 +39,13 @@ func TestFormatL2metTags_Uneven(t *testing.T) {
 		"foo",
 	}
 
-	got := formatL2metTags(tags)
-	assert.Contains(t, got, "test=test")
-	assert.Contains(t, got, "foo=<nil>")
+	defer func() {
+		r := recover(); if r != nil {
+			assert.NotNil(t, r)
+		}
+	}()
+
+	formatL2metTags(tags)
+
+	assert.Fail(t, "the test should have panicked on an uneven number of tags")
 }

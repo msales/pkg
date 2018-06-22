@@ -173,8 +173,22 @@ func mergeTags(prefix, suffix []interface{}) []interface{} {
 	return newTags
 }
 
-func recoverFromUnhashableKey() {
-	if r := recover(); r != nil {
-		panic("invalid type of a tag key (slice, hash or a func)")
+func deduplicateTags(tags []interface{}) []interface{} {
+	defer func() {
+		if r := recover(); r != nil {
+			panic("invalid type of a tag key (slice, hash or a func)")
+		}
+	}()
+
+	tagMap := make(map[interface{}]interface{}, len(tags)/2)
+	for i := 0; i < len(tags); i += 2 {
+		tagMap[tags[i]] = tags[i+1]
 	}
+
+	// Allocating optimistically. The actual size of the slice may be lower than the capacity in case of duplicates.
+	d := make([]interface{}, 0, len(tags))
+	for k := range tagMap {
+		d = append(d, k, tagMap[k])
+	}
+	return d
 }

@@ -200,7 +200,13 @@ func TestFormatStatsdTags_Uneven(t *testing.T) {
 		"foo",
 	}
 
-	got := formatStatsdTags(tags)
-	assert.Contains(t, got, ",test=test")
-	assert.Contains(t, got, ",foo=<nil>")
+	defer func() {
+		r := recover(); if r != nil {
+			assert.NotNil(t, r)
+		}
+	}()
+
+	formatStatsdTags(tags)
+
+	assert.Fail(t, "the test should have panicked on an uneven number of tags")
 }
