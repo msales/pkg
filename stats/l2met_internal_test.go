@@ -40,9 +40,7 @@ func TestFormatL2metTags_Uneven(t *testing.T) {
 	}
 
 	defer func() {
-		r := recover(); if r != nil {
-			assert.NotNil(t, r)
-		}
+		assert.NotNil(t, recover())
 	}()
 
 	formatL2metTags(tags)

@@ -201,9 +201,7 @@ func TestFormatStatsdTags_Uneven(t *testing.T) {
 	}
 
 	defer func() {
-		r := recover(); if r != nil {
-			assert.NotNil(t, r)
-		}
+		assert.NotNil(t, recover())
 	}()
 
 	formatStatsdTags(tags)
