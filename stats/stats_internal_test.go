@@ -49,6 +49,17 @@ func TestWithStatsFunc(t *testing.T) {
 	}
 }
 
+func TestNullStats(t *testing.T) {
+	s := Null
+
+	assert.Nil(t, s.Inc("test", 1, 1.0))
+	assert.Nil(t, s.Dec("test", 1, 1.0))
+	assert.Nil(t, s.Gauge("test", 1.0, 1.0))
+	assert.Nil(t, s.Timing("test", 0, 1.0))
+
+	assert.NoError(t, s.Close())
+}
+
 func TestMergeTags(t *testing.T) {
 	tags := []interface{}{
 		"test1", "foo",
@@ -78,7 +89,7 @@ func TestMergeTags(t *testing.T) {
 	}
 }
 
-func BenchmarkTaggedStats_CollectTags(b *testing.B) {
+func BenchmarkTaggedStats_MergeTags(b *testing.B) {
 	tags := []interface{}{
 		"test1", "test",
 		"test2", "test",
@@ -94,16 +105,50 @@ func BenchmarkTaggedStats_CollectTags(b *testing.B) {
 		"k5", "v",
 	}
 
+	b.ReportAllocs()
+
 	for n := 0; n < b.N; n++ {
 		mergeTags(tags, addedTags)
 	}
 }
 
-func TestNullStats(t *testing.T) {
-	s := Null
+func TestDeduplicateTags(t *testing.T) {
+	tests := []struct {
+		tags     []interface{}
+		expected []interface{}
+	}{
+		{
+			[]interface{}{"test1", "foo", "test1", "bar"},
+			[]interface{}{"test1", "bar"},
+		},
+		{
+			[]interface{}{"test1", "foo", "test2", "bar"},
+			[]interface{}{"test1", "foo", "test2", "bar"},
+		},
+		{
+			[]interface{}{"test1", "foo", "test2", "bar", "test1", "baz"},
+			[]interface{}{"test1", "baz", "test2", "bar"},
+		},
+	}
 
-	assert.Nil(t, s.Inc("test", 1, 1.0, nil))
-	assert.Nil(t, s.Dec("test", 1, 1.0, nil))
-	assert.Nil(t, s.Gauge("test", 1.0, 1.0, nil))
-	assert.Nil(t, s.Timing("test", 0, 1.0, nil))
+	for _, test := range tests {
+		assert.Equal(t, test.expected, deduplicateTags(test.tags))
+	}
+}
+
+func BenchmarkTaggedStats_DeduplicateTags(b *testing.B) {
+	tags := []interface{}{
+		"test1", "foo",
+		"test2", "bar",
+		"test1", "baz",
+		"test3", "test",
+		"test4", "test",
+		"test5", "test",
+	}
+
+	b.ReportAllocs()
+
+	for n := 0; n < b.N; n++ {
+		deduplicateTags(tags)
+	}
 }
