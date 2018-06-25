@@ -56,6 +56,8 @@ func TestNullStats(t *testing.T) {
 	assert.Nil(t, s.Dec("test", 1, 1.0))
 	assert.Nil(t, s.Gauge("test", 1.0, 1.0))
 	assert.Nil(t, s.Timing("test", 0, 1.0))
+
+	assert.NoError(t, s.Close())
 }
 
 func TestMergeTags(t *testing.T) {

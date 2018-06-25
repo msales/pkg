@@ -12,6 +12,7 @@ import (
 func TestNewStatsd(t *testing.T) {
 	s, err := NewStatsd("127.0.0.1:1234", "test")
 	assert.NoError(t, err)
+	defer s.Close()
 
 	assert.IsType(t, &Statsd{}, s)
 
@@ -90,6 +91,7 @@ func TestStatsd_Timing(t *testing.T) {
 func TestNewBufferedStatsd(t *testing.T) {
 	s, err := NewBufferedStatsd("127.0.0.1:1234", "test", WithFlushInterval(time.Second), WithFlushBytes(1))
 	assert.NoError(t, err)
+	defer s.Close()
 
 	assert.IsType(t, &BufferedStatsd{}, s)
 	assert.Equal(t, time.Second, s.flushInterval)
