@@ -116,7 +116,7 @@ type TaggedStats struct {
 }
 
 // NewTaggedStats creates a new TaggedStats instance.
-func NewTaggedStats(stats Stats, tags []interface{}) *TaggedStats {
+func NewTaggedStats(stats Stats, tags ...interface{}) *TaggedStats {
 	return &TaggedStats{
 		stats: stats,
 		tags:  normalizeTags(tags),
@@ -149,16 +149,16 @@ func (s TaggedStats) Close() error {
 }
 
 func normalizeTags(tags []interface{}) []interface{} {
-	// If Tags was passed, then expand it
+	// If Tags object was passed, then expand it
 	if len(tags) == 1 {
 		if ctxMap, ok := tags[0].(Tags); ok {
 			tags = ctxMap.toArray()
 		}
 	}
 
-	// tags needs to be event as it is a key/value pair
+	// tags need to be even as they are key/value pairs
 	if len(tags)%2 != 0 {
-		tags = append(tags, nil)
+		panic("odd number of tags")
 	}
 
 	return tags
@@ -171,4 +171,24 @@ func mergeTags(prefix, suffix []interface{}) []interface{} {
 	copy(newTags[n:], suffix)
 
 	return newTags
+}
+
+func deduplicateTags(tags []interface{}) []interface{} {
+	defer func() {
+		if r := recover(); r != nil {
+			panic("invalid type of a tag key (slice, hash or a func)")
+		}
+	}()
+
+	tagMap := make(map[interface{}]interface{}, len(tags)/2)
+	for i := 0; i < len(tags); i += 2 {
+		tagMap[tags[i]] = tags[i+1]
+	}
+
+	// Allocating optimistically. The actual size of the slice may be lower than the capacity in case of duplicates.
+	d := make([]interface{}, 0, len(tags))
+	for k := range tagMap {
+		d = append(d, k, tagMap[k])
+	}
+	return d
 }

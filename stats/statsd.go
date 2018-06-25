@@ -133,16 +133,11 @@ func formatStatsdTags(tags []interface{}) string {
 		return ""
 	}
 
-	tags = normalizeTags(tags)
-
-	tagMap := make(map[interface{}]interface{}, len(tags)/2)
-	for i := 0; i < len(tags); i += 2 {
-		tagMap[tags[i]] = tags[i+1]
-	}
+	tags = deduplicateTags(normalizeTags(tags))
 
 	var buf bytes.Buffer
-	for k, v := range tagMap {
-		buf.WriteString(fmt.Sprintf(",%v=%v", k, v))
+	for i := 0; i < len(tags); i += 2 {
+		buf.WriteString(fmt.Sprintf(",%v=%v", tags[i], tags[i+1]))
 	}
 
 	return buf.String()

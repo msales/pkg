@@ -33,5 +33,5 @@ func (t *timer) Start() {
 }
 
 func (t *timer) Done() {
-	Timing(t.ctx, t.name, time.Since(t.start), t.rate, t.tags)
+	Timing(t.ctx, t.name, time.Since(t.start), t.rate, t.tags...)
 }
