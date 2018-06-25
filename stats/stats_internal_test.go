@@ -52,10 +52,10 @@ func TestWithStatsFunc(t *testing.T) {
 func TestNullStats(t *testing.T) {
 	s := Null
 
-	assert.Nil(t, s.Inc("test", 1, 1.0, nil))
-	assert.Nil(t, s.Dec("test", 1, 1.0, nil))
-	assert.Nil(t, s.Gauge("test", 1.0, 1.0, nil))
-	assert.Nil(t, s.Timing("test", 0, 1.0, nil))
+	assert.Nil(t, s.Inc("test", 1, 1.0))
+	assert.Nil(t, s.Dec("test", 1, 1.0))
+	assert.Nil(t, s.Gauge("test", 1.0, 1.0))
+	assert.Nil(t, s.Timing("test", 0, 1.0))
 }
 
 func TestMergeTags(t *testing.T) {
