@@ -174,21 +174,19 @@ func mergeTags(prefix, suffix []interface{}) []interface{} {
 }
 
 func deduplicateTags(tags []interface{}) []interface{} {
-	defer func() {
-		if r := recover(); r != nil {
-			panic("invalid type of a tag key (slice, hash or a func)")
-		}
-	}()
-
-	tagMap := make(map[interface{}]interface{}, len(tags)/2)
+	res := make([]interface{}, 0, len(tags))
+Loop:
 	for i := 0; i < len(tags); i += 2 {
-		tagMap[tags[i]] = tags[i+1]
+		for j := 0; j < len(res); j += 2 {
+			if tags[i] == res[j] {
+				res[j+1] = tags[i+1]
+				continue Loop
+			}
+		}
+
+		res = append(res, tags[i])
+		res = append(res, tags[i+1])
 	}
 
-	// Allocating optimistically. The actual size of the slice may be lower than the capacity in case of duplicates.
-	d := make([]interface{}, 0, len(tags))
-	for k := range tagMap {
-		d = append(d, k, tagMap[k])
-	}
-	return d
+	return res
 }
