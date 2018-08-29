@@ -3,26 +3,33 @@
 
 [[projects]]
   branch = "master"
+  digest = "1:2b036724237c0630b22864b499d27a35e7f9f0eefc3d90bf738571617d6ceaae"
   name = "github.com/bradfitz/gomemcache"
   packages = ["memcache"]
+  pruneopts = ""
   revision = "1952afaa557dc08e8e0d89eafab110fb501c1a2b"
 
 [[projects]]
+  digest = "1:47fe89a242ccbae03d31b4c665d3d983786acd316c0d7c51bcfa0d019b205004"
   name = "github.com/cactus/go-statsd-client"
   packages = [
     "statsd",
-    "statsd/statsdtest"
+    "statsd/statsdtest",
   ]
+  pruneopts = ""
   revision = "138b925ccdf617776955904ba7759fce64406cec"
   version = "v3.1.1"
 
 [[projects]]
+  digest = "1:56c130d885a4aacae1dd9c7b71cfe39912c7ebc1ff7d2b46083c8812996dc43b"
   name = "github.com/davecgh/go-spew"
   packages = ["spew"]
+  pruneopts = ""
   revision = "346938d642f2ec3594ed81d874461961cd0faa76"
   version = "v1.1.0"
 
 [[projects]]
+  digest = "1:3dfd659219b6f63dc0677a62b8d4e8f10b5cf53900aef40858db10a19407e41d"
   name = "github.com/go-redis/redis"
   packages = [
     ".",
@@ -32,35 +39,58 @@
     "internal/pool",
     "internal/proto",
     "internal/singleflight",
-    "internal/util"
+    "internal/util",
   ]
+  pruneopts = ""
   revision = "83fb42932f6145ce52df09860384a4653d2d332a"
   version = "v6.12.0"
 
 [[projects]]
+  digest = "1:961dc3b1d11f969370533390fdf203813162980c858e1dabe827b60940c909a5"
+  name = "github.com/magiconair/properties"
+  packages = ["assert"]
+  pruneopts = ""
+  revision = "c2353362d570a7bfa228149c62842019201cfb71"
+  version = "v1.8.0"
+
+[[projects]]
+  digest = "1:256484dbbcd271f9ecebc6795b2df8cad4c458dd0f5fd82a8c2fa0c29f233411"
   name = "github.com/pmezard/go-difflib"
   packages = ["difflib"]
+  pruneopts = ""
   revision = "792786c7400a136282c1664665ae0a8db921c6c2"
   version = "v1.0.0"
 
 [[projects]]
+  digest = "1:306417ea2f31ea733df356a2b895de63776b6a5107085b33458e5cd6eb1d584d"
   name = "github.com/stretchr/objx"
   packages = ["."]
+  pruneopts = ""
   revision = "facf9a85c22f48d2f52f2380e4efce1768749a89"
   version = "v0.1"
 
 [[projects]]
+  digest = "1:a30066593578732a356dc7e5d7f78d69184ca65aeeff5939241a3ab10559bb06"
   name = "github.com/stretchr/testify"
   packages = [
     "assert",
-    "mock"
+    "mock",
   ]
+  pruneopts = ""
   revision = "12b6f73e6084dad08a7c6e575284b177ecafbc71"
   version = "v1.2.1"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "8e3ee3bfffcdb48c07875c6ad77dd371197c6eb56bc3eee74bd99dad35925cdb"
+  input-imports = [
+    "github.com/bradfitz/gomemcache/memcache",
+    "github.com/cactus/go-statsd-client/statsd",
+    "github.com/cactus/go-statsd-client/statsd/statsdtest",
+    "github.com/go-redis/redis",
+    "github.com/magiconair/properties/assert",
+    "github.com/stretchr/testify/assert",
+    "github.com/stretchr/testify/mock",
+  ]
   solver-name = "gps-cdcl"
   solver-version = 1
