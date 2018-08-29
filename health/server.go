@@ -5,11 +5,15 @@ import (
 	"time"
 )
 
-const healthPath = "/health"
+var DefaultPattern = "/health"
 
-func NewServer(addr string, reporters ...Reporter) *http.Server {
+func ListenAndServe(addr string, reporters ...Reporter) error {
+	return newServer(addr, reporters...).ListenAndServe()
+}
+
+func newServer(addr string, reporters ...Reporter) *http.Server {
 	mux := &http.ServeMux{}
-	mux.Handle(healthPath, DefaultHandler.With(reporters...))
+	mux.Handle(DefaultPattern, DefaultHandler.With(reporters...))
 
 	return &http.Server{
 		Addr:    addr,
