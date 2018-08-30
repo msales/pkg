@@ -17,7 +17,7 @@ func TestWithRequestStats(t *testing.T) {
 	s := new(MockStats)
 	s.On("Inc", "request.start", int64(1), float32(1.0), []interface{}{
 		"method", "GET",
-		"path",   "/",
+		"path", "/",
 	}).Return(nil).Once()
 	s.On("Inc", "request.complete", int64(1), float32(1.0), []interface{}{
 		"status", "0",

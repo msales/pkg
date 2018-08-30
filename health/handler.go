@@ -12,7 +12,7 @@ type Reporter interface {
 
 type Handler struct {
 	Reporters []Reporter
-	ShowErr bool
+	ShowErr   bool
 }
 
 func (h *Handler) With(reporters ...Reporter) *Handler {
