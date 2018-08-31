@@ -1,9 +1,9 @@
 package clix_test
 
 import (
+	"github.com/msales/pkg/log"
 	"testing"
 
-	"github.com/inconshreveable/log15"
 	"github.com/msales/pkg/clix"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -37,8 +37,7 @@ func TestNewLogger(t *testing.T) {
 			assert.Error(t, err)
 		} else {
 			assert.NoError(t, err)
-			assert.IsType(t, log15.New(), l)
-
+			assert.Implements(t, (*log.Logger)(nil), l)
 		}
 	}
 }
@@ -50,6 +49,11 @@ type CtxMock struct {
 func (m *CtxMock) Bool(name string) bool {
 	args := m.Called(name)
 	return args.Bool(0)
+}
+
+func (m *CtxMock) Int(name string) int {
+	args := m.Called(name)
+	return args.Int(0)
 }
 
 func (m *CtxMock) String(name string) string {

@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	FlagPort = "http-port"
+	FlagPort = "port"
 
 	FlagLogFormat = "log-format"
 	FlagLogLevel  = "log-level"
@@ -23,7 +23,7 @@ const (
 )
 
 type defaults struct {
-	HTTPPort  int
+	Port      int
 	LogFormat string
 	LogLevel  string
 
@@ -31,7 +31,7 @@ type defaults struct {
 }
 
 var Defaults = defaults{
-	HTTPPort:  80,
+	Port:      80,
 	LogFormat: "json",
 	LogLevel:  "info",
 
@@ -47,9 +47,9 @@ func (f Flags) Merge(flags Flags) Flags {
 var ServerFlags = Flags{
 	cli.IntFlag{
 		Name:   FlagPort,
-		Value:  Defaults.HTTPPort,
+		Value:  Defaults.Port,
 		Usage:  "Port for HTTP server to listen on",
-		EnvVar: "HTTP_PORT",
+		EnvVar: "PORT",
 	},
 }
 
