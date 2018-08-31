@@ -49,7 +49,7 @@ func (s L2met) Gauge(name string, value float64, rate float32, tags ...interface
 
 // Timing sends the value of a Duration.
 func (s L2met) Timing(name string, value time.Duration, rate float32, tags ...interface{}) error {
-	msg := s.formatL2metMetric(name, fmt.Sprintf("%dms", int64(value/time.Millisecond)), "measure", tags)
+	msg := s.formatL2metMetric(name, formatDuration(value), "measure", tags)
 	s.log.Info(msg)
 
 	return nil
@@ -74,6 +74,27 @@ func (s L2met) formatL2metMetric(name, value, measure string, tags []interface{}
 	buf.WriteString(value)
 
 	return buf.String()
+}
+
+// formatDuration converts duration into fractional milliseconds
+// with no trailing zeros.
+func formatDuration(d time.Duration) string {
+	i := uint64(d / time.Millisecond)
+	p := uint64(d % time.Millisecond / 1000)
+
+	if p > 0 {
+		for {
+			if p % 10 == 0 {
+				p /= 10
+				continue
+			}
+			break
+		}
+
+		return fmt.Sprintf("%d.%dms", i, p)
+	}
+
+	return fmt.Sprintf("%dms", i)
 }
 
 // formatStatsdTags formats into an InfluxDB style string
