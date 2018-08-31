@@ -14,8 +14,9 @@ var ProfilerServer = &http.Server{
 	WriteTimeout: time.Minute,
 }
 
-func RunProfiler(c *cli.Context) {
+func RunProfiler(c *cli.Context) error {
 	runProfiler(c)
+	return nil
 }
 
 func runProfiler(c Ctx) {
