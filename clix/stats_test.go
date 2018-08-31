@@ -1,16 +1,17 @@
 package clix_test
 
 import (
+	"testing"
+
 	"github.com/msales/pkg/clix"
 	"github.com/msales/pkg/log"
 	"github.com/msales/pkg/stats"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func TestNewStats(t *testing.T) {
 	tests := []struct {
-		dsn  string
+		dsn    string
 		prefix string
 		tags   []string
 
@@ -41,4 +42,3 @@ func TestNewStats(t *testing.T) {
 		}
 	}
 }
-

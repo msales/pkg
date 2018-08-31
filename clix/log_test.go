@@ -1,9 +1,9 @@
 package clix_test
 
 import (
-	"github.com/msales/pkg/log"
 	"testing"
 
+	"github.com/msales/pkg/log"
 	"github.com/msales/pkg/clix"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"

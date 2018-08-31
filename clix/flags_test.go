@@ -6,7 +6,6 @@ import (
 
 	"github.com/msales/pkg/clix"
 	"github.com/stretchr/testify/assert"
-
 	"github.com/urfave/cli"
 )
 

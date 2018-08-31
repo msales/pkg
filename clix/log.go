@@ -40,7 +40,7 @@ func newLogFormat(c Ctx) (log15.Format, error) {
 	case "json":
 		return log15.JsonFormat(), nil
 	case "logfmt":
-		return 	log15.LogfmtFormat(), nil
+		return log15.LogfmtFormat(), nil
 	default:
 		return nil, errors.New(fmt.Sprintf("invalid log format: '%s'", format))
 	}

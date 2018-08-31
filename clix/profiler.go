@@ -2,14 +2,15 @@ package clix
 
 import (
 	"fmt"
-	"github.com/urfave/cli"
 	"net/http"
 	"net/http/pprof"
 	"time"
+
+	"github.com/urfave/cli"
 )
 
 var ProfilerServer = &http.Server{
-	ReadTimeout: time.Minute,
+	ReadTimeout:  time.Minute,
 	WriteTimeout: time.Minute,
 }
 

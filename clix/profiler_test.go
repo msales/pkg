@@ -2,11 +2,12 @@ package clix
 
 import (
 	"context"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 	"net"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
 func TestRunProfiler_Enabled(t *testing.T) {
@@ -19,7 +20,7 @@ func TestRunProfiler_Enabled(t *testing.T) {
 
 	time.Sleep(10 * time.Millisecond)
 
-	conn, err := net.DialTimeout("tcp",":62874", time.Second)
+	conn, err := net.DialTimeout("tcp", ":62874", time.Second)
 	assert.NoError(t, err)
 
 	if err == nil {
@@ -33,7 +34,7 @@ func TestRunProfiler_Disabled(t *testing.T) {
 
 	runProfiler(ctx)
 
-	_, err := net.DialTimeout("tcp",":62874", time.Second)
+	_, err := net.DialTimeout("tcp", ":62874", time.Second)
 
 	assert.Error(t, err)
 }

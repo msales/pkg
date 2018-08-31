@@ -41,7 +41,7 @@ func NewContext(c *cli.Context, opts ...CtxOptionFunc) (*Context, error) {
 	}
 
 	if _, ok := stats.FromContext(ctx); !ok {
-		l, _ := log.FromContext(ctx)	// guaranteed to have a Logger instance here
+		l, _ := log.FromContext(ctx) // guaranteed to have a Logger instance here
 		s, err := NewStats(ctx, l)
 		if err != nil {
 			return nil, err
