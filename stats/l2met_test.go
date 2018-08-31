@@ -39,9 +39,27 @@ func TestL2met_Timing(t *testing.T) {
 	l := &testLogger{}
 	s := stats.NewL2met(l, "test")
 
-	s.Timing("test", 2*time.Second+2*time.Microsecond, 1.0, "test", "test")
+	s.Timing("test", 2*time.Second+time.Nanosecond, 1.0, "test", "test")
 
 	assert.Equal(t, "test=test measure#test.test=2000ms", l.msg)
+}
+
+func TestL2met_TimingFractions(t *testing.T) {
+	l := &testLogger{}
+	s := stats.NewL2met(l, "test")
+
+	s.Timing("test", 1234500*time.Nanosecond, 1.0, "test", "test")
+
+	assert.Equal(t, "test=test measure#test.test=1.234ms", l.msg)
+}
+
+func TestL2met_TimingPartialFractions(t *testing.T) {
+	l := &testLogger{}
+	s := stats.NewL2met(l, "test")
+
+	s.Timing("test", 1230*time.Microsecond, 1.0, "test", "test")
+
+	assert.Equal(t, "test=test measure#test.test=1.23ms", l.msg)
 }
 
 func TestL2met_Close(t *testing.T) {
