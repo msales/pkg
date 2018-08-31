@@ -2,10 +2,10 @@ package cache
 
 import (
 	"testing"
+	"time"
 
 	"github.com/go-redis/redis"
 	"github.com/stretchr/testify/assert"
-	"time"
 )
 
 func TestWithPoolSize(t *testing.T) {

@@ -28,6 +28,9 @@ type Logger interface {
 
 // WithLogger sets Logger in the context.
 func WithLogger(ctx context.Context, logger Logger) context.Context {
+	if logger == nil {
+		logger = Null
+	}
 	return context.WithValue(ctx, ctxKey, logger)
 }
 

@@ -2,11 +2,12 @@ package health_test
 
 import (
 	"errors"
-	"github.com/msales/pkg/health"
-	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/msales/pkg/health"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestHandler_With(t *testing.T) {
@@ -40,7 +41,7 @@ func TestHandler_ServeHTTP(t *testing.T) {
 		{[]error{errors.New("")}, http.StatusServiceUnavailable},
 		{[]error{errors.New(""), nil}, http.StatusServiceUnavailable},
 		{[]error{nil, errors.New("")}, http.StatusServiceUnavailable},
-		{[]error{ errors.New(""), errors.New("")}, http.StatusServiceUnavailable},
+		{[]error{errors.New(""), errors.New("")}, http.StatusServiceUnavailable},
 	}
 
 	for _, tt := range tests {

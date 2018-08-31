@@ -2,8 +2,9 @@ package stats_test
 
 import (
 	"testing"
-	"github.com/msales/pkg/stats"
+
 	"github.com/magiconair/properties/assert"
+	"github.com/msales/pkg/stats"
 )
 
 func TestTags_With(t *testing.T) {
