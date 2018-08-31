@@ -12,7 +12,7 @@ import (
 func TestRunProfiler_Enabled(t *testing.T) {
 	ctx := new(CtxMock)
 	ctx.On("Bool", clix.FlagProfiler).Return(true)
-	ctx.On("Int", clix.FlagProfilerPort).Return(62874)
+	ctx.On("String", clix.FlagProfilerPort).Return("62874")
 
 	clix.RunProfiler(ctx)
 	defer clix.ProfilerServer.Shutdown(context.Background())

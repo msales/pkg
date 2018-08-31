@@ -18,7 +18,7 @@ func RunProfiler(c Ctx) {
 	}
 
 	ProfilerServer.Handler = makeProfilerMux()
-	ProfilerServer.Addr = fmt.Sprintf(":%d", c.Int(FlagProfilerPort))
+	ProfilerServer.Addr = fmt.Sprintf(":%s", c.String(FlagProfilerPort))
 
 	go func() {
 		err := ProfilerServer.ListenAndServe()

@@ -51,11 +51,6 @@ func (m *CtxMock) Bool(name string) bool {
 	return args.Bool(0)
 }
 
-func (m *CtxMock) Int(name string) int {
-	args := m.Called(name)
-	return args.Int(0)
-}
-
 func (m *CtxMock) String(name string) string {
 	args := m.Called(name)
 	return args.String(0)

@@ -23,19 +23,19 @@ const (
 )
 
 type defaults struct {
-	Port      int
+	Port      string
 	LogFormat string
 	LogLevel  string
 
-	ProfilerPort int
+	ProfilerPort string
 }
 
 var Defaults = defaults{
-	Port:      80,
+	Port:      "80",
 	LogFormat: "json",
 	LogLevel:  "info",
 
-	ProfilerPort: 8081,
+	ProfilerPort: "8081",
 }
 
 type Flags []cli.Flag
@@ -45,7 +45,7 @@ func (f Flags) Merge(flags Flags) Flags {
 }
 
 var ServerFlags = Flags{
-	cli.IntFlag{
+	cli.StringFlag{
 		Name:   FlagPort,
 		Value:  Defaults.Port,
 		Usage:  "Port for HTTP server to listen on",
@@ -95,7 +95,7 @@ var ProfilerFlags = Flags{
 		Usage:  "Enable profiler server.",
 		EnvVar: "PROFILER",
 	},
-	cli.IntFlag{
+	cli.StringFlag{
 		Name:   FlagProfilerPort,
 		Value:  Defaults.ProfilerPort,
 		Usage:  "Port for the profiler to listen on.",

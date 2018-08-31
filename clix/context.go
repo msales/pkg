@@ -10,7 +10,6 @@ import (
 
 type Ctx interface {
 	Bool(name string) bool
-	Int(name string) int
 	String(name string) string
 	StringSlice(name string) []string
 }
