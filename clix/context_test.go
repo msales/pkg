@@ -11,7 +11,6 @@ import (
 	"github.com/msales/pkg/stats"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
-
 	"github.com/urfave/cli"
 )
 

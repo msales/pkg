@@ -14,7 +14,7 @@ const (
 	FlagLogLevel  = "log-level"
 	FlagLogTags   = "log-tags"
 
-	FlagStatsAddr   = "stats-addr"
+	FlagStatsDSN    = "stats-dsn"
 	FlagStatsPrefix = "stats-prefix"
 	FlagStatsTags   = "stats-tags"
 
@@ -38,14 +38,22 @@ var Defaults = defaults{
 	ProfilerPort: 8081,
 }
 
-var flags = []cli.Flag{
+type Flags []cli.Flag
+
+func (f Flags) Merge(flags Flags) Flags {
+	return append(f, flags...)
+}
+
+var ServerFlags = Flags{
 	cli.IntFlag{
 		Name:   FlagPort,
 		Value:  Defaults.HTTPPort,
 		Usage:  "Port for HTTP server to listen on",
 		EnvVar: "HTTP_PORT",
 	},
+}
 
+var CommonFlags = Flags{
 	cli.StringFlag{
 		Name:   FlagLogFormat,
 		Value:  Defaults.LogFormat,
@@ -65,9 +73,9 @@ var flags = []cli.Flag{
 	},
 
 	cli.StringFlag{
-		Name:   FlagStatsAddr,
+		Name:   FlagStatsDSN,
 		Usage:  "The URL of a stats backend.",
-		EnvVar: "STATS_ADDR",
+		EnvVar: "STATS_DSN",
 	},
 	cli.StringFlag{
 		Name:   FlagStatsPrefix,
@@ -81,7 +89,7 @@ var flags = []cli.Flag{
 	},
 }
 
-var profilerFlags = []cli.Flag{
+var ProfilerFlags = Flags{
 	cli.BoolFlag{
 		Name:   FlagProfiler,
 		Usage:  "Enable profiler server.",
@@ -95,15 +103,7 @@ var profilerFlags = []cli.Flag{
 	},
 }
 
-func Flags() []cli.Flag {
-	return flags
-}
-
-func ProfilerFlags() []cli.Flag {
-	return profilerFlags
-}
-
-func splitTags(slice []string, sep string) ([]interface{}, error) {
+func SplitTags(slice []string, sep string) ([]interface{}, error) {
 	res := make([]interface{}, 2*len(slice))
 
 	for i, str := range slice {

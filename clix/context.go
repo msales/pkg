@@ -14,8 +14,6 @@ type Ctx interface {
 	StringSlice(name string) []string
 }
 
-type CtxOptionFunc func(ctx *Context)
-
 type ctxContext context.Context
 
 type Context struct {
@@ -29,22 +27,27 @@ func NewContext(c *cli.Context, opts ...CtxOptionFunc) (*Context, error) {
 		ctxContext: context.Background(),
 	}
 
-	if len(opts) == 0 {
+	for _, opt := range opts {
+		opt(ctx)
+	}
+
+	if _, ok := log.FromContext(ctx); !ok {
 		l, err := NewLogger(ctx)
 		if err != nil {
 			return nil, err
 		}
 
+		Logger(l)(ctx)
+	}
+
+	if _, ok := stats.FromContext(ctx); !ok {
+		l, _ := log.FromContext(ctx)	// guaranteed to have a Logger instance here
 		s, err := NewStats(ctx, l)
 		if err != nil {
 			return nil, err
 		}
 
-		opts = append(opts, Logger(l), Stats(s))
-	}
-
-	for _, opt := range opts {
-		opt(ctx)
+		Stats(s)(ctx)
 	}
 
 	return ctx, nil
@@ -58,6 +61,8 @@ func (c *Context) Close() error {
 
 	return nil
 }
+
+type CtxOptionFunc func(ctx *Context)
 
 func Logger(l log.Logger) CtxOptionFunc {
 	return func(ctx *Context) {

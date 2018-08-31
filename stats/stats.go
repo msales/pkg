@@ -36,6 +36,9 @@ type Stats interface {
 
 // WithStats sets Stats in the context.
 func WithStats(ctx context.Context, stats Stats) context.Context {
+	if stats == nil {
+		stats = Null
+	}
 	return context.WithValue(ctx, ctxKey, stats)
 }
 

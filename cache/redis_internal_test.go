@@ -2,7 +2,6 @@ package cache
 
 import (
 	"testing"
-
 	"time"
 
 	"github.com/go-redis/redis"

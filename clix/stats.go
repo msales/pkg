@@ -14,7 +14,7 @@ func NewStats(c Ctx, l log.Logger) (stats.Stats, error) {
 	var s stats.Stats
 	var err error
 
-	dsn := c.String(FlagStatsAddr)
+	dsn := c.String(FlagStatsDSN)
 	if dsn == "" {
 		return stats.Null, nil
 	}
@@ -36,7 +36,7 @@ func NewStats(c Ctx, l log.Logger) (stats.Stats, error) {
 		return nil, errors.New(fmt.Sprintf("Unknown scheme: %s", scheme))
 	}
 
-	tags, err := splitTags(c.StringSlice(FlagStatsTags), "=")
+	tags, err := SplitTags(c.StringSlice(FlagStatsTags), "=")
 	if err != nil {
 		return nil, err
 	}

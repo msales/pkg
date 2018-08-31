@@ -21,7 +21,7 @@ func NewLogger(c Ctx) (log15.Logger, error) {
 
 	handler := log15.LvlFilterHandler(level, log15.StreamHandler(os.Stdout, format))
 
-	tags, err := splitTags(c.StringSlice(FlagLogTags), "=")
+	tags, err := SplitTags(c.StringSlice(FlagLogTags), "=")
 	if err != nil {
 		return nil, err
 	}
@@ -39,6 +39,8 @@ func newLogFormat(c Ctx) (log15.Format, error) {
 		return log15.TerminalFormat(), nil
 	case "json":
 		return log15.JsonFormat(), nil
+	case "logfmt":
+		return 	log15.LogfmtFormat(), nil
 	default:
 		return nil, errors.New(fmt.Sprintf("invalid log format: '%s'", format))
 	}
