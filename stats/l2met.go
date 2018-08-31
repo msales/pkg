@@ -84,7 +84,7 @@ func formatDuration(d time.Duration) string {
 
 	if p > 0 {
 		for {
-			if p % 10 == 0 {
+			if p%10 == 0 {
 				p /= 10
 				continue
 			}

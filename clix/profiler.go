@@ -5,14 +5,20 @@ import (
 	"net/http"
 	"net/http/pprof"
 	"time"
+
+	"github.com/urfave/cli"
 )
 
 var ProfilerServer = &http.Server{
-	ReadTimeout: time.Minute,
+	ReadTimeout:  time.Minute,
 	WriteTimeout: time.Minute,
 }
 
-func RunProfiler(c Ctx) {
+func RunProfiler(c *cli.Context) {
+	runProfiler(c)
+}
+
+func runProfiler(c Ctx) {
 	if !c.Bool(FlagProfiler) {
 		return
 	}
