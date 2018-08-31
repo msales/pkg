@@ -1,9 +1,9 @@
-package clix_test
+package clix
 
 import (
 	"context"
-	"github.com/msales/pkg/clix"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 	"net"
 	"testing"
 	"time"
@@ -11,11 +11,11 @@ import (
 
 func TestRunProfiler_Enabled(t *testing.T) {
 	ctx := new(CtxMock)
-	ctx.On("Bool", clix.FlagProfiler).Return(true)
-	ctx.On("String", clix.FlagProfilerPort).Return("62874")
+	ctx.On("Bool", FlagProfiler).Return(true)
+	ctx.On("String", FlagProfilerPort).Return("62874")
 
-	clix.RunProfiler(ctx)
-	defer clix.ProfilerServer.Shutdown(context.Background())
+	runProfiler(ctx)
+	defer ProfilerServer.Shutdown(context.Background())
 
 	time.Sleep(10 * time.Millisecond)
 
@@ -29,11 +29,30 @@ func TestRunProfiler_Enabled(t *testing.T) {
 
 func TestRunProfiler_Disabled(t *testing.T) {
 	ctx := new(CtxMock)
-	ctx.On("Bool", clix.FlagProfiler).Return(false)
+	ctx.On("Bool", FlagProfiler).Return(false)
 
-	clix.RunProfiler(ctx)
+	runProfiler(ctx)
 
 	_, err := net.DialTimeout("tcp",":62874", time.Second)
 
 	assert.Error(t, err)
+}
+
+type CtxMock struct {
+	mock.Mock
+}
+
+func (m *CtxMock) Bool(name string) bool {
+	args := m.Called(name)
+	return args.Bool(0)
+}
+
+func (m *CtxMock) String(name string) string {
+	args := m.Called(name)
+	return args.String(0)
+}
+
+func (m *CtxMock) StringSlice(name string) []string {
+	args := m.Called(name)
+	return args.Get(0).([]string)
 }

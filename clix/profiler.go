@@ -2,6 +2,7 @@ package clix
 
 import (
 	"fmt"
+	"github.com/urfave/cli"
 	"net/http"
 	"net/http/pprof"
 	"time"
@@ -12,7 +13,11 @@ var ProfilerServer = &http.Server{
 	WriteTimeout: time.Minute,
 }
 
-func RunProfiler(c Ctx) {
+func RunProfiler(c *cli.Context) {
+	runProfiler(c)
+}
+
+func runProfiler(c Ctx) {
 	if !c.Bool(FlagProfiler) {
 		return
 	}
