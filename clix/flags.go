@@ -63,7 +63,7 @@ var CommonFlags = Flags{
 	cli.StringFlag{
 		Name:   FlagLogLevel,
 		Value:  Defaults.LogLevel,
-		Usage:  "Specify the log level. E.g. `debug`, `warning`.",
+		Usage:  "Specify the log level. E.g. 'debug', 'warning'.",
 		EnvVar: "LOG_LEVEL",
 	},
 	cli.StringSliceFlag{
