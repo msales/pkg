@@ -13,7 +13,7 @@ import (
 
 var testsData = []struct {
 	inUrl  string
-	outMap map[string][]string
+	outMap url.Values
 }{
 	{
 		inUrl: "/?param[0]=value1&param[1]=value2",
@@ -61,7 +61,7 @@ var testsData = []struct {
 	},
 	{
 		inUrl: "/?single=asdf&param[0]=valuea&param[1]=valueb&param2[]=Parama&param2[]=Paramb",
-		outMap: map[string][]string{
+		outMap: url.Values{
 			"param[]": {
 				"valuea",
 				"valueb",
@@ -116,7 +116,7 @@ func TestWithQueryNormalizer(t *testing.T) {
 	}
 }
 
-func BenchmarkWithQueryNormalizer(b *testing.B) {
+func BenchmarkWithVerySimpleQueryNormalizer(b *testing.B) {
 
 	for n := 0; n < b.N; n++ {
 		h := middleware.WithQueryNormalizer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {}))
