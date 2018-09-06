@@ -11,6 +11,8 @@ import (
 func WithQueryNormalizer(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if i := strings.Index(r.URL.RawQuery, "["); i == -1 {
+			h.ServeHTTP(w, r)
+
 			return
 		}
 
