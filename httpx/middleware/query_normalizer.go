@@ -10,19 +10,19 @@ import (
 // WithQueryNormalizer fixes wrong php query string handling as array
 func WithQueryNormalizer(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if i := strings.Index(r.URL.RawQuery, "["); i == -1 {
+		if -1 == strings.Index(r.URL.RawQuery, "[") {
 			h.ServeHTTP(w, r)
 
 			return
 		}
 
-		q := r.URL.Query()
-		normalizedQuery := make(url.Values, 0)
+		qs := r.URL.Query()
+		normalizedQuery := make(url.Values, len(qs))
 
-		for key, qVal := range q {
-			newKey := getNormalizedValue(key)
+		for key, vals := range qs {
+			newKey := normalizedQueryKey(key)
 
-			for _, v := range qVal {
+			for _, v := range vals {
 				normalizedQuery.Add(newKey, v)
 			}
 		}
@@ -33,7 +33,7 @@ func WithQueryNormalizer(h http.Handler) http.Handler {
 	})
 }
 
-func getNormalizedValue(key string) string {
+func normalizedQueryKey(key string) string {
 	strs := strings.Split(key, "[")
 	if len(strs) == 0 {
 		return key
