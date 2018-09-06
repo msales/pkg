@@ -2,41 +2,45 @@ package middleware
 
 import (
 	"net/http"
-
 	"net/url"
-	"regexp"
+	"strconv"
+	"strings"
 )
 
 // WithQueryNormalizer fixes wrong php query string handling as array
 func WithQueryNormalizer(h http.Handler) http.Handler {
-	rxp, e := regexp.Compile("\\[[0-9]+\\]")
-	if e != nil {
-		panic(e)
-	}
-
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		q := r.URL.Query()
+		if i := strings.Index(r.URL.RawQuery, "["); i == -1 {
+			return
+		}
 
+		q := r.URL.Query()
 		normalizedQuery := make(url.Values, 0)
 
 		for key, qVal := range q {
-			newKey, values := getNormalizedValue(key, qVal, rxp)
+			newKey := getNormalizedValue(key)
 
-			for _, v := range values {
+			for _, v := range qVal {
 				normalizedQuery.Add(newKey, v)
 			}
 		}
 
 		r.URL.RawQuery = normalizedQuery.Encode()
+
+		h.ServeHTTP(w, r)
 	})
 }
 
-func getNormalizedValue(key string, qVal []string, rxp *regexp.Regexp) (string, []string) {
-	isNastyArray := rxp.Match([]byte(key))
-
-	if isNastyArray == false {
-		return key, qVal
+func getNormalizedValue(key string) string {
+	strs := strings.Split(key, "[")
+	if len(strs) == 0 {
+		return key
 	}
 
-	return rxp.ReplaceAllString(key, ""), qVal
+	for i, str := range strs {
+		if _, err := strconv.Atoi(str[:len(str)-1]); err == nil {
+			strs[i] = "]"
+		}
+	}
+	return strings.Join(strs, "[")
 }
