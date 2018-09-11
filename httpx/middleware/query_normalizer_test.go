@@ -25,6 +25,15 @@ var testsData = []struct {
 		},
 	},
 	{
+		inUrl: "/?param%5B0%5D=value1&param%5B1%5D=value2",
+		outMap: url.Values{
+			"param[]": {
+				"value1",
+				"value2",
+			},
+		},
+	},
+	{
 		inUrl: "/?param[]=value1&param[]=value2",
 		outMap: url.Values{
 			"param[]": {

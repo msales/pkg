@@ -7,10 +7,12 @@ import (
 	"strings"
 )
 
+const encodedBracket = "%5B"
+
 // WithQueryNormalizer fixes wrong php query string handling as array
 func WithQueryNormalizer(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if -1 == strings.Index(r.URL.RawQuery, "[") {
+		if -1 == strings.Index(r.URL.RawQuery, "[") && -1 == strings.Index(r.URL.RawQuery, encodedBracket) {
 			h.ServeHTTP(w, r)
 
 			return
