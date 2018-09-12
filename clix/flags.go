@@ -27,7 +27,7 @@ const (
 	FlagKafkaProducerBrokers = "kafka-producer-brokers"
 	FlagKafkaProducerTopic   = "kafka-producer-topic"
 
-	FlagRedisDsn = "redis-dsn"
+	FlagRedisDSN = "redis-dsn"
 )
 
 type defaults struct {
@@ -100,7 +100,7 @@ var KafkaProducerFlags = Flags{
 
 var RedisFlags = Flags{
 	cli.StringFlag{
-		Name:   FlagRedisDsn,
+		Name:   FlagRedisDSN,
 		Usage:  "The DSN of Redis.",
 		EnvVar: "REDIS_DSN",
 	},

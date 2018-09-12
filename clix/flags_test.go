@@ -12,15 +12,18 @@ import (
 func TestFlags_Merge(t *testing.T) {
 	f1 := cli.StringFlag{}
 	f2 := cli.StringFlag{}
-	flags := clix.Flags{f1}
-	newFlags := clix.Flags{f2}
+	f3 := cli.StringFlag{}
+	flags1 := clix.Flags{f1}
+	flags2 := clix.Flags{f2}
+	flags3 := clix.Flags{f3}
 
-	merged := flags.Merge(newFlags)
+	merged := flags1.Merge(flags2, flags3)
 
 	assert.IsType(t, clix.Flags{}, merged)
-	assert.Len(t, merged, 2)
-	assert.Contains(t, flags, f1)
-	assert.Contains(t, flags, f2)
+	assert.Len(t, merged, 3)
+	assert.Contains(t, flags1, f1)
+	assert.Contains(t, flags1, f2)
+	assert.Contains(t, flags1, f3)
 }
 
 func Test_SplitTags(t *testing.T) {
