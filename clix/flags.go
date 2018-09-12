@@ -50,8 +50,9 @@ type Flags []cli.Flag
 
 func (f Flags) Merge(flags ...Flags) Flags {
 	var m Flags
+	m = append(m, f...)
 	for _, flag := range flags {
-		m = append(f, flag...)
+		m = append(m, flag...)
 	}
 
 	return m
