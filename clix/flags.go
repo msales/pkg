@@ -20,6 +20,14 @@ const (
 
 	FlagProfiler     = "profiler"
 	FlagProfilerPort = "profiler-port"
+
+	FlagKafkaConsumerBrokers = "kafka-consumer-brokers"
+	FlagKafkaConsumerGroupID = "kafka-consumer-group-id"
+	FlagKafkaConsumerTopic   = "kafka-consumer-topic"
+	FlagKafkaProducerBrokers = "kafka-producer-brokers"
+	FlagKafkaProducerTopic   = "kafka-producer-topic"
+
+	FlagRedisDsn = "redis-dsn"
 )
 
 type defaults struct {
@@ -40,8 +48,13 @@ var Defaults = defaults{
 
 type Flags []cli.Flag
 
-func (f Flags) Merge(flags Flags) Flags {
-	return append(f, flags...)
+func (f Flags) Merge(flags ...Flags) Flags {
+	var m Flags
+	for _, flag := range flags {
+		m = append(f, flag...)
+	}
+
+	return m
 }
 
 var ServerFlags = Flags{
@@ -50,6 +63,45 @@ var ServerFlags = Flags{
 		Value:  Defaults.Port,
 		Usage:  "Port for HTTP server to listen on",
 		EnvVar: "PORT",
+	},
+}
+
+var KafkaConsumerFlags = Flags{
+	cli.StringSliceFlag{
+		Name:   FlagKafkaConsumerBrokers,
+		Usage:  "Kafka consumer brokers.",
+		EnvVar: "KAFKA_CONSUMER_BROKERS",
+	},
+	cli.StringFlag{
+		Name:   FlagKafkaConsumerGroupID,
+		Usage:  "Kafka consumer group id.",
+		EnvVar: "KAFKA_CONSUMER_GROUP_ID",
+	},
+	cli.StringFlag{
+		Name:   FlagKafkaConsumerTopic,
+		Usage:  "Kafka topic to consume from.",
+		EnvVar: "KAFKA_CONSUMER_TOPIC",
+	},
+}
+
+var KafkaProducerFlags = Flags{
+	cli.StringSliceFlag{
+		Name:   FlagKafkaProducerBrokers,
+		Usage:  "Kafka producer brokers.",
+		EnvVar: "KAFKA_PRODUCER_BROKERS",
+	},
+	cli.StringFlag{
+		Name:   FlagKafkaProducerTopic,
+		Usage:  "Kafka topic to produce into.",
+		EnvVar: "KAFKA_PRODUCER_TOPIC",
+	},
+}
+
+var RedisFlags = Flags{
+	cli.StringFlag{
+		Name:   FlagRedisDsn,
+		Usage:  "The DSN of Redis.",
+		EnvVar: "REDIS_DSN",
 	},
 }
 
