@@ -43,6 +43,6 @@ func WithResponseTime(h http.Handler) http.Handler {
 
 type PathTransformationFunc func(path string) string
 
-func Clear(string) string {
+func ClearPath(string) string {
 	return ""
 }

@@ -21,8 +21,8 @@ func TestWithRequestStats(t *testing.T) {
 	}{
 		{"/test", nil, "/test"},
 		{"", nil, ""},
-		{"/test", []middleware.PathTransformationFunc{middleware.Clear}, ""},
-		{"", []middleware.PathTransformationFunc{middleware.Clear}, ""},
+		{"/test", []middleware.PathTransformationFunc{middleware.ClearPath}, ""},
+		{"", []middleware.PathTransformationFunc{middleware.ClearPath}, ""},
 	}
 
 	for _, tt := range tests {
