@@ -8,11 +8,17 @@ import (
 )
 
 // WithRequestStats collects statistics about the request.
-func WithRequestStats(h http.Handler) http.Handler {
+func WithRequestStats(h http.Handler, transformers ...PathTransformationFunc) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		path := r.URL.Path
+
+		for _, fn := range transformers {
+			path = fn(path)
+		}
+
 		stats.Inc(r.Context(), "request.start", 1, 1.0,
 			"method", r.Method,
-			"path", r.URL.Path,
+			"path", path,
 		)
 
 		rw := NewResponseWriter(w)
@@ -20,6 +26,7 @@ func WithRequestStats(h http.Handler) http.Handler {
 
 		stats.Inc(r.Context(), "request.complete", 1, 1.0,
 			"status", fmt.Sprintf("%d", rw.Status()),
+			"path", path,
 		)
 	})
 }
@@ -32,4 +39,10 @@ func WithResponseTime(h http.Handler) http.Handler {
 
 		h.ServeHTTP(w, r)
 	})
+}
+
+type PathTransformationFunc func(path string) string
+
+func Clear(string) string {
+	return ""
 }

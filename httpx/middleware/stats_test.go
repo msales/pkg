@@ -14,24 +14,38 @@ import (
 )
 
 func TestWithRequestStats(t *testing.T) {
-	s := new(MockStats)
-	s.On("Inc", "request.start", int64(1), float32(1.0), []interface{}{
-		"method", "GET",
-		"path", "/",
-	}).Return(nil).Once()
-	s.On("Inc", "request.complete", int64(1), float32(1.0), []interface{}{
-		"status", "0",
-	}).Return(nil).Once()
+	tests := []struct {
+		path         string
+		transformers []middleware.PathTransformationFunc
+		expectedPath string
+	}{
+		{"/test", nil, "/test"},
+		{"", nil, ""},
+		{"/test", []middleware.PathTransformationFunc{middleware.Clear}, ""},
+		{"", []middleware.PathTransformationFunc{middleware.Clear}, ""},
+	}
 
-	m := middleware.WithRequestStats(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {}))
+	for _, tt := range tests {
+		s := new(MockStats)
+		s.On("Inc", "request.start", int64(1), float32(1.0), []interface{}{
+			"method", "GET",
+			"path", tt.expectedPath,
+		}).Return(nil).Once()
+		s.On("Inc", "request.complete", int64(1), float32(1.0), []interface{}{
+			"status", "0",
+			"path", tt.expectedPath,
+		}).Return(nil).Once()
 
-	resp := httptest.NewRecorder()
-	req, _ := http.NewRequest("GET", "/", nil)
+		m := middleware.WithRequestStats(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {}), tt.transformers...)
 
-	ctx := stats.WithStats(context.Background(), s)
-	m.ServeHTTP(resp, req.WithContext(ctx))
+		resp := httptest.NewRecorder()
+		req, _ := http.NewRequest("GET", tt.path, nil)
 
-	s.AssertExpectations(t)
+		ctx := stats.WithStats(context.Background(), s)
+		m.ServeHTTP(resp, req.WithContext(ctx))
+
+		s.AssertExpectations(t)
+	}
 }
 
 func TestWithResponseTime(t *testing.T) {
