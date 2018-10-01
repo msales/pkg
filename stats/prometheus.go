@@ -16,7 +16,6 @@ type Prometheus struct {
 	prefix string
 
 	reg      *prometheus.Registry
-	metrics  map[string]prometheus.Collector
 	counters map[string]*prometheus.CounterVec
 	gauges   map[string]*prometheus.GaugeVec
 	timings  map[string]*prometheus.SummaryVec
@@ -25,8 +24,11 @@ type Prometheus struct {
 // NewPrometheus creates a new Prometheus stats instance.
 func NewPrometheus(prefix string) *Prometheus {
 	return &Prometheus{
-		prefix: prefix,
-		reg:    prometheus.NewRegistry(),
+		prefix:   prefix,
+		reg:      prometheus.NewRegistry(),
+		counters: map[string]*prometheus.CounterVec{},
+		gauges:   map[string]*prometheus.GaugeVec{},
+		timings:  map[string]*prometheus.SummaryVec{},
 	}
 }
 
@@ -38,14 +40,15 @@ func (s *Prometheus) Handler() http.Handler {
 // Inc increments a count by the value.
 func (s *Prometheus) Inc(name string, value int64, rate float32, tags ...interface{}) error {
 	lblNames, lbls := prometheusTags(tags)
-	key := prometheusKey(name, lblNames)
+	key := s.createKey(name, lblNames)
 
 	m, ok := s.counters[key]
 	if !ok {
-		m := prometheus.NewCounterVec(
+		m = prometheus.NewCounterVec(
 			prometheus.CounterOpts{
-				Namespace: s.prefix,
-				Name:      name,
+				Namespace: s.formatFQN(s.prefix),
+				Name:      s.formatFQN(name),
+				Help:      name,
 			},
 			lblNames,
 		)
@@ -64,14 +67,15 @@ func (s *Prometheus) Inc(name string, value int64, rate float32, tags ...interfa
 // Dec decrements a count by the value.
 func (s *Prometheus) Dec(name string, value int64, rate float32, tags ...interface{}) error {
 	lblNames, lbls := prometheusTags(tags)
-	key := prometheusKey(name, lblNames)
+	key := s.createKey(name, lblNames)
 
 	m, ok := s.counters[key]
 	if !ok {
-		m := prometheus.NewCounterVec(
+		m = prometheus.NewCounterVec(
 			prometheus.CounterOpts{
-				Namespace: s.prefix,
-				Name:      name,
+				Namespace: s.formatFQN(s.prefix),
+				Name:      s.formatFQN(name),
+				Help:      name,
 			},
 			lblNames,
 		)
@@ -90,14 +94,15 @@ func (s *Prometheus) Dec(name string, value int64, rate float32, tags ...interfa
 // Gauge measures the value of a metric.
 func (s *Prometheus) Gauge(name string, value float64, rate float32, tags ...interface{}) error {
 	lblNames, lbls := prometheusTags(tags)
-	key := prometheusKey(name, lblNames)
+	key := s.createKey(name, lblNames)
 
 	m, ok := s.gauges[key]
 	if !ok {
-		m := prometheus.NewGaugeVec(
+		m = prometheus.NewGaugeVec(
 			prometheus.GaugeOpts{
-				Namespace: s.prefix,
-				Name:      name,
+				Namespace: s.formatFQN(s.prefix),
+				Name:      s.formatFQN(name),
+				Help:      name,
 			},
 			lblNames,
 		)
@@ -116,14 +121,15 @@ func (s *Prometheus) Gauge(name string, value float64, rate float32, tags ...int
 // Timing sends the value of a Duration.
 func (s *Prometheus) Timing(name string, value time.Duration, rate float32, tags ...interface{}) error {
 	lblNames, lbls := prometheusTags(tags)
-	key := prometheusKey(name, lblNames)
+	key := s.createKey(name, lblNames)
 
 	m, ok := s.timings[key]
 	if !ok {
-		m := prometheus.NewSummaryVec(
+		m = prometheus.NewSummaryVec(
 			prometheus.SummaryOpts{
-				Namespace:  s.prefix,
-				Name:       name,
+				Namespace:  s.formatFQN(s.prefix),
+				Name:       s.formatFQN(name),
+				Help:       name,
 				Objectives: map[float64]float64{0.5: 0.05, 0.9: 0.01, 0.99: 0.001},
 			},
 			lblNames,
@@ -145,6 +151,16 @@ func (s *Prometheus) Close() error {
 	return nil
 }
 
+// createKey creates a unique metric key.
+func (s *Prometheus) createKey(name string, lblNames []string) string {
+	return name + strings.Join(lblNames, ":")
+}
+
+// formatFQN formats FQN strings.
+func (s *Prometheus) formatFQN(name string) string {
+	return strings.Replace(name, ".", "_", -1)
+}
+
 // prometheusTags create a prometheus Label map from tags
 func prometheusTags(tags []interface{}) ([]string, prometheus.Labels) {
 	tags = deduplicateTags(normalizeTags(tags))
@@ -160,9 +176,4 @@ func prometheusTags(tags []interface{}) ([]string, prometheus.Labels) {
 	sort.Strings(names)
 
 	return names, lbls
-}
-
-// prometheusKey creates a unique metric key.
-func prometheusKey(name string, lblNames []string) string {
-	return name + strings.Join(lblNames, ":")
 }
