@@ -3,6 +3,7 @@ package clix
 import (
 	"errors"
 	"fmt"
+	"net/http"
 	"net/url"
 	"time"
 
@@ -30,8 +31,13 @@ func NewStats(c Ctx, l log.Logger) (stats.Stats, error) {
 		if err != nil {
 			return nil, err
 		}
+
 	case "l2met":
 		s = newL2metStats(c, l)
+
+	case "prometheus":
+		s = newPrometheusStats(c, uri.Host, l)
+
 	default:
 		return nil, errors.New(fmt.Sprintf("Unknown scheme: %s", scheme))
 	}
@@ -55,4 +61,20 @@ func newStatsDStats(c Ctx, addr string) (stats.Stats, error) {
 
 func newL2metStats(c Ctx, l log.Logger) stats.Stats {
 	return stats.NewL2met(l, c.String(FlagStatsPrefix))
+}
+
+func newPrometheusStats(c Ctx, addr string, l log.Logger) stats.Stats {
+	s := stats.NewPrometheus(c.String(FlagStatsPrefix))
+
+	if addr != "" {
+		mux := http.NewServeMux()
+		mux.Handle("/metrics", s.Handler())
+		go func() {
+			if err := http.ListenAndServe(addr, mux); err != nil {
+				l.Error(err.Error())
+			}
+		}()
+	}
+
+	return s
 }

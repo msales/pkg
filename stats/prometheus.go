@@ -23,7 +23,7 @@ type Prometheus struct {
 }
 
 // NewPrometheus creates a new Prometheus stats instance.
-func NewPrometheus(prefix string) Stats {
+func NewPrometheus(prefix string) *Prometheus {
 	return &Prometheus{
 		prefix: prefix,
 		reg:    prometheus.NewRegistry(),
