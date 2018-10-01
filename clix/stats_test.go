@@ -20,6 +20,8 @@ func TestNewStats(t *testing.T) {
 		{"statsd://localhost:8125", "test", []string{}, false},
 		{"", "test", []string{}, false},
 		{"l2met://", "test", []string{}, false},
+		{"prometheus://", "test", []string{}, false},
+		{"prometheus://:51234", "test", []string{}, false},
 		{"l2met://", "", []string{}, false},
 		{"invalid-scheme", "", []string{}, true},
 		{"unknownscheme://", "", []string{}, true},
