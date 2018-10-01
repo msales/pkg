@@ -1,6 +1,7 @@
 package stats
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"sort"
@@ -39,9 +40,9 @@ func (s *Prometheus) Handler() http.Handler {
 
 // Inc increments a count by the value.
 func (s *Prometheus) Inc(name string, value int64, rate float32, tags ...interface{}) error {
-	lblNames, lbls := prometheusTags(tags)
-	key := s.createKey(name, lblNames)
+	lblNames, lbls := formatPrometheusTags(tags)
 
+	key := s.createKey(name, lblNames)
 	m, ok := s.counters[key]
 	if !ok {
 		m = prometheus.NewCounterVec(
@@ -66,36 +67,14 @@ func (s *Prometheus) Inc(name string, value int64, rate float32, tags ...interfa
 
 // Dec decrements a count by the value.
 func (s *Prometheus) Dec(name string, value int64, rate float32, tags ...interface{}) error {
-	lblNames, lbls := prometheusTags(tags)
-	key := s.createKey(name, lblNames)
-
-	m, ok := s.counters[key]
-	if !ok {
-		m = prometheus.NewCounterVec(
-			prometheus.CounterOpts{
-				Namespace: s.formatFQN(s.prefix),
-				Name:      s.formatFQN(name),
-				Help:      name,
-			},
-			lblNames,
-		)
-
-		if err := s.reg.Register(m); err != nil {
-			return err
-		}
-		s.counters[key] = m
-	}
-
-	m.With(lbls).Add(-float64(value))
-
-	return nil
+	return errors.New("prometheus: decrement not supported")
 }
 
 // Gauge measures the value of a metric.
 func (s *Prometheus) Gauge(name string, value float64, rate float32, tags ...interface{}) error {
-	lblNames, lbls := prometheusTags(tags)
-	key := s.createKey(name, lblNames)
+	lblNames, lbls := formatPrometheusTags(tags)
 
+	key := s.createKey(name, lblNames)
 	m, ok := s.gauges[key]
 	if !ok {
 		m = prometheus.NewGaugeVec(
@@ -120,9 +99,9 @@ func (s *Prometheus) Gauge(name string, value float64, rate float32, tags ...int
 
 // Timing sends the value of a Duration.
 func (s *Prometheus) Timing(name string, value time.Duration, rate float32, tags ...interface{}) error {
-	lblNames, lbls := prometheusTags(tags)
-	key := s.createKey(name, lblNames)
+	lblNames, lbls := formatPrometheusTags(tags)
 
+	key := s.createKey(name, lblNames)
 	m, ok := s.timings[key]
 	if !ok {
 		m = prometheus.NewSummaryVec(
@@ -161,8 +140,8 @@ func (s *Prometheus) formatFQN(name string) string {
 	return strings.Replace(name, ".", "_", -1)
 }
 
-// prometheusTags create a prometheus Label map from tags
-func prometheusTags(tags []interface{}) ([]string, prometheus.Labels) {
+// formatPrometheusTags create a prometheus Label map from tags.
+func formatPrometheusTags(tags []interface{}) ([]string, prometheus.Labels) {
 	tags = deduplicateTags(normalizeTags(tags))
 
 	names := make([]string, 0, len(tags)/2)
