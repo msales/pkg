@@ -4,7 +4,7 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/msales/pkg/clix"
+	"github.com/msales/pkg/v2/clix"
 	"github.com/stretchr/testify/assert"
 	"github.com/urfave/cli"
 )

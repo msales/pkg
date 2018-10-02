@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/magiconair/properties/assert"
-	"github.com/msales/pkg/stats"
+	"github.com/msales/pkg/v2/stats"
 )
 
 func TestTags_With(t *testing.T) {
