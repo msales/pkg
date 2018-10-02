@@ -26,31 +26,31 @@ func NewStatsd(addr, prefix string) (Stats, error) {
 }
 
 // Inc increments a count by the value.
-func (s Statsd) Inc(name string, value int64, rate float32, tags ...interface{}) error {
+func (s *Statsd) Inc(name string, value int64, rate float32, tags ...interface{}) error {
 	name += formatStatsdTags(tags)
 	return s.client.Inc(name, value, rate)
 }
 
 // Dec decrements a count by the value.
-func (s Statsd) Dec(name string, value int64, rate float32, tags ...interface{}) error {
+func (s *Statsd) Dec(name string, value int64, rate float32, tags ...interface{}) error {
 	name += formatStatsdTags(tags)
 	return s.client.Dec(name, value, rate)
 }
 
 // Gauge measures the value of a metric.
-func (s Statsd) Gauge(name string, value float64, rate float32, tags ...interface{}) error {
+func (s *Statsd) Gauge(name string, value float64, rate float32, tags ...interface{}) error {
 	name += formatStatsdTags(tags)
 	return s.client.Gauge(name, int64(value), rate)
 }
 
 // Timing sends the value of a Duration.
-func (s Statsd) Timing(name string, value time.Duration, rate float32, tags ...interface{}) error {
+func (s *Statsd) Timing(name string, value time.Duration, rate float32, tags ...interface{}) error {
 	name += formatStatsdTags(tags)
 	return s.client.TimingDuration(name, value, rate)
 }
 
 // Close closes the client and flushes buffered stats, if applicable
-func (s Statsd) Close() error {
+func (s *Statsd) Close() error {
 	return s.client.Close()
 }
 
@@ -99,31 +99,31 @@ func NewBufferedStatsd(addr, prefix string, opts ...BufferedStatsdFunc) (*Buffer
 }
 
 // Inc increments a count by the value.
-func (s BufferedStatsd) Inc(name string, value int64, rate float32, tags ...interface{}) error {
+func (s *BufferedStatsd) Inc(name string, value int64, rate float32, tags ...interface{}) error {
 	name += formatStatsdTags(tags)
 	return s.client.Inc(name, value, rate)
 }
 
 // Dec decrements a count by the value.
-func (s BufferedStatsd) Dec(name string, value int64, rate float32, tags ...interface{}) error {
+func (s *BufferedStatsd) Dec(name string, value int64, rate float32, tags ...interface{}) error {
 	name += formatStatsdTags(tags)
 	return s.client.Dec(name, value, rate)
 }
 
 // Gauge measures the value of a metric.
-func (s BufferedStatsd) Gauge(name string, value float64, rate float32, tags ...interface{}) error {
+func (s *BufferedStatsd) Gauge(name string, value float64, rate float32, tags ...interface{}) error {
 	name += formatStatsdTags(tags)
 	return s.client.Gauge(name, int64(value), rate)
 }
 
 // Timing sends the value of a Duration.
-func (s BufferedStatsd) Timing(name string, value time.Duration, rate float32, tags ...interface{}) error {
+func (s *BufferedStatsd) Timing(name string, value time.Duration, rate float32, tags ...interface{}) error {
 	name += formatStatsdTags(tags)
 	return s.client.TimingDuration(name, value, rate)
 }
 
 // Close closes the client and flushes buffered stats, if applicable
-func (s BufferedStatsd) Close() error {
+func (s *BufferedStatsd) Close() error {
 	return s.client.Close()
 }
 
