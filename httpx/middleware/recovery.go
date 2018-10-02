@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/msales/pkg/log"
+	"github.com/msales/pkg/v2/log"
 )
 
 // Recovery is a middleware that will recover from panics and logs the error.

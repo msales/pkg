@@ -3,8 +3,8 @@ package clix
 import (
 	"context"
 
-	"github.com/msales/pkg/log"
-	"github.com/msales/pkg/stats"
+	"github.com/msales/pkg/v2/log"
+	"github.com/msales/pkg/v2/stats"
 	"github.com/urfave/cli"
 )
 

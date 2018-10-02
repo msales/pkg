@@ -6,8 +6,8 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/msales/pkg/log"
-	"github.com/msales/pkg/stats"
+	"github.com/msales/pkg/v2/log"
+	"github.com/msales/pkg/v2/stats"
 )
 
 func NewStats(c Ctx, l log.Logger) (stats.Stats, error) {

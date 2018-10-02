@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/msales/pkg/stats"
+	"github.com/msales/pkg/v2/stats"
 )
 
 // WithRequestStats collects statistics about the request.

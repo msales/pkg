@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/msales/pkg/log"
+	"github.com/msales/pkg/v2/log"
 )
 
 // L2met represents a l2met client.
