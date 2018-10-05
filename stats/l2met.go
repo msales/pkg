@@ -25,32 +25,48 @@ func NewL2met(l log.Logger, prefix string) Stats {
 
 // Inc increments a count by the value.
 func (s *L2met) Inc(name string, value int64, rate float32, tags ...interface{}) error {
-	msg := s.formatL2metMetric(name, fmt.Sprintf("%d", value), "count", tags)
-	s.log.Info(msg)
+	tags = deduplicateTags(normalizeTags(tags))
+	ctx := append([]interface{}{
+		s.formatL2metKey(name, "count"),
+		fmt.Sprintf("%d", value),
+	}, tags...)
+	s.log.Info("", ctx...)
 
 	return nil
 }
 
 // Dec decrements a count by the value.
 func (s *L2met) Dec(name string, value int64, rate float32, tags ...interface{}) error {
-	msg := s.formatL2metMetric(name, fmt.Sprintf("-%d", value), "count", tags)
-	s.log.Info(msg)
+	tags = deduplicateTags(normalizeTags(tags))
+	ctx := append([]interface{}{
+		s.formatL2metKey(name, "count"),
+		fmt.Sprintf("-%d", value),
+	}, tags...)
+	s.log.Info("", ctx...)
 
 	return nil
 }
 
 // Gauge measures the value of a metric.
 func (s *L2met) Gauge(name string, value float64, rate float32, tags ...interface{}) error {
-	msg := s.formatL2metMetric(name, fmt.Sprintf("%v", value), "sample", tags)
-	s.log.Info(msg)
+	tags = deduplicateTags(normalizeTags(tags))
+	ctx := append([]interface{}{
+		s.formatL2metKey(name, "sample"),
+		fmt.Sprintf("%v", value),
+	}, tags...)
+	s.log.Info("", ctx...)
 
 	return nil
 }
 
 // Timing sends the value of a Duration.
 func (s *L2met) Timing(name string, value time.Duration, rate float32, tags ...interface{}) error {
-	msg := s.formatL2metMetric(name, formatDuration(value), "measure", tags)
-	s.log.Info(msg)
+	tags = deduplicateTags(normalizeTags(tags))
+	ctx := append([]interface{}{
+		s.formatL2metKey(name, "measure"),
+		formatDuration(value),
+	}, tags...)
+	s.log.Info("", ctx...)
 
 	return nil
 }
@@ -60,18 +76,16 @@ func (s *L2met) Close() error {
 	return nil
 }
 
-func (s *L2met) formatL2metMetric(name, value, measure string, tags []interface{}) string {
+// formatL2metKey creates an l2met compatible ctx key.
+func (s *L2met) formatL2metKey(name, measure string) string {
 	if s.prefix != "" {
 		name = strings.Join([]string{s.prefix, name}, ".")
 	}
 
 	var buf bytes.Buffer
-	buf.WriteString(formatL2metTags(tags))
 	buf.WriteString(measure)
 	buf.WriteString("#")
 	buf.WriteString(name)
-	buf.WriteString("=")
-	buf.WriteString(value)
 
 	return buf.String()
 }
@@ -95,20 +109,4 @@ func formatDuration(d time.Duration) string {
 	}
 
 	return fmt.Sprintf("%dms", i)
-}
-
-// formatStatsdTags formats into an InfluxDB style string
-func formatL2metTags(tags []interface{}) string {
-	if len(tags) == 0 {
-		return ""
-	}
-
-	tags = deduplicateTags(normalizeTags(tags))
-
-	var buf bytes.Buffer
-	for i := 0; i < len(tags); i += 2 {
-		buf.WriteString(fmt.Sprintf("%v=%v ", tags[i], tags[i+1]))
-	}
-
-	return buf.String()
 }
