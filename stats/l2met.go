@@ -76,6 +76,7 @@ func (s *L2met) Close() error {
 	return nil
 }
 
+// formatL2metKey creates an l2met compatible ctx key.
 func (s *L2met) formatL2metKey(name, measure string) string {
 	if s.prefix != "" {
 		name = strings.Join([]string{s.prefix, name}, ".")
