@@ -1,6 +1,9 @@
 package stats_test
 
 import (
+	"bytes"
+	"fmt"
+	"strings"
 	"testing"
 	"time"
 
@@ -14,7 +17,7 @@ func TestL2met_Inc(t *testing.T) {
 
 	s.Inc("test", 2, 1.0, "test", "test")
 
-	assert.Equal(t, "test=test count#test.test=2", l.msg)
+	assert.Equal(t, "msg= count#test.test=2 test=test", l.Render())
 }
 
 func TestL2met_Dec(t *testing.T) {
@@ -23,7 +26,7 @@ func TestL2met_Dec(t *testing.T) {
 
 	s.Dec("test", 2, 1.0, "test", "test")
 
-	assert.Equal(t, "test=test count#test.test=-2", l.msg)
+	assert.Equal(t, "msg= count#test.test=-2 test=test", l.Render())
 }
 
 func TestL2met_Gauge(t *testing.T) {
@@ -32,7 +35,7 @@ func TestL2met_Gauge(t *testing.T) {
 
 	s.Gauge("test", 2.1, 1.0, "test", "test")
 
-	assert.Equal(t, "test=test sample#test.test=2.1", l.msg)
+	assert.Equal(t, "msg= sample#test.test=2.1 test=test", l.Render())
 }
 
 func TestL2met_Timing(t *testing.T) {
@@ -41,7 +44,7 @@ func TestL2met_Timing(t *testing.T) {
 
 	s.Timing("test", 2*time.Second+time.Nanosecond, 1.0, "test", "test")
 
-	assert.Equal(t, "test=test measure#test.test=2000ms", l.msg)
+	assert.Equal(t, "msg= measure#test.test=2000ms test=test", l.Render())
 }
 
 func TestL2met_TimingFractions(t *testing.T) {
@@ -50,7 +53,7 @@ func TestL2met_TimingFractions(t *testing.T) {
 
 	s.Timing("test", 1234500*time.Nanosecond, 1.0, "test", "test")
 
-	assert.Equal(t, "test=test measure#test.test=1.234ms", l.msg)
+	assert.Equal(t, "msg= measure#test.test=1.234ms test=test", l.Render())
 }
 
 func TestL2met_TimingPartialFractions(t *testing.T) {
@@ -59,7 +62,7 @@ func TestL2met_TimingPartialFractions(t *testing.T) {
 
 	s.Timing("test", 1230*time.Microsecond, 1.0, "test", "test")
 
-	assert.Equal(t, "test=test measure#test.test=1.23ms", l.msg)
+	assert.Equal(t, "msg= measure#test.test=1.23ms test=test", l.Render())
 }
 
 func TestL2met_Close(t *testing.T) {
@@ -89,4 +92,13 @@ func (l *testLogger) Info(msg string, ctx ...interface{}) {
 func (l *testLogger) Error(msg string, ctx ...interface{}) {
 	l.msg = msg
 	l.ctx = ctx
+}
+
+func (l *testLogger) Render() string {
+	var buf bytes.Buffer
+	for i := 0; i < len(l.ctx); i += 2 {
+		buf.WriteString(fmt.Sprintf("%v=%v ", l.ctx[i], l.ctx[i+1]))
+	}
+
+	return strings.Trim(fmt.Sprintf("msg=%s %s", l.msg, buf.String()), " ")
 }
