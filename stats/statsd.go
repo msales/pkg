@@ -135,12 +135,12 @@ func formatStatsdTags(tags []interface{}) string {
 
 	tags = deduplicateTags(normalizeTags(tags))
 
-	var buf string
+	var s string
 	for i := 0; i < len(tags); i += 2 {
-		buf += "," + formatValue(tags[i]) + "=" + formatValue(tags[i+1])
+		s += "," + formatValue(tags[i]) + "=" + formatValue(tags[i+1])
 	}
 
-	return buf
+	return s
 }
 
 func formatValue(value interface{}) string {
