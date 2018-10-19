@@ -74,6 +74,16 @@ func TestL2met_Close(t *testing.T) {
 	assert.NoError(t, err)
 }
 
+func BenchmarkL2met_Inc(b *testing.B) {
+	l := &testLogger{}
+	s := stats.NewL2met(l, "test")
+
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		s.Inc("test", 2, 1.0, "test", "test")
+	}
+}
+
 type testLogger struct {
 	msg string
 	ctx []interface{}

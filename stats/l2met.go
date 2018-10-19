@@ -1,9 +1,7 @@
 package stats
 
 import (
-	"bytes"
-	"fmt"
-	"strings"
+	"strconv"
 	"time"
 
 	"github.com/msales/pkg/log"
@@ -28,7 +26,7 @@ func (s *L2met) Inc(name string, value int64, rate float32, tags ...interface{})
 	tags = deduplicateTags(normalizeTags(tags))
 	ctx := append([]interface{}{
 		s.formatL2metKey(name, "count"),
-		fmt.Sprintf("%d", value),
+		strconv.FormatInt(value, 10),
 	}, tags...)
 	s.log.Info("", ctx...)
 
@@ -40,7 +38,7 @@ func (s *L2met) Dec(name string, value int64, rate float32, tags ...interface{})
 	tags = deduplicateTags(normalizeTags(tags))
 	ctx := append([]interface{}{
 		s.formatL2metKey(name, "count"),
-		fmt.Sprintf("-%d", value),
+		"-" + strconv.FormatInt(value, 10),
 	}, tags...)
 	s.log.Info("", ctx...)
 
@@ -52,7 +50,7 @@ func (s *L2met) Gauge(name string, value float64, rate float32, tags ...interfac
 	tags = deduplicateTags(normalizeTags(tags))
 	ctx := append([]interface{}{
 		s.formatL2metKey(name, "sample"),
-		fmt.Sprintf("%v", value),
+		strconv.FormatFloat(value, 'g', -1, 64),
 	}, tags...)
 	s.log.Info("", ctx...)
 
@@ -79,15 +77,10 @@ func (s *L2met) Close() error {
 // formatL2metKey creates an l2met compatible ctx key.
 func (s *L2met) formatL2metKey(name, measure string) string {
 	if s.prefix != "" {
-		name = strings.Join([]string{s.prefix, name}, ".")
+		return measure + "#" + s.prefix + "." + name
 	}
 
-	var buf bytes.Buffer
-	buf.WriteString(measure)
-	buf.WriteString("#")
-	buf.WriteString(name)
-
-	return buf.String()
+	return measure + "#" + name
 }
 
 // formatDuration converts duration into fractional milliseconds
@@ -105,8 +98,8 @@ func formatDuration(d time.Duration) string {
 			break
 		}
 
-		return fmt.Sprintf("%d.%dms", i, p)
+		return strconv.FormatUint(i, 10) + "." + strconv.FormatUint(p, 10) + "ms"
 	}
 
-	return fmt.Sprintf("%dms", i)
+	return strconv.FormatUint(i, 10) + "ms"
 }

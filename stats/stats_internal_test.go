@@ -49,6 +49,15 @@ func TestWithStatsFunc(t *testing.T) {
 	}
 }
 
+func TestTaggedStats_Collapses(t *testing.T) {
+	o := NewTaggedStats(Null, "test", "test")
+
+	s := NewTaggedStats(o, "global", "foobar")
+
+	assert.Equal(t, Null, s.stats)
+	assert.Equal(t, []interface{}{"test", "test", "global", "foobar"}, s.tags)
+}
+
 func TestNullStats(t *testing.T) {
 	s := Null
 

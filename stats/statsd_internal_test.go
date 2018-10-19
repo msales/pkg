@@ -210,3 +210,17 @@ func TestFormatStatsdTags_Uneven(t *testing.T) {
 
 	assert.Fail(t, "the test should have panicked on an uneven number of tags")
 }
+
+func BenchmarkFormatStatsdTags(b *testing.B) {
+	tags := []interface{}{
+		"string", "test",
+		"float", 1.2,
+		"int", 1,
+		"bool", true,
+	}
+
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		formatStatsdTags(tags)
+	}
+}

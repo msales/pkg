@@ -1,8 +1,8 @@
 package stats
 
 import (
-	"bytes"
 	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/cactus/go-statsd-client/statsd"
@@ -135,10 +135,31 @@ func formatStatsdTags(tags []interface{}) string {
 
 	tags = deduplicateTags(normalizeTags(tags))
 
-	var buf bytes.Buffer
+	var buf string
 	for i := 0; i < len(tags); i += 2 {
-		buf.WriteString(fmt.Sprintf(",%v=%v", tags[i], tags[i+1]))
+		buf += "," + formatValue(tags[i]) + "=" + formatValue(tags[i+1])
 	}
 
-	return buf.String()
+	return buf
+}
+
+func formatValue(value interface{}) string {
+	if value == nil {
+		return "nil"
+	}
+
+	switch v := value.(type) {
+	case bool:
+		return strconv.FormatBool(v)
+	case float32:
+		return strconv.FormatFloat(float64(v), 'g', -1, 64)
+	case float64:
+		return strconv.FormatFloat(v, 'g', -1, 64)
+	case int, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64:
+		return fmt.Sprintf("%d", value)
+	case string:
+		return v
+	default:
+		return fmt.Sprintf("%v", value)
+	}
 }
