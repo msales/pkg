@@ -32,8 +32,9 @@ func TestWithRequestStats(t *testing.T) {
 			"path", tt.expectedPath,
 		}).Return(nil).Once()
 		s.On("Inc", "request.complete", int64(1), float32(1.0), []interface{}{
-			"status", "0",
+			"method", "GET",
 			"path", tt.expectedPath,
+			"status", "0",
 		}).Return(nil).Once()
 
 		m := middleware.WithRequestStats(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {}), tt.transformers...)

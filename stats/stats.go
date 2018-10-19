@@ -120,6 +120,11 @@ type TaggedStats struct {
 
 // NewTaggedStats creates a new TaggedStats instance.
 func NewTaggedStats(stats Stats, tags ...interface{}) *TaggedStats {
+	if t, ok := stats.(*TaggedStats); ok {
+		stats = t.stats
+		tags = append(t.tags, tags...)
+	}
+
 	return &TaggedStats{
 		stats: stats,
 		tags:  normalizeTags(tags),
@@ -161,7 +166,7 @@ func normalizeTags(tags []interface{}) []interface{} {
 
 	// tags need to be even as they are key/value pairs
 	if len(tags)%2 != 0 {
-		panic("odd number of tags")
+		panic("stats: odd number of tags")
 	}
 
 	return tags
