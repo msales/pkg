@@ -1,6 +1,7 @@
 package stats
 
 import (
+	"context"
 	"runtime"
 	"time"
 )
@@ -19,6 +20,13 @@ func RuntimeEvery(stats Stats, t time.Duration) {
 	for range c {
 		r := newRuntimeStats()
 		r.send(stats)
+	}
+}
+
+// RuntimeFromContext is the same as RuntimeEvery but from context.
+func RuntimeFromContext(ctx context.Context, t time.Duration) {
+	if s, ok := FromContext(ctx); ok {
+		RuntimeEvery(s, t)
 	}
 }
 

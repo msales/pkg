@@ -1,8 +1,8 @@
 package middleware
 
 import (
-	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/msales/pkg/stats"
 )
@@ -11,12 +11,16 @@ import (
 func WithRequestStats(h http.Handler, transformers ...PathTransformationFunc) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		path := r.URL.Path
-
 		for _, fn := range transformers {
 			path = fn(path)
 		}
 
-		stats.Inc(r.Context(), "request.start", 1, 1.0,
+		s, ok := stats.FromContext(r.Context())
+		if !ok {
+			s = stats.Null
+		}
+
+		s.Inc("request.start", 1, 1.0,
 			"method", r.Method,
 			"path", path,
 		)
@@ -24,9 +28,10 @@ func WithRequestStats(h http.Handler, transformers ...PathTransformationFunc) ht
 		rw := NewResponseWriter(w)
 		h.ServeHTTP(rw, r)
 
-		stats.Inc(r.Context(), "request.complete", 1, 1.0,
-			"status", fmt.Sprintf("%d", rw.Status()),
+		s.Inc("request.complete", 1, 1.0,
+			"method", r.Method,
 			"path", path,
+			"status", strconv.Itoa(rw.Status()),
 		)
 	})
 }
