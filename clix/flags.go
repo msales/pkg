@@ -1,9 +1,6 @@
 package clix
 
 import (
-	"errors"
-	"strings"
-
 	"gopkg.in/urfave/cli.v1"
 )
 
@@ -164,22 +161,4 @@ var ProfilerFlags = Flags{
 		Usage:  "Port for the profiler to listen on.",
 		EnvVar: "PROFILER_PORT",
 	},
-}
-
-// SplitTags splits a slice of strings into a slice using
-// the given separator.
-func SplitTags(slice []string, sep string) ([]interface{}, error) {
-	res := make([]interface{}, 2*len(slice))
-
-	for i, str := range slice {
-		parts := strings.SplitN(str, sep, 2)
-		if len(parts) != 2 {
-			return nil, errors.New("invalid tags string")
-		}
-
-		res[2*i] = parts[0]
-		res[2*i+1] = parts[1]
-	}
-
-	return res, nil
 }
