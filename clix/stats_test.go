@@ -7,34 +7,35 @@ import (
 	"github.com/msales/pkg/log"
 	"github.com/msales/pkg/stats"
 	"github.com/stretchr/testify/assert"
+	"gopkg.in/urfave/cli.v1"
 )
 
 func TestNewStats(t *testing.T) {
 	tests := []struct {
 		dsn    string
 		prefix string
-		tags   []string
+		tags   *cli.StringSlice
 
 		shouldErr bool
 	}{
-		{"statsd://localhost:8125", "test", []string{}, false},
-		{"", "test", []string{}, false},
-		{"l2met://", "test", []string{}, false},
-		{"prometheus://", "test", []string{}, false},
-		{"prometheus://:51234", "test", []string{}, false},
-		{"l2met://", "", []string{}, false},
-		{"invalid-scheme", "", []string{}, true},
-		{"unknownscheme://", "", []string{}, true},
-		{"l2met://", "", []string{"a"}, true},
+		{"statsd://localhost:8125", "test", &cli.StringSlice{}, false},
+		{"", "test", &cli.StringSlice{}, false},
+		{"l2met://", "test", &cli.StringSlice{}, false},
+		{"prometheus://", "test", &cli.StringSlice{}, false},
+		{"prometheus://:51234", "test", &cli.StringSlice{}, false},
+		{"l2met://", "", &cli.StringSlice{}, false},
+		{"invalid-scheme", "", &cli.StringSlice{}, true},
+		{"unknownscheme://", "", &cli.StringSlice{}, true},
+		{"l2met://", "", &cli.StringSlice{"a"}, true},
 	}
 
 	for _, tt := range tests {
-		ctx := new(CtxMock)
-		ctx.On("String", clix.FlagStatsDSN).Return(tt.dsn)
-		ctx.On("String", clix.FlagStatsPrefix).Return(tt.prefix)
-		ctx.On("StringSlice", clix.FlagStatsTags).Return(tt.tags)
+		c, fs := newTestContext()
+		fs.String(clix.FlagStatsDSN, tt.dsn, "doc")
+		fs.String(clix.FlagStatsPrefix, tt.prefix, "doc")
+		fs.Var(tt.tags, clix.FlagStatsTags, "doc")
 
-		s, err := clix.NewStats(ctx, log.Null)
+		s, err := clix.NewStats(c, log.Null)
 
 		if tt.shouldErr {
 			assert.Error(t, err)

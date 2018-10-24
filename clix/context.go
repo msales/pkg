@@ -5,23 +5,19 @@ import (
 
 	"github.com/msales/pkg/log"
 	"github.com/msales/pkg/stats"
-	"github.com/urfave/cli"
+	"gopkg.in/urfave/cli.v1"
 )
-
-type Ctx interface {
-	Bool(name string) bool
-	String(name string) string
-	StringSlice(name string) []string
-}
 
 type ctxContext context.Context
 
+// Context represents an application context.
 type Context struct {
 	*cli.Context
 	ctxContext
 }
 
-func NewContext(c *cli.Context, opts ...CtxOptionFunc) (*Context, error) {
+// NewContext creates a new Context from the CLI Context.
+func NewContext(c *cli.Context, opts ...ContextFunc) (*Context, error) {
 	ctx := &Context{
 		Context:    c,
 		ctxContext: context.Background(),
@@ -32,27 +28,28 @@ func NewContext(c *cli.Context, opts ...CtxOptionFunc) (*Context, error) {
 	}
 
 	if _, ok := log.FromContext(ctx); !ok {
-		l, err := NewLogger(ctx)
+		l, err := NewLogger(ctx.Context)
 		if err != nil {
 			return nil, err
 		}
 
-		Logger(l)(ctx)
+		WithLogger(l)(ctx)
 	}
 
 	if _, ok := stats.FromContext(ctx); !ok {
-		l, _ := log.FromContext(ctx) // guaranteed to have a Logger instance here
-		s, err := NewStats(ctx, l)
+		l, _ := log.FromContext(ctx) // guaranteed to have a WithLogger instance here
+		s, err := NewStats(ctx.Context, l)
 		if err != nil {
 			return nil, err
 		}
 
-		Stats(s)(ctx)
+		WithStats(s)(ctx)
 	}
 
 	return ctx, nil
 }
 
+// Close closes the context.
 func (c *Context) Close() error {
 	s, ok := stats.FromContext(c)
 	if ok {
@@ -62,15 +59,18 @@ func (c *Context) Close() error {
 	return nil
 }
 
-type CtxOptionFunc func(ctx *Context)
+// ContextFunc configures the Context.
+type ContextFunc func(ctx *Context)
 
-func Logger(l log.Logger) CtxOptionFunc {
+// WithLogger sets the logger instance on the Context.
+func WithLogger(l log.Logger) ContextFunc {
 	return func(ctx *Context) {
 		ctx.ctxContext = log.WithLogger(ctx.ctxContext, l)
 	}
 }
 
-func Stats(s stats.Stats) CtxOptionFunc {
+// WithStats set the stats instance on the Context.
+func WithStats(s stats.Stats) ContextFunc {
 	return func(ctx *Context) {
 		ctx.ctxContext = stats.WithStats(ctx.ctxContext, s)
 	}
