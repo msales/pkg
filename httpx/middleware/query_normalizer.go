@@ -37,7 +37,7 @@ func WithQueryNormalizer(h http.Handler) http.Handler {
 
 func normalizedQueryKey(key string) string {
 	strs := strings.Split(key, "[")
-	if len(strs) == 0 {
+	if len(strs) == 1 {
 		return key
 	}
 

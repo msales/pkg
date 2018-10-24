@@ -16,28 +16,23 @@ import (
 func TestWithRequestStats(t *testing.T) {
 	tests := []struct {
 		path         string
-		transformers []middleware.PathTransformationFunc
-		expectedPath string
+		tagFuncs     []middleware.TagsFunc
+		expectedTags []interface{}
 	}{
-		{"/test", nil, "/test"},
-		{"", nil, ""},
-		{"/test", []middleware.PathTransformationFunc{middleware.ClearPath}, ""},
-		{"", []middleware.PathTransformationFunc{middleware.ClearPath}, ""},
+		{"/test", nil, []interface{}{"method", "GET", "path", "/test"}},
+		{"", nil, []interface{}{"method", "GET", "path", ""}},
+		{"/test", []middleware.TagsFunc{testTags}, []interface{}{"method", "GET"}},
+		{"", []middleware.TagsFunc{testTags}, []interface{}{"method", "GET"}},
 	}
 
 	for _, tt := range tests {
 		s := new(MockStats)
-		s.On("Inc", "request.start", int64(1), float32(1.0), []interface{}{
-			"method", "GET",
-			"path", tt.expectedPath,
-		}).Return(nil).Once()
-		s.On("Inc", "request.complete", int64(1), float32(1.0), []interface{}{
-			"method", "GET",
-			"path", tt.expectedPath,
+		s.On("Inc", "request.start", int64(1), float32(1.0), tt.expectedTags).Return(nil).Once()
+		s.On("Inc", "request.complete", int64(1), float32(1.0), append([]interface{}{
 			"status", "0",
-		}).Return(nil).Once()
+		}, tt.expectedTags...)).Return(nil).Once()
 
-		m := middleware.WithRequestStats(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {}), tt.transformers...)
+		m := middleware.WithRequestStats(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {}), tt.tagFuncs...)
 
 		resp := httptest.NewRecorder()
 		req, _ := http.NewRequest("GET", tt.path, nil)
@@ -47,6 +42,15 @@ func TestWithRequestStats(t *testing.T) {
 
 		s.AssertExpectations(t)
 	}
+}
+
+func TestWithRequestStats_NoStats(t *testing.T) {
+	m := middleware.WithRequestStats(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {}))
+
+	resp := httptest.NewRecorder()
+	req, _ := http.NewRequest("GET", "/", nil)
+
+	m.ServeHTTP(resp, req.WithContext(context.Background()))
 }
 
 func TestWithResponseTime(t *testing.T) {
@@ -62,6 +66,12 @@ func TestWithResponseTime(t *testing.T) {
 	m.ServeHTTP(resp, req.WithContext(ctx))
 
 	s.AssertExpectations(t)
+}
+
+func testTags(r *http.Request) []interface{} {
+	return []interface{}{
+		"method", r.Method,
+	}
 }
 
 type MockStats struct {
