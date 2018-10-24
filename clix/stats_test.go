@@ -26,6 +26,7 @@ func TestNewStats(t *testing.T) {
 		{"l2met://", "", &cli.StringSlice{}, false},
 		{"invalid-scheme", "", &cli.StringSlice{}, true},
 		{"unknownscheme://", "", &cli.StringSlice{}, true},
+		{":/", "", &cli.StringSlice{}, true},
 		{"l2met://", "", &cli.StringSlice{"a"}, true},
 	}
 
