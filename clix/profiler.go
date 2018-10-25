@@ -4,15 +4,11 @@ import (
 	"context"
 	"net/http"
 	"net/http/pprof"
-	"time"
 
 	"gopkg.in/urfave/cli.v1"
 )
 
-var profilerServer = &http.Server{
-	ReadTimeout:  time.Minute,
-	WriteTimeout: time.Minute,
-}
+var profilerServer = &http.Server{}
 
 // RunProfiler runs a profiler server.
 func RunProfiler(c *cli.Context) error {
