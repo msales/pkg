@@ -182,19 +182,15 @@ func mergeTags(prefix, suffix []interface{}) []interface{} {
 }
 
 func deduplicateTags(tags []interface{}) []interface{} {
-	res := make([]interface{}, 0, len(tags))
-Loop:
 	for i := 0; i < len(tags); i += 2 {
-		for j := 0; j < len(res); j += 2 {
-			if tags[i] == res[j] {
-				res[j+1] = tags[i+1]
-				continue Loop
+		for j := i + 2; j < len(tags); j += 2 {
+			if tags[i] == tags[j] {
+				tags[i+1] = tags[j+1]
+				tags = append(tags[:j], tags[j+2:]...)
+				j -= 2
 			}
 		}
-
-		res = append(res, tags[i])
-		res = append(res, tags[i+1])
 	}
 
-	return res
+	return tags
 }
