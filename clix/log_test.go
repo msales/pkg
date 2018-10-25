@@ -6,32 +6,34 @@ import (
 	"github.com/msales/pkg/clix"
 	"github.com/msales/pkg/log"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
+	"gopkg.in/urfave/cli.v1"
 )
 
 func TestNewLogger(t *testing.T) {
 	tests := []struct {
 		level  string
 		format string
-		tags   []string
+		tags   *cli.StringSlice
 
 		shouldErr bool
 	}{
-		{"info", "json", []string{}, false},
-		{"", "json", []string{}, true},
-		{"invalid", "json", []string{}, true},
-		{"info", "", []string{}, true},
-		{"info", "invalid", []string{}, true},
-		{"info", "json", []string{"single"}, true},
+		{"info", "json", &cli.StringSlice{}, false},
+		{"info", "terminal", &cli.StringSlice{}, false},
+		{"info", "logfmt", &cli.StringSlice{}, false},
+		{"", "json", &cli.StringSlice{}, false},
+		{"info", "", &cli.StringSlice{}, false},
+		{"invalid", "json", &cli.StringSlice{}, true},
+		{"info", "invalid", &cli.StringSlice{}, true},
+		{"info", "json", &cli.StringSlice{"single"}, true},
 	}
 
 	for _, tt := range tests {
-		ctx := new(CtxMock)
-		ctx.On("String", clix.FlagLogLevel).Return(tt.level)
-		ctx.On("String", clix.FlagLogFormat).Return(tt.format)
-		ctx.On("StringSlice", clix.FlagLogTags).Return(tt.tags)
+		c, fs := newTestContext()
+		fs.String(clix.FlagLogLevel, tt.level, "doc")
+		fs.String(clix.FlagLogFormat, tt.format, "doc")
+		fs.Var(tt.tags, clix.FlagLogTags, "doc")
 
-		l, err := clix.NewLogger(ctx)
+		l, err := clix.NewLogger(c)
 
 		if tt.shouldErr {
 			assert.Error(t, err)
@@ -40,23 +42,4 @@ func TestNewLogger(t *testing.T) {
 			assert.Implements(t, (*log.Logger)(nil), l)
 		}
 	}
-}
-
-type CtxMock struct {
-	mock.Mock
-}
-
-func (m *CtxMock) Bool(name string) bool {
-	args := m.Called(name)
-	return args.Bool(0)
-}
-
-func (m *CtxMock) String(name string) string {
-	args := m.Called(name)
-	return args.String(0)
-}
-
-func (m *CtxMock) StringSlice(name string) []string {
-	args := m.Called(name)
-	return args.Get(0).([]string)
 }

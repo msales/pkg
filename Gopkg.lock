@@ -120,7 +120,10 @@
 [[projects]]
   digest = "1:4142d94383572e74b42352273652c62afec5b23f325222ed09198f46009022d1"
   name = "github.com/prometheus/client_golang"
-  packages = ["prometheus"]
+  packages = [
+    "prometheus",
+    "prometheus/promhttp",
+  ]
   pruneopts = ""
   revision = "c5b7fccd204277076155f10851dad72b76a49317"
   version = "v0.8.0"
@@ -178,20 +181,20 @@
   version = "v1.2.1"
 
 [[projects]]
-  digest = "1:e85837cb04b78f61688c6eba93ea9d14f60d611e2aaf8319999b1a60d2dafbfa"
-  name = "github.com/urfave/cli"
-  packages = ["."]
-  pruneopts = ""
-  revision = "cfb38830724cc34fedffe9a2a29fb54fa9169cd1"
-  version = "v1.20.0"
-
-[[projects]]
   branch = "master"
   digest = "1:79b4fb7cfed68c4d0727858bd32dbe3be4b97ea58e2d767f92287f67810cbc98"
   name = "golang.org/x/sys"
   packages = ["unix"]
   pruneopts = ""
   revision = "d99a578cf41bfccdeaf48b0845c823a4b8b0ad5e"
+
+[[projects]]
+  digest = "1:e85837cb04b78f61688c6eba93ea9d14f60d611e2aaf8319999b1a60d2dafbfa"
+  name = "gopkg.in/urfave/cli.v1"
+  packages = ["."]
+  pruneopts = ""
+  revision = "cfb38830724cc34fedffe9a2a29fb54fa9169cd1"
+  version = "v1.20.0"
 
 [solve-meta]
   analyzer-name = "dep"
@@ -204,9 +207,10 @@
     "github.com/inconshreveable/log15",
     "github.com/magiconair/properties/assert",
     "github.com/prometheus/client_golang/prometheus",
+    "github.com/prometheus/client_golang/prometheus/promhttp",
     "github.com/stretchr/testify/assert",
     "github.com/stretchr/testify/mock",
-    "github.com/urfave/cli",
+    "gopkg.in/urfave/cli.v1",
   ]
   solver-name = "gps-cdcl"
   solver-version = 1

@@ -1,12 +1,10 @@
 package clix
 
 import (
-	"errors"
-	"strings"
-
-	"github.com/urfave/cli"
+	"gopkg.in/urfave/cli.v1"
 )
 
+// Flag constants declared for CLI use.
 const (
 	FlagPort = "port"
 
@@ -38,6 +36,7 @@ type defaults struct {
 	ProfilerPort string
 }
 
+// Defaults holds the flag default values.
 var Defaults = defaults{
 	Port:      "80",
 	LogFormat: "json",
@@ -46,8 +45,10 @@ var Defaults = defaults{
 	ProfilerPort: "8081",
 }
 
+// Flags represents a set of CLI flags.
 type Flags []cli.Flag
 
+// Merge joins one or more Flags together, making a new set.
 func (f Flags) Merge(flags ...Flags) Flags {
 	var m Flags
 	m = append(m, f...)
@@ -58,6 +59,7 @@ func (f Flags) Merge(flags ...Flags) Flags {
 	return m
 }
 
+// ServerFlags are flags that configure a server.
 var ServerFlags = Flags{
 	cli.StringFlag{
 		Name:   FlagPort,
@@ -67,6 +69,7 @@ var ServerFlags = Flags{
 	},
 }
 
+// KafkaConsumerFlags are flags that configure a Kafka consumer.
 var KafkaConsumerFlags = Flags{
 	cli.StringSliceFlag{
 		Name:   FlagKafkaConsumerBrokers,
@@ -85,6 +88,7 @@ var KafkaConsumerFlags = Flags{
 	},
 }
 
+// KafkaProducerFlags are flags that configure a Kafka producer.
 var KafkaProducerFlags = Flags{
 	cli.StringSliceFlag{
 		Name:   FlagKafkaProducerBrokers,
@@ -98,6 +102,7 @@ var KafkaProducerFlags = Flags{
 	},
 }
 
+// RedisFlags are flags that configure redis.
 var RedisFlags = Flags{
 	cli.StringFlag{
 		Name:   FlagRedisDSN,
@@ -106,6 +111,7 @@ var RedisFlags = Flags{
 	},
 }
 
+// CommonFlags are flags that configure logging and stats.
 var CommonFlags = Flags{
 	cli.StringFlag{
 		Name:   FlagLogFormat,
@@ -142,6 +148,7 @@ var CommonFlags = Flags{
 	},
 }
 
+// ProfilerFlags are flags that configure to the profiler.
 var ProfilerFlags = Flags{
 	cli.BoolFlag{
 		Name:   FlagProfiler,
@@ -154,20 +161,4 @@ var ProfilerFlags = Flags{
 		Usage:  "Port for the profiler to listen on.",
 		EnvVar: "PROFILER_PORT",
 	},
-}
-
-func SplitTags(slice []string, sep string) ([]interface{}, error) {
-	res := make([]interface{}, 2*len(slice))
-
-	for i, str := range slice {
-		parts := strings.SplitN(str, sep, 2)
-		if len(parts) != 2 {
-			return nil, errors.New("invalid tags string")
-		}
-
-		res[2*i] = parts[0]
-		res[2*i+1] = parts[1]
-	}
-
-	return res, nil
 }
