@@ -5,6 +5,7 @@ import (
 
 	"github.com/msales/pkg/v3/clix"
 	"github.com/stretchr/testify/assert"
+	"gopkg.in/urfave/cli.v1"
 )
 
 func TestFlags_Merge(t *testing.T) {

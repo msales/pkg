@@ -6,6 +6,7 @@ import (
 	"github.com/msales/pkg/v3/clix"
 	"github.com/msales/pkg/v3/log"
 	"github.com/stretchr/testify/assert"
+	"gopkg.in/urfave/cli.v1"
 )
 
 func TestNewLogger(t *testing.T) {

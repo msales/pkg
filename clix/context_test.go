@@ -11,6 +11,7 @@ import (
 	"github.com/msales/pkg/v3/stats"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"gopkg.in/urfave/cli.v1"
 )
 
 func TestWithLogger(t *testing.T) {

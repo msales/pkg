@@ -8,6 +8,7 @@ import (
 
 	"github.com/msales/pkg/v3/log"
 	"github.com/msales/pkg/v3/stats"
+	"gopkg.in/urfave/cli.v1"
 )
 
 // NewStats creates a new stats client.

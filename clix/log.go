@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/inconshreveable/log15"
+	"gopkg.in/urfave/cli.v1"
 )
 
 // NewLogger creates a new logger.
