@@ -4,8 +4,6 @@ import (
 	"context"
 	"net/http"
 	"net/http/pprof"
-
-	"gopkg.in/urfave/cli.v1"
 )
 
 var profilerServer = &http.Server{}

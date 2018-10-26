@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/msales/pkg/log"
+	"github.com/msales/pkg/v3/log"
 )
 
 // SamplerFunc represents a function that samples the L2met stats.
@@ -37,18 +37,18 @@ func UseSampler(sampler SamplerFunc) L2metFunc {
 
 // L2met represents a l2met client.
 type L2met struct {
-	log      log.Logger
-	prefix   string
+	log    log.Logger
+	prefix string
 
 	useRates bool
-	sampler SamplerFunc
+	sampler  SamplerFunc
 }
 
 // NewL2met create a l2met instance.
 func NewL2met(l log.Logger, prefix string, opts ...L2metFunc) Stats {
 	s := &L2met{
-		log:    l,
-		prefix: prefix,
+		log:     l,
+		prefix:  prefix,
 		sampler: defaultSampler,
 	}
 
@@ -156,8 +156,6 @@ func (s *L2met) formatL2metRate(rate float32) string {
 
 	return "@" + strconv.FormatFloat(float64(rate), 'f', -1, 32)
 }
-
-
 
 // formatDuration converts duration into fractional milliseconds
 // with no trailing zeros.

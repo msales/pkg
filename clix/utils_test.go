@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/msales/pkg/clix"
+	"github.com/msales/pkg/v3/clix"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -33,7 +33,7 @@ func Test_SplitTags(t *testing.T) {
 }
 
 func TestWaitForSignals(t *testing.T) {
-	tests := []struct{
+	tests := []struct {
 		signal syscall.Signal
 	}{
 		{signal: syscall.SIGINT},

@@ -6,7 +6,7 @@ import (
 
 	"context"
 
-	"github.com/msales/pkg/stats"
+	"github.com/msales/pkg/v3/stats"
 	"github.com/stretchr/testify/mock"
 )
 

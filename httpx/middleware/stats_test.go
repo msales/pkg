@@ -8,8 +8,8 @@ import (
 	"context"
 	"time"
 
-	"github.com/msales/pkg/httpx/middleware"
-	"github.com/msales/pkg/stats"
+	"github.com/msales/pkg/v3/httpx/middleware"
+	"github.com/msales/pkg/v3/stats"
 	"github.com/stretchr/testify/mock"
 )
 

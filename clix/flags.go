@@ -1,9 +1,5 @@
 package clix
 
-import (
-	"gopkg.in/urfave/cli.v1"
-)
-
 // Flag constants declared for CLI use.
 const (
 	FlagPort = "port"
