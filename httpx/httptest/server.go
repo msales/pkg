@@ -99,14 +99,13 @@ func (s *Server) handler(w http.ResponseWriter, r *http.Request) {
 			continue
 		}
 
+		for i := 0; i < len(exp.headers); i += 2 {
+			w.Header().Add(exp.headers[i], exp.headers[i+1])
+		}
+
 		if exp.fn != nil {
 			exp.fn(w, r)
 		} else {
-
-			for i := 0; i < len(exp.headers); i += 2 {
-				w.Header().Add(exp.headers[i], exp.headers[i+1])
-			}
-
 			w.WriteHeader(exp.status)
 			if len(exp.body) > 0 {
 				w.Write(exp.body)
