@@ -33,7 +33,7 @@ func Test_SplitTags(t *testing.T) {
 }
 
 func TestWaitForSignals(t *testing.T) {
-	tests := []struct{
+	tests := []struct {
 		signal syscall.Signal
 	}{
 		{signal: syscall.SIGINT},
