@@ -2,6 +2,7 @@ package health_test
 
 import (
 	"testing"
+	"time"
 
 	"github.com/msales/pkg/health"
 	"github.com/msales/pkg/httpx"
@@ -13,6 +14,8 @@ func TestStartServer(t *testing.T) {
 
 	go health.StartServer("127.0.0.1:8080", r)
 	defer health.StopServer()
+
+	time.Sleep(time.Millisecond)
 
 	resp, err := httpx.Get("http://127.0.0.1:8080/health")
 	assert.NoError(t, err)
