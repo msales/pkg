@@ -3,7 +3,7 @@ package clix_test
 import (
 	"testing"
 
-	"github.com/msales/pkg/clix"
+	"github.com/msales/pkg/v3/clix"
 	"github.com/stretchr/testify/assert"
 	"gopkg.in/urfave/cli.v1"
 )

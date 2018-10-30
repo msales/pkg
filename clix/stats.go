@@ -6,8 +6,8 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/msales/pkg/log"
-	"github.com/msales/pkg/stats"
+	"github.com/msales/pkg/v3/log"
+	"github.com/msales/pkg/v3/stats"
 	"gopkg.in/urfave/cli.v1"
 )
 

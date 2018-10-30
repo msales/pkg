@@ -8,8 +8,8 @@ import (
 
 	"errors"
 
-	"github.com/msales/pkg/httpx/middleware"
-	"github.com/msales/pkg/log"
+	"github.com/msales/pkg/v3/httpx/middleware"
+	"github.com/msales/pkg/v3/log"
 )
 
 func TestWithRecovery(t *testing.T) {

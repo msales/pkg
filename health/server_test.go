@@ -4,8 +4,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/msales/pkg/health"
-	"github.com/msales/pkg/httpx"
+	"github.com/msales/pkg/v3/health"
+	"github.com/msales/pkg/v3/httpx"
 	"github.com/stretchr/testify/assert"
 )
 

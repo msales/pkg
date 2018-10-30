@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/msales/pkg/log"
+	"github.com/msales/pkg/v3/log"
 )
 
 // SamplerFunc represents a function that samples the L2met stats.

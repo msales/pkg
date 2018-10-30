@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/msales/pkg/httpx"
-	"github.com/msales/pkg/httpx/httptest"
+	"github.com/msales/pkg/v3/httpx"
+	"github.com/msales/pkg/v3/httpx/httptest"
 	"github.com/stretchr/testify/assert"
 )
 

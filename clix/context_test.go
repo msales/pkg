@@ -6,9 +6,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/msales/pkg/clix"
-	"github.com/msales/pkg/log"
-	"github.com/msales/pkg/stats"
+	"github.com/msales/pkg/v3/clix"
+	"github.com/msales/pkg/v3/log"
+	"github.com/msales/pkg/v3/stats"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"gopkg.in/urfave/cli.v1"

@@ -4,7 +4,7 @@ import (
 	"net"
 	"testing"
 
-	"github.com/msales/pkg/cache"
+	"github.com/msales/pkg/v3/cache"
 )
 
 var (
