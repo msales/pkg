@@ -23,5 +23,9 @@
   version = "2.14.0"
 
 [[constraint]]
+  name = "github.com/ryanuber/go-glob"
+  version = "*"
+
+[[constraint]]
   name = "github.com/stretchr/testify"
   version = "^1.1.0"

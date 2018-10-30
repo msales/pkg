@@ -110,6 +110,14 @@
   version = "v1.0.1"
 
 [[projects]]
+  branch = "PL1-2340"
+  digest = "1:0558de13a63d6530f8a641ef1b947dbe765aa72025b23a076236f7efa7de1c3e"
+  name = "github.com/msales/places-normalizer"
+  packages = ["mocks"]
+  pruneopts = ""
+  revision = "6e875a5436b020f291b462ec4e66e3fc53d6b364"
+
+[[projects]]
   digest = "1:256484dbbcd271f9ecebc6795b2df8cad4c458dd0f5fd82a8c2fa0c29f233411"
   name = "github.com/pmezard/go-difflib"
   packages = ["difflib"]
@@ -162,6 +170,14 @@
   revision = "418d78d0b9a7b7de3a6bbc8a23def624cc977bb2"
 
 [[projects]]
+  digest = "1:29df111893b87bd947307aab294c042e900c2f29c53ad3896127955b4283728a"
+  name = "github.com/ryanuber/go-glob"
+  packages = ["."]
+  pruneopts = ""
+  revision = "572520ed46dbddaed19ea3d9541bdd0494163693"
+  version = "v0.1"
+
+[[projects]]
   digest = "1:306417ea2f31ea733df356a2b895de63776b6a5107085b33458e5cd6eb1d584d"
   name = "github.com/stretchr/objx"
   packages = ["."]
@@ -206,6 +222,7 @@
     "github.com/go-redis/redis",
     "github.com/inconshreveable/log15",
     "github.com/magiconair/properties/assert",
+    "github.com/msales/places-normalizer/mocks",
     "github.com/prometheus/client_golang/prometheus",
     "github.com/prometheus/client_golang/prometheus/promhttp",
     "github.com/stretchr/testify/assert",
