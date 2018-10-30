@@ -1,15 +1,21 @@
 package clix
 
 import (
-	"errors"
 	"fmt"
 	"os"
 
 	"github.com/inconshreveable/log15"
+	"gopkg.in/urfave/cli.v1"
 )
 
-func NewLogger(c Ctx) (log15.Logger, error) {
-	level, err := log15.LvlFromString(c.String(FlagLogLevel))
+// NewLogger creates a new logger.
+func NewLogger(c *cli.Context) (log15.Logger, error) {
+	levelStr := c.String(FlagLogLevel)
+	if levelStr == "" {
+		levelStr = "info"
+	}
+
+	level, err := log15.LvlFromString(levelStr)
 	if err != nil {
 		return nil, err
 	}
@@ -32,16 +38,16 @@ func NewLogger(c Ctx) (log15.Logger, error) {
 	return logger, nil
 }
 
-func newLogFormat(c Ctx) (log15.Format, error) {
+func newLogFormat(c *cli.Context) (log15.Format, error) {
 	format := c.String(FlagLogFormat)
 	switch format {
 	case "terminal":
 		return log15.TerminalFormat(), nil
-	case "json":
+	case "json", "":
 		return log15.JsonFormat(), nil
 	case "logfmt":
 		return log15.LogfmtFormat(), nil
 	default:
-		return nil, errors.New(fmt.Sprintf("invalid log format: '%s'", format))
+		return nil, fmt.Errorf("invalid log format: '%s'", format)
 	}
 }

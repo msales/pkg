@@ -6,40 +6,36 @@ import (
 	"testing"
 	"time"
 
-	"github.com/msales/pkg/clix"
-	"github.com/msales/pkg/log"
-	"github.com/msales/pkg/stats"
+	"github.com/msales/pkg/v3/clix"
+	"github.com/msales/pkg/v3/log"
+	"github.com/msales/pkg/v3/stats"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
-	"github.com/urfave/cli"
+	"gopkg.in/urfave/cli.v1"
 )
 
-func TestLogger(t *testing.T) {
+func TestWithLogger(t *testing.T) {
 	ctx := &clix.Context{}
 
-	fn := clix.Logger(log.Null)
-
-	assert.IsType(t, clix.CtxOptionFunc(nil), fn)
+	fn := clix.WithLogger(log.Null)
+	assert.IsType(t, clix.ContextFunc(nil), fn)
 
 	fn(ctx)
 
 	l, ok := log.FromContext(ctx)
-
 	assert.True(t, ok)
 	assert.Equal(t, l, log.Null)
 }
 
-func TestStats(t *testing.T) {
+func TestWithStats(t *testing.T) {
 	ctx := &clix.Context{}
 
-	fn := clix.Stats(stats.Null)
-
-	assert.IsType(t, clix.CtxOptionFunc(nil), fn)
+	fn := clix.WithStats(stats.Null)
+	assert.IsType(t, clix.ContextFunc(nil), fn)
 
 	fn(ctx)
 
 	s, ok := stats.FromContext(ctx)
-
 	assert.True(t, ok)
 	assert.Equal(t, s, stats.Null)
 }
@@ -47,7 +43,7 @@ func TestStats(t *testing.T) {
 func TestNewContext(t *testing.T) {
 	c := cli.NewContext(nil, flag.NewFlagSet("", flag.ContinueOnError), nil)
 
-	ctx, err := clix.NewContext(c, clix.Logger(log.Null), clix.Stats(stats.Null))
+	ctx, err := clix.NewContext(c)
 
 	assert.IsType(t, &clix.Context{}, ctx)
 	assert.NoError(t, err)
@@ -66,13 +62,20 @@ func TestContext_Close(t *testing.T) {
 		s.On("Close").Return(tt.err)
 
 		c := cli.NewContext(nil, flag.NewFlagSet("", flag.ContinueOnError), nil)
-		ctx, err := clix.NewContext(c, clix.Logger(log.Null), clix.Stats(s))
+		ctx, err := clix.NewContext(c, clix.WithLogger(log.Null), clix.WithStats(s))
 		assert.NoError(t, err)
 
 		err = ctx.Close()
 
 		assert.Equal(t, err, tt.err)
 	}
+}
+
+func newTestContext() (*cli.Context, *flag.FlagSet) {
+	fs := flag.NewFlagSet("test", 0)
+	c := cli.NewContext(cli.NewApp(), fs, nil)
+
+	return c, fs
 }
 
 type MockStats struct {

@@ -1,11 +1,10 @@
 package httpx
 
 import (
-	"net/http/httptest"
-	"testing"
-
 	"errors"
 	"net/http"
+	"net/http/httptest"
+	"testing"
 
 	"github.com/stretchr/testify/assert"
 )

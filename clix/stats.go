@@ -1,17 +1,18 @@
 package clix
 
 import (
-	"errors"
 	"fmt"
 	"net/http"
 	"net/url"
 	"time"
 
-	"github.com/msales/pkg/log"
-	"github.com/msales/pkg/stats"
+	"github.com/msales/pkg/v3/log"
+	"github.com/msales/pkg/v3/stats"
+	"gopkg.in/urfave/cli.v1"
 )
 
-func NewStats(c Ctx, l log.Logger) (stats.Stats, error) {
+// NewStats creates a new stats client.
+func NewStats(c *cli.Context, l log.Logger) (stats.Stats, error) {
 	var s stats.Stats
 	var err error
 
@@ -39,7 +40,7 @@ func NewStats(c Ctx, l log.Logger) (stats.Stats, error) {
 		s = newPrometheusStats(c, uri.Host, l)
 
 	default:
-		return nil, errors.New(fmt.Sprintf("Unknown scheme: %s", scheme))
+		return nil, fmt.Errorf("Unknown scheme: %s", scheme)
 	}
 
 	tags, err := SplitTags(c.StringSlice(FlagStatsTags), "=")
@@ -50,7 +51,7 @@ func NewStats(c Ctx, l log.Logger) (stats.Stats, error) {
 	return stats.NewTaggedStats(s, tags...), nil
 }
 
-func newStatsDStats(c Ctx, addr string) (stats.Stats, error) {
+func newStatsDStats(c *cli.Context, addr string) (stats.Stats, error) {
 	s, err := stats.NewBufferedStatsd(addr, c.String(FlagStatsPrefix), stats.WithFlushInterval(1*time.Second))
 	if err != nil {
 		return nil, err
@@ -59,11 +60,11 @@ func newStatsDStats(c Ctx, addr string) (stats.Stats, error) {
 	return s, nil
 }
 
-func newL2metStats(c Ctx, l log.Logger) stats.Stats {
+func newL2metStats(c *cli.Context, l log.Logger) stats.Stats {
 	return stats.NewL2met(l, c.String(FlagStatsPrefix))
 }
 
-func newPrometheusStats(c Ctx, addr string, l log.Logger) stats.Stats {
+func newPrometheusStats(c *cli.Context, addr string, l log.Logger) stats.Stats {
 	s := stats.NewPrometheus(c.String(FlagStatsPrefix))
 
 	if addr != "" {

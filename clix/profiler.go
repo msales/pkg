@@ -1,41 +1,40 @@
 package clix
 
 import (
-	"fmt"
+	"context"
 	"net/http"
 	"net/http/pprof"
-	"time"
 
-	"github.com/urfave/cli"
+	"gopkg.in/urfave/cli.v1"
 )
 
-var ProfilerServer = &http.Server{
-	ReadTimeout:  time.Minute,
-	WriteTimeout: time.Minute,
-}
+var profilerServer = &http.Server{}
 
+// RunProfiler runs a profiler server.
 func RunProfiler(c *cli.Context) error {
-	runProfiler(c)
-	return nil
-}
-
-func runProfiler(c Ctx) {
 	if !c.Bool(FlagProfiler) {
-		return
+		return nil
 	}
 
-	ProfilerServer.Handler = makeProfilerMux()
-	ProfilerServer.Addr = fmt.Sprintf(":%s", c.String(FlagProfilerPort))
+	profilerServer.Handler = newProfilerMux()
+	profilerServer.Addr = ":" + c.String(FlagProfilerPort)
 
 	go func() {
-		err := ProfilerServer.ListenAndServe()
+		err := profilerServer.ListenAndServe()
 		if err != nil && err != http.ErrServerClosed {
 			panic(err)
 		}
 	}()
+
+	return nil
 }
 
-func makeProfilerMux() http.Handler {
+// StopProfiler stops a running profiler server.
+func StopProfiler() error {
+	return profilerServer.Shutdown(context.Background())
+}
+
+func newProfilerMux() http.Handler {
 	mux := &http.ServeMux{}
 
 	mux.HandleFunc("/debug/pprof/", pprof.Index)

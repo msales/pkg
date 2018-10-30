@@ -6,29 +6,34 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/msales/pkg/health"
+	"github.com/msales/pkg/v3/health"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestHandler_With(t *testing.T) {
-	h := &health.Handler{}
-	r1 := &ReporterMock{}
-	r2 := &ReporterMock{}
+	h := health.NewHandler()
+	r1 := &testReporter{}
+	r2 := &testReporter{}
 
 	h.With(r1, r2)
 
-	assert.Contains(t, h.Reporters, r1)
-	assert.Contains(t, h.Reporters, r2)
+	w := httptest.NewRecorder()
+	req := httptest.NewRequest("GET", "/health", nil)
+	h.ServeHTTP(w, req)
+	assert.True(t, r1.called)
+	assert.True(t, r2.called)
 }
 
 func TestHandler_WithErrors(t *testing.T) {
-	h := &health.Handler{}
-
-	assert.False(t, h.ShowErr)
+	h := health.NewHandler()
+	h.With(&testReporter{err: errors.New("test")})
 
 	h.WithErrors()
 
-	assert.True(t, h.ShowErr)
+	w := httptest.NewRecorder()
+	req := httptest.NewRequest("GET", "/health", nil)
+	h.ServeHTTP(w, req)
+	assert.Equal(t, "test\n", w.Body.String())
 }
 
 func TestHandler_ServeHTTP(t *testing.T) {
@@ -48,11 +53,11 @@ func TestHandler_ServeHTTP(t *testing.T) {
 		var reporters []health.Reporter
 
 		for _, err := range tt.reporterErrs {
-			r := ReporterMock{err}
+			r := &testReporter{err: err}
 			reporters = append(reporters, r)
 		}
 
-		h := (&health.Handler{}).With(reporters...)
+		h := (health.NewHandler()).With(reporters...)
 
 		w := httptest.NewRecorder()
 		req := httptest.NewRequest("GET", "/health", nil)
@@ -63,10 +68,13 @@ func TestHandler_ServeHTTP(t *testing.T) {
 	}
 }
 
-type ReporterMock struct {
-	healthy error
+type testReporter struct {
+	called bool
+	err    error
 }
 
-func (r ReporterMock) IsHealthy() error {
-	return r.healthy
+func (r *testReporter) IsHealthy() error {
+	r.called = true
+
+	return r.err
 }

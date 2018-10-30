@@ -4,15 +4,30 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/msales/pkg/stats"
+	"github.com/msales/pkg/v3/stats"
 )
 
+// TagsFunc returns a set of tags from a request
+type TagsFunc func(*http.Request) []interface{}
+
+// DefaultTags extracts the method and path from the request.
+func DefaultTags(r *http.Request) []interface{} {
+	return []interface{}{
+		"method", r.Method,
+		"path", r.URL.Path,
+	}
+}
+
 // WithRequestStats collects statistics about the request.
-func WithRequestStats(h http.Handler, transformers ...PathTransformationFunc) http.Handler {
+func WithRequestStats(h http.Handler, fns ...TagsFunc) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		path := r.URL.Path
-		for _, fn := range transformers {
-			path = fn(path)
+		if len(fns) == 0 {
+			fns = []TagsFunc{DefaultTags}
+		}
+
+		var tags []interface{}
+		for _, fn := range fns {
+			tags = append(tags, fn(r)...)
 		}
 
 		s, ok := stats.FromContext(r.Context())
@@ -20,19 +35,16 @@ func WithRequestStats(h http.Handler, transformers ...PathTransformationFunc) ht
 			s = stats.Null
 		}
 
-		s.Inc("request.start", 1, 1.0,
-			"method", r.Method,
-			"path", path,
-		)
+		s.Inc("request.start", 1, 1.0, tags...)
 
 		rw := NewResponseWriter(w)
 		h.ServeHTTP(rw, r)
 
-		s.Inc("request.complete", 1, 1.0,
-			"method", r.Method,
-			"path", path,
-			"status", strconv.Itoa(rw.Status()),
-		)
+		cpltTags := make([]interface{}, len(tags)+2)
+		cpltTags[0] = "status"
+		cpltTags[1] = strconv.FormatInt(int64(rw.Status()), 10)
+		copy(cpltTags[2:], tags)
+		s.Inc("request.complete", 1, 1.0, cpltTags...)
 	})
 }
 
@@ -44,10 +56,4 @@ func WithResponseTime(h http.Handler) http.Handler {
 
 		h.ServeHTTP(w, r)
 	})
-}
-
-type PathTransformationFunc func(path string) string
-
-func ClearPath(string) string {
-	return ""
 }
