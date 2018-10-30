@@ -18,6 +18,7 @@ require (
 	github.com/prometheus/client_model v0.0.0-20180712105110-5c3871d89910 // indirect
 	github.com/prometheus/common v0.0.0-20180801064454-c7de2306084e // indirect
 	github.com/prometheus/procfs v0.0.0-20180920065004-418d78d0b9a7 // indirect
+	github.com/ryanuber/go-glob v0.0.0-20170128012129-256dc444b735
 	github.com/stretchr/objx v0.1.0 // indirect
 	github.com/stretchr/testify v1.2.1
 	gopkg.in/urfave/cli.v1 v1.20.0
