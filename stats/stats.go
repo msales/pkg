@@ -166,7 +166,7 @@ func normalizeTags(tags []interface{}) []interface{} {
 
 	// tags need to be even as they are key/value pairs
 	if len(tags)%2 != 0 {
-		panic("stats: odd number of tags")
+		tags = append(tags, nil, "STATS_ERROR", "Normalised odd number of tags by adding nil")
 	}
 
 	return tags

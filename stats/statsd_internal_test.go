@@ -171,18 +171,34 @@ func TestBufferedStatsd_Timing(t *testing.T) {
 
 func TestFormatStatsdTags(t *testing.T) {
 	tags := []interface{}{
+		"bool", true,
+		"float32", float32(1.23),
+		"float64", float64(1.23),
+		"int", 1,
+		"int8", int8(2),
+		"int16", int16(2),
+		"int32", int32(2),
+		"int64", int64(2),
+		"uint", uint(1),
+		"uint8", uint8(2),
+		"uint16", uint16(2),
+		"uint32", uint32(2),
+		"uint64", uint64(2),
 		"test", "test",
 		"foo", "bar",
 		"test", "baz",
+		"struct", struct {
+			Name string
+		}{Name: "blah"},
 	}
 
 	assert.Equal(t, "", formatStatsdTags(nil))
 	assert.Equal(t, "", formatStatsdTags([]interface{}{}))
 
 	got := formatStatsdTags(tags)
-	assert.NotContains(t, got, ",test=test")
-	assert.Contains(t, got, ",test=baz")
-	assert.Contains(t, got, ",foo=bar")
+
+	expect := ",bool=true,float32=1.2300000190734863,float64=1.23,int=1,int8=2,int16=2,int32=2,int64=2,uint=1,uint8=2,uint16=2,uint32=2,uint64=2,test=baz,foo=bar,struct={Name:blah}"
+	assert.Equal(t, expect, got)
 }
 
 func TestFormatStatsdTags_Tags(t *testing.T) {
@@ -202,13 +218,9 @@ func TestFormatStatsdTags_Uneven(t *testing.T) {
 		"foo",
 	}
 
-	defer func() {
-		assert.NotNil(t, recover())
-	}()
+	s := formatStatsdTags(tags)
 
-	formatStatsdTags(tags)
-
-	assert.Fail(t, "the test should have panicked on an uneven number of tags")
+	assert.Equal(t, ",test=test,foo=nil,STATS_ERROR=Normalised odd number of tags by adding nil", s)
 }
 
 func BenchmarkFormatStatsdTags(b *testing.B) {
