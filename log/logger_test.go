@@ -38,6 +38,18 @@ func TestError(t *testing.T) {
 	m.AssertExpectations(t)
 }
 
+func TestNullLogger_Debug(t *testing.T) {
+	log.Null.Debug("test log", "foo", "bar")
+}
+
+func TestNullLogger_Info(t *testing.T) {
+	log.Null.Info("test log", "foo", "bar")
+}
+
+func TestNullLogger_Error(t *testing.T) {
+	log.Null.Error("test log", "foo", "bar")
+}
+
 type MockLogger struct {
 	mock.Mock
 }
