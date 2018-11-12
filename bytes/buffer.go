@@ -4,6 +4,7 @@ import (
 	"strconv"
 	"sync"
 	"time"
+	"unsafe"
 )
 
 // Pool is a pool of Buffers.
@@ -95,9 +96,9 @@ func (b *Buffer) Bytes() []byte {
 	return b.b
 }
 
-// String returns a string copy of the underlying byte slice.
+// String returns a string of the underlying byte slice.
 func (b *Buffer) String() string {
-	return string(b.b)
+	return *(*string)(unsafe.Pointer(&b.b))
 }
 
 // Reset resets the underlying byte slice. Subsequent writes re-use the slice's
