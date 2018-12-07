@@ -155,7 +155,7 @@ func (s *L2met) formatL2metRate(rate float32) string {
 	buf := l2metPool.Get()
 	buf.WriteByte('@')
 	buf.AppendFloat(float64(rate), 'f', -1, 32)
-	res := buf.String()
+	res := string(buf.Bytes())
 	l2metPool.Put(buf)
 
 	return res
@@ -195,7 +195,7 @@ func formatDuration(d time.Duration) string {
 	}
 
 	buf.WriteString("ms")
-	res := buf.String()
+	res := string(buf.Bytes())
 	l2metPool.Put(buf)
 
 	return res
