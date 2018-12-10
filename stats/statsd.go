@@ -145,7 +145,7 @@ func formatStatsdTags(tags []interface{}) string {
 		formatStatsdValue(buf, tags[i+1])
 	}
 
-	s := buf.String()
+	s := string(buf.Bytes())
 	statsdPool.Put(buf)
 	return s
 }
