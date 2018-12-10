@@ -15,12 +15,9 @@ import (
 )
 
 func TestWithLogger(t *testing.T) {
-	ctx := &clix.Context{}
-
-	fn := clix.WithLogger(log.Null)
-	assert.IsType(t, clix.ContextFunc(nil), fn)
-
-	fn(ctx)
+	c, _ := newTestContext()
+	ctx, err := clix.NewContext(c, clix.WithLogger(log.Null))
+	assert.NoError(t, err)
 
 	l, ok := log.FromContext(ctx)
 	assert.True(t, ok)
@@ -28,12 +25,9 @@ func TestWithLogger(t *testing.T) {
 }
 
 func TestWithStats(t *testing.T) {
-	ctx := &clix.Context{}
-
-	fn := clix.WithStats(stats.Null)
-	assert.IsType(t, clix.ContextFunc(nil), fn)
-
-	fn(ctx)
+	c, _ := newTestContext()
+	ctx, err := clix.NewContext(c, clix.WithStats(stats.Null))
+	assert.NoError(t, err)
 
 	s, ok := stats.FromContext(ctx)
 	assert.True(t, ok)
@@ -41,41 +35,111 @@ func TestWithStats(t *testing.T) {
 }
 
 func TestNewContext(t *testing.T) {
-	c := cli.NewContext(nil, flag.NewFlagSet("", flag.ContinueOnError), nil)
+	c, _ := newTestContext()
 
 	ctx, err := clix.NewContext(c)
 
-	assert.IsType(t, &clix.Context{}, ctx)
 	assert.NoError(t, err)
+	assert.IsType(t, &clix.Context{}, ctx)
+}
+
+func TestNewContext_LoggerError(t *testing.T) {
+	c, flags := newTestContext()
+	flags.String(clix.FlagLogFormat, "test", "")
+
+	_, err := clix.NewContext(c)
+
+	assert.Error(t, err)
+}
+
+func TestNewContext_StatsError(t *testing.T) {
+	c, flags := newTestContext()
+	flags.String(clix.FlagStatsDSN, "test://", "")
+
+	_, err := clix.NewContext(c)
+
+	assert.Error(t, err)
 }
 
 func TestContext_Close(t *testing.T) {
+	c, _ := newTestContext()
+	ctx, _ := clix.NewContext(c, clix.WithLogger(log.Null), clix.WithStats(stats.Null))
+
+	err := ctx.Close()
+
+	assert.NoError(t, err)
+}
+
+func TestContext_CloseErrors(t *testing.T) {
 	tests := []struct {
-		err error
+		name     string
+		logErr   error
+		statsErr error
 	}{
-		{nil},
-		{errors.New("")},
+		{
+			name:     "No Error",
+			logErr:   nil,
+			statsErr: nil,
+		},
+		{
+			name:     "Logger Error",
+			logErr:   errors.New("test"),
+			statsErr: nil,
+		},
+		{
+			name:     "Stats Error",
+			logErr:   nil,
+			statsErr: errors.New("test"),
+		},
 	}
 
 	for _, tt := range tests {
-		s := new(MockStats)
-		s.On("Close").Return(tt.err)
+		t.Run(tt.name, func(t *testing.T) {
+			l := new(MockLogger)
+			l.On("Close").Return(tt.logErr)
 
-		c := cli.NewContext(nil, flag.NewFlagSet("", flag.ContinueOnError), nil)
-		ctx, err := clix.NewContext(c, clix.WithLogger(log.Null), clix.WithStats(s))
-		assert.NoError(t, err)
+			s := new(MockStats)
+			s.On("Close").Return(tt.statsErr)
 
-		err = ctx.Close()
+			c, _ := newTestContext()
+			ctx, err := clix.NewContext(c, clix.WithLogger(l), clix.WithStats(s))
+			assert.NoError(t, err)
 
-		assert.Equal(t, err, tt.err)
+			err = ctx.Close()
+
+			if tt.logErr != nil || tt.statsErr != nil {
+				assert.Error(t, err)
+			} else {
+				assert.NoError(t, err)
+			}
+		})
 	}
 }
 
 func newTestContext() (*cli.Context, *flag.FlagSet) {
-	fs := flag.NewFlagSet("test", 0)
+	fs := flag.NewFlagSet("test", flag.ContinueOnError)
 	c := cli.NewContext(cli.NewApp(), fs, nil)
 
 	return c, fs
+}
+
+type MockLogger struct {
+	mock.Mock
+}
+
+func (m *MockLogger) Debug(msg string, ctx ...interface{}) {}
+
+func (m *MockLogger) Info(msg string, ctx ...interface{}) {}
+
+func (m *MockLogger) Warn(msg string, ctx ...interface{}) {}
+
+func (m *MockLogger) Error(msg string, ctx ...interface{}) {}
+
+func (m *MockLogger) Crit(msg string, ctx ...interface{}) {}
+
+func (m *MockLogger) Close() error {
+	args := m.Called()
+	return args.Error(0)
 }
 
 type MockStats struct {

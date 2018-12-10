@@ -2,11 +2,29 @@ package clix
 
 import (
 	"context"
+	"io"
 
 	"github.com/msales/pkg/v3/log"
 	"github.com/msales/pkg/v3/stats"
 	"gopkg.in/urfave/cli.v1"
 )
+
+// ContextFunc configures the Context.
+type ContextFunc func(ctx *Context)
+
+// WithLogger sets the logger instance on the Context.
+func WithLogger(l log.Logger) ContextFunc {
+	return func(ctx *Context) {
+		ctx.logger = l
+	}
+}
+
+// WithStats set the stats instance on the Context.
+func WithStats(s stats.Stats) ContextFunc {
+	return func(ctx *Context) {
+		ctx.stats = s
+	}
+}
 
 type ctxContext context.Context
 
@@ -14,6 +32,9 @@ type ctxContext context.Context
 type Context struct {
 	*cli.Context
 	ctxContext
+
+	logger log.Logger
+	stats  stats.Stats
 }
 
 // NewContext creates a new Context from the CLI Context.
@@ -27,18 +48,17 @@ func NewContext(c *cli.Context, opts ...ContextFunc) (*Context, error) {
 		opt(ctx)
 	}
 
-	if _, ok := log.FromContext(ctx); !ok {
+	if ctx.logger == nil {
 		l, err := NewLogger(ctx.Context)
 		if err != nil {
 			return nil, err
 		}
 
-		WithLogger(l)(ctx)
+		ctx.logger = l
 	}
 
-	if _, ok := stats.FromContext(ctx); !ok {
-		l, _ := log.FromContext(ctx) // guaranteed to have a WithLogger instance here
-		s, err := NewStats(ctx.Context, l)
+	if ctx.stats == nil {
+		s, err := NewStats(ctx.Context, ctx.logger) // guaranteed to have a logger instance here
 		if err != nil {
 			return nil, err
 		}
@@ -46,32 +66,21 @@ func NewContext(c *cli.Context, opts ...ContextFunc) (*Context, error) {
 		WithStats(s)(ctx)
 	}
 
+	ctx.ctxContext = log.WithLogger(ctx.ctxContext, ctx.logger)
+	ctx.ctxContext = stats.WithStats(ctx.ctxContext, ctx.stats)
+
 	return ctx, nil
 }
 
 // Close closes the context.
 func (c *Context) Close() error {
-	s, ok := stats.FromContext(c)
-	if ok {
-		return s.Close()
+	if err := c.stats.Close(); err != nil {
+		return err
+	}
+
+	if l, ok := c.logger.(io.Closer); ok {
+		return l.Close()
 	}
 
 	return nil
-}
-
-// ContextFunc configures the Context.
-type ContextFunc func(ctx *Context)
-
-// WithLogger sets the logger instance on the Context.
-func WithLogger(l log.Logger) ContextFunc {
-	return func(ctx *Context) {
-		ctx.ctxContext = log.WithLogger(ctx.ctxContext, l)
-	}
-}
-
-// WithStats set the stats instance on the Context.
-func WithStats(s stats.Stats) ContextFunc {
-	return func(ctx *Context) {
-		ctx.ctxContext = stats.WithStats(ctx.ctxContext, s)
-	}
 }
