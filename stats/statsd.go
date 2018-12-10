@@ -2,10 +2,10 @@ package stats
 
 import (
 	"fmt"
-	"strconv"
 	"time"
 
 	"github.com/cactus/go-statsd-client/statsd"
+	"github.com/msales/pkg/v3/bytes"
 )
 
 // Statsd represents a statsd client.
@@ -127,6 +127,8 @@ func (s *BufferedStatsd) Close() error {
 	return s.client.Close()
 }
 
+var statsdPool = bytes.NewPool(100)
+
 // formatStatsdTags formats into an InfluxDB style string
 func formatStatsdTags(tags []interface{}) string {
 	if len(tags) == 0 {
@@ -135,31 +137,56 @@ func formatStatsdTags(tags []interface{}) string {
 
 	tags = deduplicateTags(normalizeTags(tags))
 
-	var s string
+	buf := statsdPool.Get()
 	for i := 0; i < len(tags); i += 2 {
-		s += "," + formatValue(tags[i]) + "=" + formatValue(tags[i+1])
+		buf.WriteByte(',')
+		formatStatsdValue(buf, tags[i])
+		buf.WriteByte('=')
+		formatStatsdValue(buf, tags[i+1])
 	}
 
+	s := string(buf.Bytes())
+	statsdPool.Put(buf)
 	return s
 }
 
-func formatValue(value interface{}) string {
+// formatStatsdValue formats a value, adding it to the Buffer.
+func formatStatsdValue(buf *bytes.Buffer, value interface{}) {
 	if value == nil {
-		return "nil"
+		buf.WriteString("nil")
+		return
 	}
 
 	switch v := value.(type) {
 	case bool:
-		return strconv.FormatBool(v)
+		buf.AppendBool(v)
 	case float32:
-		return strconv.FormatFloat(float64(v), 'g', -1, 64)
+		buf.AppendFloat(float64(v), 'g', -1, 64)
 	case float64:
-		return strconv.FormatFloat(v, 'g', -1, 64)
-	case int, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64:
-		return fmt.Sprintf("%d", value)
+		buf.AppendFloat(v, 'g', -1, 64)
+	case int:
+		buf.AppendInt(int64(v))
+	case int8:
+		buf.AppendInt(int64(v))
+	case int16:
+		buf.AppendInt(int64(v))
+	case int32:
+		buf.AppendInt(int64(v))
+	case int64:
+		buf.AppendInt(v)
+	case uint:
+		buf.AppendUint(uint64(v))
+	case uint8:
+		buf.AppendUint(uint64(v))
+	case uint16:
+		buf.AppendUint(uint64(v))
+	case uint32:
+		buf.AppendUint(uint64(v))
+	case uint64:
+		buf.AppendUint(v)
 	case string:
-		return v
+		buf.WriteString(v)
 	default:
-		return fmt.Sprintf("%v", value)
+		buf.WriteString(fmt.Sprintf("%+v", value))
 	}
 }

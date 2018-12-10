@@ -2,9 +2,9 @@ package stats
 
 import (
 	"math/rand"
-	"strconv"
 	"time"
 
+	"github.com/msales/pkg/v3/bytes"
 	"github.com/msales/pkg/v3/log"
 )
 
@@ -46,6 +46,10 @@ type L2met struct {
 
 // NewL2met create a l2met instance.
 func NewL2met(l log.Logger, prefix string, opts ...L2metFunc) Stats {
+	if len(prefix) > 0 {
+		prefix += "."
+	}
+
 	s := &L2met{
 		log:     l,
 		prefix:  prefix,
@@ -64,7 +68,7 @@ func (s *L2met) Inc(name string, value int64, rate float32, tags ...interface{})
 	s.render(
 		"count",
 		name,
-		strconv.FormatInt(value, 10),
+		value,
 		rate,
 		tags,
 	)
@@ -77,7 +81,7 @@ func (s *L2met) Dec(name string, value int64, rate float32, tags ...interface{})
 	s.render(
 		"count",
 		name,
-		"-"+strconv.FormatInt(value, 10),
+		value*-1,
 		rate,
 		tags,
 	)
@@ -90,7 +94,7 @@ func (s *L2met) Gauge(name string, value float64, rate float32, tags ...interfac
 	s.render(
 		"sample",
 		name,
-		strconv.FormatFloat(value, 'g', -1, 64),
+		value,
 		rate,
 		tags,
 	)
@@ -112,7 +116,7 @@ func (s *L2met) Timing(name string, value time.Duration, rate float32, tags ...i
 }
 
 // render outputs the metric to the logger
-func (s *L2met) render(measure, name, value string, rate float32, tags []interface{}) {
+func (s *L2met) render(measure, name string, value interface{}, rate float32, tags []interface{}) {
 	if !s.includeStat(rate) {
 		return
 	}
@@ -120,7 +124,7 @@ func (s *L2met) render(measure, name, value string, rate float32, tags []interfa
 	tags = deduplicateTags(normalizeTags(tags))
 
 	ctx := make([]interface{}, len(tags)+2)
-	ctx[0] = s.formatL2metKey(name, measure) + s.formatL2metRate(rate)
+	ctx[0] = measure + "#" + s.prefix + name + s.formatL2metRate(rate)
 	ctx[1] = value
 	copy(ctx[2:], tags)
 
@@ -131,6 +135,7 @@ func (s *L2met) includeStat(rate float32) bool {
 	if !s.useRates || rate == 1.0 {
 		return true
 	}
+
 	return s.sampler(rate)
 }
 
@@ -139,14 +144,7 @@ func (s *L2met) Close() error {
 	return nil
 }
 
-// formatL2metKey creates an l2met compatible ctx key.
-func (s *L2met) formatL2metKey(name, measure string) string {
-	if s.prefix != "" {
-		return measure + "#" + s.prefix + "." + name
-	}
-
-	return measure + "#" + name
-}
+var l2metPool = bytes.NewPool(100)
 
 // formatL2metKey creates an l2met compatible rate suffix.
 func (s *L2met) formatL2metRate(rate float32) string {
@@ -154,16 +152,30 @@ func (s *L2met) formatL2metRate(rate float32) string {
 		return ""
 	}
 
-	return "@" + strconv.FormatFloat(float64(rate), 'f', -1, 32)
+	buf := l2metPool.Get()
+	buf.WriteByte('@')
+	buf.AppendFloat(float64(rate), 'f', -1, 32)
+	res := string(buf.Bytes())
+	l2metPool.Put(buf)
+
+	return res
 }
 
 // formatDuration converts duration into fractional milliseconds
 // with no trailing zeros.
 func formatDuration(d time.Duration) string {
-	i := uint64(d / time.Millisecond)
-	p := uint64(d % time.Millisecond / 1000)
+	buf := l2metPool.Get()
+	buf.AppendUint(uint64(d / time.Millisecond))
 
+	p := uint64(d % time.Millisecond)
 	if p > 0 {
+		om := 0
+		m := uint64(100000)
+		for p < m {
+			om++
+			m /= 10
+		}
+
 		for {
 			if p%10 == 0 {
 				p /= 10
@@ -172,8 +184,19 @@ func formatDuration(d time.Duration) string {
 			break
 		}
 
-		return strconv.FormatUint(i, 10) + "." + strconv.FormatUint(p, 10) + "ms"
+		buf.WriteByte('.')
+
+		for om > 0 {
+			buf.WriteByte('0')
+			om--
+		}
+
+		buf.AppendUint(p)
 	}
 
-	return strconv.FormatUint(i, 10) + "ms"
+	buf.WriteString("ms")
+	res := string(buf.Bytes())
+	l2metPool.Put(buf)
+
+	return res
 }

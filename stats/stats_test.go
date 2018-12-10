@@ -1,10 +1,9 @@
 package stats_test
 
 import (
+	"context"
 	"testing"
 	"time"
-
-	"context"
 
 	"github.com/msales/pkg/v3/stats"
 	"github.com/stretchr/testify/mock"

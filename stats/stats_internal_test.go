@@ -15,6 +15,14 @@ func TestWithStats(t *testing.T) {
 	assert.Equal(t, Null, got)
 }
 
+func TestWithStats_NilStats(t *testing.T) {
+	ctx := WithStats(context.Background(), nil)
+
+	got := ctx.Value(ctxKey)
+
+	assert.Equal(t, Null, got)
+}
+
 func TestFromContext(t *testing.T) {
 	ctx := context.WithValue(context.Background(), ctxKey, Null)
 
