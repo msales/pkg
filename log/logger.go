@@ -2,6 +2,7 @@ package log
 
 import (
 	"context"
+	"io"
 	"os"
 )
 
@@ -63,7 +64,14 @@ func Error(ctx context.Context, msg string, pairs ...interface{}) {
 
 // Fatal is equivalent to Error() followed by a call to os.Exit(1).
 func Fatal(ctx context.Context, msg string, pairs ...interface{}) {
-	Error(ctx, msg, pairs...)
+	withLogger(ctx, func(l Logger) {
+		l.Error(msg, pairs...)
+
+		if cl, ok := l.(io.Closer); ok {
+			cl.Close()
+		}
+	})
+
 	os.Exit(1)
 }
 
