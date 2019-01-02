@@ -12,9 +12,9 @@ services:
   - memcached
 
 before_install:
+  - go mod download
   - go get -u golang.org/x/lint/golint
   - go get github.com/mattn/goveralls
-  - go mod download
 
 script:
   - golint ./...
