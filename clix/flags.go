@@ -1,6 +1,10 @@
 package clix
 
-import "gopkg.in/urfave/cli.v1"
+import (
+	"time"
+
+	"gopkg.in/urfave/cli.v1"
+)
 
 // Flag constants declared for CLI use.
 const (
@@ -22,6 +26,9 @@ const (
 	FlagKafkaConsumerTopic   = "kafka-consumer-topic"
 	FlagKafkaProducerBrokers = "kafka-producer-brokers"
 	FlagKafkaProducerTopic   = "kafka-producer-topic"
+
+	FlagCommitBatch    = "commit-batch"
+	FlagCommitInterval = "commit-interval"
 
 	FlagRedisDSN = "redis-dsn"
 )
@@ -97,6 +104,22 @@ var KafkaProducerFlags = Flags{
 		Name:   FlagKafkaProducerTopic,
 		Usage:  "Kafka topic to produce into.",
 		EnvVar: "KAFKA_PRODUCER_TOPIC",
+	},
+}
+
+// CommitterFlags are flags that configure message processing batch size and committing interval.
+var CommitterFlags = Flags{
+	cli.IntFlag{
+		Name:   FlagCommitBatch,
+		Value:  500,
+		Usage:  "Commit batch size for message processing.",
+		EnvVar: "COMMIT_BATCH",
+	},
+	cli.DurationFlag{
+		Name:   FlagCommitInterval,
+		Value:  1 * time.Second,
+		Usage:  "Commit interval for message processing.",
+		EnvVar: "COMMIT_INTERVAL",
 	},
 }
 
