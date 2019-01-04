@@ -1,6 +1,9 @@
 package clix
 
-import "gopkg.in/urfave/cli.v1"
+import (
+	"gopkg.in/urfave/cli.v1"
+	"time"
+)
 
 // Flag constants declared for CLI use.
 const (
@@ -22,6 +25,9 @@ const (
 	FlagKafkaConsumerTopic   = "kafka-consumer-topic"
 	FlagKafkaProducerBrokers = "kafka-producer-brokers"
 	FlagKafkaProducerTopic   = "kafka-producer-topic"
+
+	FlagCommitBatch    = "commit-batch"
+	FlagCommitInterval = "commit-interval"
 
 	FlagRedisDSN = "redis-dsn"
 )
@@ -97,6 +103,21 @@ var KafkaProducerFlags = Flags{
 		Name:   FlagKafkaProducerTopic,
 		Usage:  "Kafka topic to produce into.",
 		EnvVar: "KAFKA_PRODUCER_TOPIC",
+	},
+}
+
+var ComitterFlags = Flags{
+	cli.IntFlag{
+		Name:   FlagCommitBatch,
+		Value:  500,
+		Usage:  "Commit batch size for message processing.",
+		EnvVar: "COMMIT_BATCH",
+	},
+	cli.DurationFlag{
+		Name:   FlagCommitInterval,
+		Value:  1 * time.Second,
+		Usage:  "Commit interval for message processing.",
+		EnvVar: "COMMIT_INTERVAL",
 	},
 }
 
