@@ -1,8 +1,9 @@
 package clix
 
 import (
-	"gopkg.in/urfave/cli.v1"
 	"time"
+
+	"gopkg.in/urfave/cli.v1"
 )
 
 // Flag constants declared for CLI use.
@@ -106,6 +107,7 @@ var KafkaProducerFlags = Flags{
 	},
 }
 
+// CommitterFlags are flags that configure message processing batch size and committing interval.
 var CommitterFlags = Flags{
 	cli.IntFlag{
 		Name:   FlagCommitBatch,
