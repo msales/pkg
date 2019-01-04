@@ -106,7 +106,7 @@ var KafkaProducerFlags = Flags{
 	},
 }
 
-var ComitterFlags = Flags{
+var CommitterFlags = Flags{
 	cli.IntFlag{
 		Name:   FlagCommitBatch,
 		Value:  500,
