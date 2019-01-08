@@ -33,6 +33,7 @@ github.com/matttproud/golang_protobuf_extensions v1.0.1 h1:4hp9jkHxhMHkqkrB3Ix0j
 github.com/matttproud/golang_protobuf_extensions v1.0.1/go.mod h1:D8He9yQNgCq6Z5Ld7szi9bcBfOoFv/3dc6xSMkL2PC0=
 github.com/msales/logged v0.2.0 h1:amLuKkHy6vLCoV2PWKUK3uIinRyedZhsvYLkvU87u+A=
 github.com/msales/logged v0.2.0/go.mod h1:JxxBSh+kSlxSYZD+hGTPIijsxoqKhY9qNCpti1dhp4s=
+github.com/msales/pkg v2.5.0+incompatible h1:PayPx0Ns1cI1saYYLbilauJv2gBayAjPuukjp4Q+d0E=
 github.com/onsi/ginkgo v1.6.0/go.mod h1:lLunBs/Ym6LB5Z9jYTR76FiuTmxDTDusOGeTQH+WWjE=
 github.com/onsi/ginkgo v1.7.0 h1:WSHQ+IS43OoUrWtD1/bbclrwK8TTH5hzp+umCiuxHgs=
 github.com/onsi/ginkgo v1.7.0/go.mod h1:lLunBs/Ym6LB5Z9jYTR76FiuTmxDTDusOGeTQH+WWjE=
