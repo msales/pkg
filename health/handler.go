@@ -6,7 +6,16 @@ import (
 
 // Reporter represents an a health reporter.
 type Reporter interface {
+	// IsHealthy emits error if application is not healthy.
 	IsHealthy() error
+}
+
+// ReporterFunc is an adapter for anonymous functions to be used as health reporters.
+type ReporterFunc func() error
+
+// IsHealthy emits error if application is not healthy.
+func (f ReporterFunc) IsHealthy() error {
+	return f()
 }
 
 // Handler is an http health handler.

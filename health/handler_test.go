@@ -78,3 +78,11 @@ func (r *testReporter) IsHealthy() error {
 
 	return r.err
 }
+
+func TestReporterFunc_IsHealthy(t *testing.T) {
+	err := errors.New("test")
+	reporter := health.ReporterFunc(func() error { return err})
+	result := reporter.IsHealthy()
+
+	assert.True(t, err == result)
+}
