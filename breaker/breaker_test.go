@@ -31,6 +31,10 @@ func TestRateFuse(t *testing.T) {
 	assert.True(t, f.Trip(breaker.Counter{Requests: 10, Failures: 10}))
 }
 
+func TestRateFusePanicsIfRateOver100(t *testing.T) {
+	assert.Panics(t, func() { breaker.RateFuse(101) })
+}
+
 func TestNewBreaker(t *testing.T) {
 	b := breaker.NewBreaker(breaker.ThresholdFuse(5))
 
@@ -123,6 +127,26 @@ func TestBreaker_RunHandlesPanic(t *testing.T) {
 
 	assert.Panics(t, func() { _ = b.Run(panicFunc) })
 	assert.Equal(t, breaker.StateOpen, b.State())
+}
+
+func BenchmarkBreaker_RunSuccess(b *testing.B) {
+	br := breaker.NewBreaker(breaker.ThresholdFuse(1), breaker.WithSleep(100*time.Millisecond))
+
+	b.ReportAllocs()
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		_ = br.Run(successFunc)
+	}
+}
+
+func BenchmarkBreaker_RunFailure(b *testing.B) {
+	br := breaker.NewBreaker(breaker.ThresholdFuse(uint64(b.N)), breaker.WithSleep(100*time.Millisecond))
+
+	b.ReportAllocs()
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		_ = br.Run(failureFunc)
+	}
 }
 
 var errTest = errors.New("test")

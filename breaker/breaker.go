@@ -97,6 +97,10 @@ func ConsecutiveFuse(count uint64) FuseFunc {
 //
 // rate should be between 0 and 100.
 func RateFuse(rate uint64) FuseFunc {
+	if rate >= 100 {
+		panic(errors.New("breaker: rate should be less than 100 percent"))
+	}
+
 	return FuseFunc(func(c Counter) bool {
 		return c.Failures/c.Requests*100 > rate
 	})
@@ -148,7 +152,7 @@ func NewBreaker(f Fuse, opts ...OptFunc) *Breaker {
 
 // Run runs the given request if the Breaker allows it.
 //
-// Run returns an error immediately is the Breaker rejects the request,
+// Run returns an error immediately if the Breaker rejects the request,
 // otherwise it returns the result of the request.
 func (b *Breaker) Run(req func() error) error {
 	if err := b.canRun(); err != nil {
