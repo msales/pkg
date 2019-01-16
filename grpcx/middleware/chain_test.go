@@ -1,11 +1,11 @@
 package middleware_test
 
 import (
-	"google.golang.org/grpc"
 	"testing"
 
 	"github.com/msales/pkg/v3/grpcx/middleware"
 	"github.com/stretchr/testify/assert"
+	"google.golang.org/grpc"
 )
 
 func TestWithUnaryClientInterceptors(t *testing.T) {
