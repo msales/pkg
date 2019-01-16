@@ -9,8 +9,8 @@ import (
 func WithCommon(ctx context.Context, h http.Handler) http.Handler {
 	h = WithResponseTime(h) // Innermost
 	h = WithRequestStats(h)
-	h = WithContext(ctx, h)
-	h = WithRecovery(h) // Outermost
+	h = WithRecovery(h)
+	h = WithContext(ctx, h) // Outermost
 
 	return h
 }
