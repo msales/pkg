@@ -15,9 +15,9 @@ func UnaryServerCommonOpts(ctx context.Context) []grpc.ServerOption {
 
 	return []grpc.ServerOption{
 		middleware.WithUnaryServerInterceptors(
-			middleware.WithUnaryServerRecovery(),
 			middleware.WithUnaryServerLogger(l),
 			middleware.WithUnaryServerStats(s),
+			middleware.WithUnaryServerRecovery(),
 		),
 		grpc.StatsHandler(
 			WithRPCStats(s),
