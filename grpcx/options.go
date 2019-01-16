@@ -31,9 +31,9 @@ func StreamServerCommonOpts(ctx context.Context) []grpc.ServerOption {
 
 	return []grpc.ServerOption{
 		middleware.WithStreamServerInterceptors(
-			middleware.WithStreamServerRecovery(),
 			middleware.WithStreamServerLogger(l),
 			middleware.WithStreamServerStats(s),
+			middleware.WithStreamServerRecovery(),
 		),
 		grpc.StatsHandler(
 			WithRPCStats(s),
