@@ -137,7 +137,9 @@ func (s *Prometheus) createKey(name string, lblNames []string) string {
 
 // formatFQN formats FQN strings.
 func (s *Prometheus) formatFQN(name string) string {
-	return strings.Replace(name, ".", "_", -1)
+	r := strings.NewReplacer(".", "_", "-", "_")
+
+	return r.Replace(name)
 }
 
 // formatPrometheusTags create a prometheus Label map from tags.
