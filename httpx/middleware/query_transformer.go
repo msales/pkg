@@ -5,6 +5,7 @@ import (
 	"net/url"
 )
 
+// StringTransformerFunc represents a function that transforms a string into another string.
 type StringTransformerFunc func(string) string
 
 type transformationRule struct {
@@ -12,14 +13,17 @@ type transformationRule struct {
 	fn   StringTransformerFunc
 }
 
+// QueryTransformer transforms query parameters with the registered functions.
 type QueryTransformer struct {
 	rules []transformationRule
 }
 
+// Register registers a function as a transformer for the given set of keys.
 func (t *QueryTransformer) Register(keys []string, fn StringTransformerFunc) {
 	t.rules = append(t.rules, transformationRule{keys: keys, fn: fn})
 }
 
+// WithQueryTransformer returns an http handler that transforms query parameters using the passed transformer.
 func WithQueryTransformer(h http.Handler, t QueryTransformer) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
 		values := req.URL.Query()
@@ -34,6 +38,7 @@ func WithQueryTransformer(h http.Handler, t QueryTransformer) http.HandlerFunc {
 	}
 }
 
+// WithQueryTransformerFunc returns an http handler that transforms query parameters using the passed function.
 func WithQueryTransformerFunc(h http.Handler, keys []string, fn StringTransformerFunc) http.Handler {
 	if len(keys) == 0 {
 		return h
