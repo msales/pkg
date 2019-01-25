@@ -11,10 +11,10 @@ import (
 // used by DefaultClient.
 var DefaultTransport = &http.Transport{
 	Proxy: http.ProxyFromEnvironment,
-	Dial: (&net.Dialer{
+	DialContext: (&net.Dialer{
 		Timeout:   15 * time.Second,
 		KeepAlive: 90 * time.Second,
-	}).Dial,
+	}).DialContext,
 	TLSHandshakeTimeout: 3 * time.Second,
 }
 
