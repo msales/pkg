@@ -1,5 +1,7 @@
 package redisx
 
+// Scan iterator is generic redis scan iterator that works on both
+// Redis Client and ClusterClient
 type ScanIterator interface {
 	Val() string
 	Next() bool
