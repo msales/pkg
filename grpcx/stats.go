@@ -8,6 +8,7 @@ import (
 
 const (
 	methodKey ctxKey = iota
+	tagsKey
 )
 
 type ctxKey int
@@ -26,34 +27,60 @@ func WithHandlers(handlers ...grpcstats.Handler) grpcstats.Handler {
 	}
 }
 
-// WithRPCStats returns a handler that collects RPC stats.
-func WithRPCStats(stats stats.Stats) grpcstats.Handler {
-	return &rpcStatsHandler{stats: stats}
+// WithRPCStats returns a handler that collects and tags RPC stats.
+func WithRPCStats(stats stats.Stats, tagsFns ...TagsFunc) grpcstats.Handler {
+	return &rpcStatsHandler{stats: stats, tagsFns: tagsFns}
 }
+
+// TagsFunc represents a function that returns a set of tags for the stats.
+// The payload is the incoming message object.
+type TagsFunc func(ctx context.Context, payload interface{}) stats.Tags
 
 // rpcStatsHandler records stats of each RPC: message rate and request duration.
 type rpcStatsHandler struct {
 	handler
 
-	stats stats.Stats
+	stats   stats.Stats
+	tagsFns []TagsFunc
 }
 
 // TagRPC can attach some information to the given context.
 func (h *rpcStatsHandler) TagRPC(ctx context.Context, info *grpcstats.RPCTagInfo) context.Context {
+	if h.tagsFns != nil {
+		ctx = context.WithValue(ctx, tagsKey, &stats.Tags{})
+	}
 	return context.WithValue(ctx, methodKey, info.FullMethodName)
 }
 
 // HandleRPC processes the RPC stats.
 func (h *rpcStatsHandler) HandleRPC(ctx context.Context, rpcStats grpcstats.RPCStats) {
-	if _, ok := rpcStats.(*grpcstats.Begin); ok {
-		h.stats.Inc("rpc.begin", 1, 1, "method", h.methodFromContext(ctx))
+	if in, ok := rpcStats.(*grpcstats.InPayload); ok && h.tagsFns != nil {
+		tags := make(stats.Tags)
+
+		for _, fn := range h.tagsFns {
+			tags.Merge(fn(ctx, in.Payload))
+		}
+
+		ctxTags := ctx.Value(tagsKey).(*stats.Tags)
+		*ctxTags = tags
 
 		return
 	}
 
 	if end, ok := rpcStats.(*grpcstats.End); ok {
-		h.stats.Inc("rpc.end", 1, 1, "method", h.methodFromContext(ctx), "status", h.getStatus(end))
-		h.stats.Timing("rpc.time", end.EndTime.Sub(end.BeginTime), 1, "method", h.methodFromContext(ctx), "status", h.getStatus(end))
+		tags := stats.Tags{}
+
+		t, ok := ctx.Value(tagsKey).(*stats.Tags)
+		if ok {
+			tags = *t
+		}
+
+		tags.
+			With("method", h.methodFromContext(ctx)).
+			With("status", h.getStatus(end))
+
+		h.stats.Inc("rpc.end", 1, 1, tags)
+		h.stats.Timing("rpc.time", end.EndTime.Sub(end.BeginTime), 1, tags)
 	}
 }
 

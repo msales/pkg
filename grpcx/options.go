@@ -10,7 +10,7 @@ import (
 )
 
 // UnaryServerCommonOpts returns commonly options for an unary server.
-func UnaryServerCommonOpts(ctx context.Context) []grpc.ServerOption {
+func UnaryServerCommonOpts(ctx context.Context, statsTagsFns ...TagsFunc) []grpc.ServerOption {
 	l, s := getLoggerAndStats(ctx)
 
 	return []grpc.ServerOption{
@@ -20,13 +20,13 @@ func UnaryServerCommonOpts(ctx context.Context) []grpc.ServerOption {
 			middleware.WithUnaryServerRecovery(),
 		),
 		grpc.StatsHandler(
-			WithRPCStats(s),
+			WithRPCStats(s, statsTagsFns...),
 		),
 	}
 }
 
 // StreamServerCommonOpts returns commonly options for a stream server.
-func StreamServerCommonOpts(ctx context.Context) []grpc.ServerOption {
+func StreamServerCommonOpts(ctx context.Context, statsTagsFns ...TagsFunc) []grpc.ServerOption {
 	l, s := getLoggerAndStats(ctx)
 
 	return []grpc.ServerOption{
@@ -36,7 +36,7 @@ func StreamServerCommonOpts(ctx context.Context) []grpc.ServerOption {
 			middleware.WithStreamServerRecovery(),
 		),
 		grpc.StatsHandler(
-			WithRPCStats(s),
+			WithRPCStats(s, statsTagsFns...),
 		),
 	}
 }
