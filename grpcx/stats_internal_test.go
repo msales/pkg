@@ -9,6 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"google.golang.org/grpc/stats"
+	pkgstats "github.com/msales/pkg/v3/stats"
 )
 
 func TestRPCStatsHandler_TagRPC(t *testing.T) {
@@ -20,34 +21,11 @@ func TestRPCStatsHandler_TagRPC(t *testing.T) {
 	assert.Equal(t, "TestMethod", ctx.Value(methodKey))
 }
 
-func TestRPCStatsHandler_HandleRPC_Begin(t *testing.T) {
-	ctx := context.WithValue(context.Background(), methodKey, "TestMethod")
-	s := new(mockStats)
-	s.On("Inc", "rpc.begin", int64(1), float32(1.0), []interface{}{"method", "TestMethod"}).Return(nil).Once()
-
-	h := WithRPCStats(s)
-
-	h.HandleRPC(ctx, &stats.Begin{})
-
-	s.AssertExpectations(t)
-}
-
-func TestRPCStatsHandler_HandleRPC_Begin_WithUnknownMethod(t *testing.T) {
-	s := new(mockStats)
-	s.On("Inc", "rpc.begin", int64(1), float32(1.0), []interface{}{"method", "unknown"}).Return(nil).Once()
-
-	h := WithRPCStats(s)
-
-	h.HandleRPC(context.Background(), &stats.Begin{})
-
-	s.AssertExpectations(t)
-}
-
 func TestRPCStatsHandler_HandleRPC_End(t *testing.T) {
 	ctx := context.WithValue(context.Background(), methodKey, "TestMethod")
 	s := new(mockStats)
-	s.On("Inc", "rpc.end", int64(1), float32(1.0), []interface{}{"method", "TestMethod", "status", "success"}).Return(nil).Once()
-	s.On("Timing", "rpc.time", time.Second, float32(1.0), []interface{}{"method", "TestMethod", "status", "success"}).Return(nil).Once()
+	s.On("Inc", "rpc.end", int64(1), float32(1.0), []interface{}{pkgstats.Tags{"method": "TestMethod", "status": "success"}}).Return(nil).Once()
+	s.On("Timing", "rpc.time", time.Second, float32(1.0), []interface{}{pkgstats.Tags{"method": "TestMethod", "status": "success"}}).Return(nil).Once()
 	now := time.Now()
 
 	h := WithRPCStats(s)
@@ -60,8 +38,8 @@ func TestRPCStatsHandler_HandleRPC_End(t *testing.T) {
 func TestRPCStatsHandler_HandleRPC_End_WithError(t *testing.T) {
 	ctx := context.WithValue(context.Background(), methodKey, "TestMethod")
 	s := new(mockStats)
-	s.On("Inc", "rpc.end", int64(1), float32(1.0), []interface{}{"method", "TestMethod", "status", "error"}).Return(nil).Once()
-	s.On("Timing", "rpc.time", time.Second, float32(1.0), []interface{}{"method", "TestMethod", "status", "error"}).Return(nil).Once()
+	s.On("Inc", "rpc.end", int64(1), float32(1.0), []interface{}{pkgstats.Tags{"method": "TestMethod", "status": "error"}}).Return(nil).Once()
+	s.On("Timing", "rpc.time", time.Second, float32(1.0), []interface{}{pkgstats.Tags{"method": "TestMethod", "status": "error"}}).Return(nil).Once()
 	now := time.Now()
 
 	h := WithRPCStats(s)
