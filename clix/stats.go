@@ -2,10 +2,10 @@ package clix
 
 import (
 	"fmt"
-	"net/http"
 	"net/url"
 	"time"
 
+	"github.com/msales/pkg/v3/httpx"
 	"github.com/msales/pkg/v3/log"
 	"github.com/msales/pkg/v3/stats"
 	"gopkg.in/urfave/cli.v1"
@@ -68,10 +68,10 @@ func newPrometheusStats(c *cli.Context, addr string, l log.Logger) stats.Stats {
 	s := stats.NewPrometheus(c.String(FlagStatsPrefix))
 
 	if addr != "" {
-		mux := http.NewServeMux()
+		mux := httpx.NewMux()
 		mux.Handle("/metrics", s.Handler())
 		go func() {
-			if err := http.ListenAndServe(addr, mux); err != nil {
+			if err := httpx.NewServer(addr, mux).ListenAndServe(); err != nil {
 				l.Error(err.Error())
 			}
 		}()

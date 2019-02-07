@@ -1,6 +1,7 @@
 package health_test
 
 import (
+	"net/http/httptest"
 	"testing"
 	"time"
 
@@ -12,12 +13,13 @@ import (
 func TestStartServer(t *testing.T) {
 	r := &testReporter{}
 
-	go health.StartServer("127.0.0.1:8080", r)
-	defer health.StopServer()
+	mux := health.NewMux(r)
+	srv := httptest.NewServer(mux)
+	defer srv.Close()
 
 	time.Sleep(time.Millisecond)
 
-	resp, err := httpx.Get("http://127.0.0.1:8080/health")
+	resp, err := httpx.Get( srv.URL+"/health")
 	assert.NoError(t, err)
 	assert.Equal(t, 200, resp.StatusCode)
 }

@@ -5,6 +5,8 @@ import (
 	"net/http"
 	"net/http/pprof"
 
+	"github.com/go-zoo/bone"
+	"github.com/msales/pkg/v3/httpx"
 	"gopkg.in/urfave/cli.v1"
 )
 
@@ -34,8 +36,8 @@ func StopProfiler() error {
 	return profilerServer.Shutdown(context.Background())
 }
 
-func newProfilerMux() http.Handler {
-	mux := &http.ServeMux{}
+func newProfilerMux() *bone.Mux {
+	mux := httpx.NewMux()
 
 	mux.HandleFunc("/debug/pprof/", pprof.Index)
 	mux.HandleFunc("/debug/pprof/cmdline", pprof.Cmdline)
