@@ -47,7 +47,8 @@ func TestWithContext_WithDeadline(t *testing.T) {
 		panic(err)
 	}
 
-	reqCtx, _ := context.WithDeadline(context.Background(), deadline)
+	reqCtx, cancel := context.WithDeadline(context.Background(), deadline)
+	defer cancel()
 
 	h := middleware.WithContext(ctx, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "test", r.Context().Value("test"))
@@ -65,7 +66,8 @@ func TestWithContext_WithDeadline(t *testing.T) {
 
 func TestWithContext_WithCancel(t *testing.T) {
 	ctx := context.WithValue(context.Background(), "test", "test")
-	reqCtx, _ := context.WithCancel(context.Background())
+	reqCtx, cancel := context.WithCancel(context.Background())
+	defer cancel()
 
 	h := middleware.WithContext(ctx, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "test", r.Context().Value("test"))
