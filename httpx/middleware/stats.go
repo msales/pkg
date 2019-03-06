@@ -21,14 +21,7 @@ func DefaultTags(r *http.Request) []interface{} {
 // WithRequestStats collects statistics about the request.
 func WithRequestStats(h http.Handler, fns ...TagsFunc) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if len(fns) == 0 {
-			fns = []TagsFunc{DefaultTags}
-		}
-
-		var tags []interface{}
-		for _, fn := range fns {
-			tags = append(tags, fn(r)...)
-		}
+		tags := prepareTags(r, fns)
 
 		s, ok := stats.FromContext(r.Context())
 		if !ok {
@@ -51,14 +44,24 @@ func WithRequestStats(h http.Handler, fns ...TagsFunc) http.Handler {
 // WithResponseTime reports the response time.
 func WithResponseTime(h http.Handler, fns ...TagsFunc) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		var tags []interface{}
-		for _, fn := range fns {
-			tags = append(tags, fn(r)...)
-		}
-
+		tags := prepareTags(r, fns)
 		t := stats.Time(r.Context(), "response.time", 1.0, tags...)
 		defer t.Done()
 
 		h.ServeHTTP(w, r)
 	})
+}
+
+// prepareTags resolves tags in accordance to provided functions and falls back to defaults in no custom tag functions were provided.
+func prepareTags(r *http.Request, fns []TagsFunc) []interface{} {
+	if len(fns) == 0 {
+		fns = []TagsFunc{DefaultTags}
+	}
+
+	var tags []interface{}
+	for _, fn := range fns {
+		tags = append(tags, fn(r)...)
+	}
+
+	return tags
 }

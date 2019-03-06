@@ -1,11 +1,10 @@
 package middleware_test
 
 import (
+	"context"
 	"net/http"
 	"net/http/httptest"
 	"testing"
-
-	"context"
 	"time"
 
 	"github.com/msales/pkg/v3/httpx/middleware"
@@ -60,7 +59,7 @@ func TestWithResponseTime(t *testing.T) {
 	}{
 		{
 			tagFuncs:     nil,
-			expectedTags: nil,
+			expectedTags: []interface{}{"method", "GET", "path", "/"},
 		},
 		{
 			tagFuncs:     []middleware.TagsFunc{testTags},
