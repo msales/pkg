@@ -35,7 +35,7 @@ func WithRequestStats(h http.Handler, fns ...TagsFunc) http.Handler {
 			s = stats.Null
 		}
 
-		s.Inc("request.start", 1, 1.0, tags...)
+		_ = s.Inc("request.start", 1, 1.0, tags...)
 
 		rw := NewResponseWriter(w)
 		h.ServeHTTP(rw, r)
@@ -44,14 +44,19 @@ func WithRequestStats(h http.Handler, fns ...TagsFunc) http.Handler {
 		cpltTags[0] = "status"
 		cpltTags[1] = strconv.FormatInt(int64(rw.Status()), 10)
 		copy(cpltTags[2:], tags)
-		s.Inc("request.complete", 1, 1.0, cpltTags...)
+		_ = s.Inc("request.complete", 1, 1.0, cpltTags...)
 	})
 }
 
 // WithResponseTime reports the response time.
-func WithResponseTime(h http.Handler) http.Handler {
+func WithResponseTime(h http.Handler, fns ...TagsFunc) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		t := stats.Time(r.Context(), "response.time", 1.0)
+		var tags []interface{}
+		for _, fn := range fns {
+			tags = append(tags, fn(r)...)
+		}
+
+		t := stats.Time(r.Context(), "response.time", 1.0, tags...)
 		defer t.Done()
 
 		h.ServeHTTP(w, r)
