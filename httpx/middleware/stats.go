@@ -21,21 +21,14 @@ func DefaultTags(r *http.Request) []interface{} {
 // WithRequestStats collects statistics about the request.
 func WithRequestStats(h http.Handler, fns ...TagsFunc) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if len(fns) == 0 {
-			fns = []TagsFunc{DefaultTags}
-		}
-
-		var tags []interface{}
-		for _, fn := range fns {
-			tags = append(tags, fn(r)...)
-		}
+		tags := prepareTags(r, fns)
 
 		s, ok := stats.FromContext(r.Context())
 		if !ok {
 			s = stats.Null
 		}
 
-		s.Inc("request.start", 1, 1.0, tags...)
+		_ = s.Inc("request.start", 1, 1.0, tags...)
 
 		rw := NewResponseWriter(w)
 		h.ServeHTTP(rw, r)
@@ -44,16 +37,31 @@ func WithRequestStats(h http.Handler, fns ...TagsFunc) http.Handler {
 		cpltTags[0] = "status"
 		cpltTags[1] = strconv.FormatInt(int64(rw.Status()), 10)
 		copy(cpltTags[2:], tags)
-		s.Inc("request.complete", 1, 1.0, cpltTags...)
+		_ = s.Inc("request.complete", 1, 1.0, cpltTags...)
 	})
 }
 
 // WithResponseTime reports the response time.
-func WithResponseTime(h http.Handler) http.Handler {
+func WithResponseTime(h http.Handler, fns ...TagsFunc) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		t := stats.Time(r.Context(), "response.time", 1.0)
+		tags := prepareTags(r, fns)
+		t := stats.Time(r.Context(), "response.time", 1.0, tags...)
 		defer t.Done()
 
 		h.ServeHTTP(w, r)
 	})
+}
+
+// prepareTags resolves tags in accordance to provided functions and falls back to defaults in no custom tag functions were provided.
+func prepareTags(r *http.Request, fns []TagsFunc) []interface{} {
+	if len(fns) == 0 {
+		fns = []TagsFunc{DefaultTags}
+	}
+
+	var tags []interface{}
+	for _, fn := range fns {
+		tags = append(tags, fn(r)...)
+	}
+
+	return tags
 }

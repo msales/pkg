@@ -1,11 +1,10 @@
 package middleware_test
 
 import (
+	"context"
 	"net/http"
 	"net/http/httptest"
 	"testing"
-
-	"context"
 	"time"
 
 	"github.com/msales/pkg/v3/httpx/middleware"
@@ -54,18 +53,34 @@ func TestWithRequestStats_NoStats(t *testing.T) {
 }
 
 func TestWithResponseTime(t *testing.T) {
-	s := new(MockStats)
-	s.On("Timing", "response.time", mock.Anything, float32(1.0), mock.Anything).Return(nil)
+	tests := []struct {
+		tagFuncs     []middleware.TagsFunc
+		expectedTags []interface{}
+	}{
+		{
+			tagFuncs:     nil,
+			expectedTags: []interface{}{"method", "GET", "path", "/"},
+		},
+		{
+			tagFuncs:     []middleware.TagsFunc{testTags},
+			expectedTags: []interface{}{"method", "GET"},
+		},
+	}
 
-	m := middleware.WithResponseTime(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {}))
+	for _, tt := range tests {
+		s := new(MockStats)
+		s.On("Timing", "response.time", mock.Anything, float32(1.0), tt.expectedTags).Return(nil).Once()
 
-	resp := httptest.NewRecorder()
-	req, _ := http.NewRequest("GET", "/", nil)
+		m := middleware.WithResponseTime(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {}), tt.tagFuncs...)
 
-	ctx := stats.WithStats(context.Background(), s)
-	m.ServeHTTP(resp, req.WithContext(ctx))
+		resp := httptest.NewRecorder()
+		req, _ := http.NewRequest("GET", "/", nil)
 
-	s.AssertExpectations(t)
+		ctx := stats.WithStats(context.Background(), s)
+		m.ServeHTTP(resp, req.WithContext(ctx))
+
+		s.AssertExpectations(t)
+	}
 }
 
 func testTags(r *http.Request) []interface{} {
