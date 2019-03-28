@@ -7,7 +7,7 @@ import (
 )
 
 // RedisOptionsFunc represents an configuration function for Redis.
-type RedisOptionsFunc func(options *redis.UniversalOptions)
+type RedisOptionsFunc func(*redis.UniversalOptions)
 
 // WithPoolSize configures the Redis pool size.
 func WithPoolSize(size int) RedisOptionsFunc {
@@ -43,7 +43,30 @@ type redisCache struct {
 }
 
 // NewRedis create a new Redis cache instance.
-func NewRedis(uri []string, opts ...RedisOptionsFunc) (Cache, error) {
+func NewRedis(uri string, opts ...RedisOptionsFunc) (Cache, error) {
+	o, err := redis.ParseURL(uri)
+	if err != nil {
+		return nil, err
+	}
+
+	uo := &redis.UniversalOptions{
+		Addrs:         []string{o.Addr},
+		RouteRandomly: true,
+	}
+
+	for _, opt := range opts {
+		opt(uo)
+	}
+
+	c := redis.NewUniversalClient(uo)
+
+	return &redisCache{
+		client:  c,
+		decoder: stringDecoder{},
+	}, nil
+}
+
+func NewRedisUniversal(uri []string, opts ...RedisOptionsFunc) (Cache, error) {
 	uo := &redis.UniversalOptions{
 		Addrs:         uri,
 		RouteRandomly: true,
