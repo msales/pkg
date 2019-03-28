@@ -7,53 +7,53 @@ import (
 )
 
 // RedisOptionsFunc represents an configuration function for Redis.
-type RedisOptionsFunc func(*redis.Options)
+type RedisOptionsFunc func(options *redis.UniversalOptions)
 
 // WithPoolSize configures the Redis pool size.
 func WithPoolSize(size int) RedisOptionsFunc {
-	return func(o *redis.Options) {
+	return func(o *redis.UniversalOptions) {
 		o.PoolSize = size
 	}
 }
 
 // WithPoolTimeout configures the Redis pool timeout.
 func WithPoolTimeout(timeout time.Duration) RedisOptionsFunc {
-	return func(o *redis.Options) {
+	return func(o *redis.UniversalOptions) {
 		o.PoolTimeout = timeout
 	}
 }
 
 // WithReadTimeout configures the Redis read timeout.
 func WithReadTimeout(timeout time.Duration) RedisOptionsFunc {
-	return func(o *redis.Options) {
+	return func(o *redis.UniversalOptions) {
 		o.ReadTimeout = timeout
 	}
 }
 
 // WithWriteTimeout configures the Redis write timeout.
 func WithWriteTimeout(timeout time.Duration) RedisOptionsFunc {
-	return func(o *redis.Options) {
+	return func(o *redis.UniversalOptions) {
 		o.WriteTimeout = timeout
 	}
 }
 
 type redisCache struct {
-	client  *redis.Client
+	client  redis.UniversalClient
 	decoder decoder
 }
 
 // NewRedis create a new Redis cache instance.
-func NewRedis(uri string, opts ...RedisOptionsFunc) (Cache, error) {
-	o, err := redis.ParseURL(uri)
-	if err != nil {
-		return nil, err
+func NewRedis(uri []string, opts ...RedisOptionsFunc) (Cache, error) {
+	uo := &redis.UniversalOptions{
+		Addrs:         uri,
+		RouteRandomly: true,
 	}
 
 	for _, opt := range opts {
-		opt(o)
+		opt(uo)
 	}
 
-	c := redis.NewClient(o)
+	c := redis.NewUniversalClient(uo)
 
 	return &redisCache{
 		client:  c,
