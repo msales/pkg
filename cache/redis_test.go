@@ -29,7 +29,7 @@ func TestRedisCache(t *testing.T) {
 		t.Skipf("skipping test; no running server at %s", testRedisServer)
 	}
 
-	c, err := cache.NewRedis([]string{"redis://" + testRedisServer})
+	c, err := cache.NewRedis("redis://" + testRedisServer + "/1")
 	assert.NoError(t, err)
 
 	runCacheTests(t, c)
