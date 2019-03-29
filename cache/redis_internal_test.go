@@ -9,7 +9,7 @@ import (
 )
 
 func TestWithPoolSize(t *testing.T) {
-	o := &redis.Options{}
+	o := &redis.UniversalOptions{}
 
 	WithPoolSize(12)(o)
 
@@ -17,7 +17,7 @@ func TestWithPoolSize(t *testing.T) {
 }
 
 func TestWithPoolTimeout(t *testing.T) {
-	o := &redis.Options{}
+	o := &redis.UniversalOptions{}
 
 	WithPoolTimeout(time.Second)(o)
 
@@ -25,7 +25,7 @@ func TestWithPoolTimeout(t *testing.T) {
 }
 
 func TestWithReadTimeout(t *testing.T) {
-	o := &redis.Options{}
+	o := &redis.UniversalOptions{}
 
 	WithReadTimeout(time.Second)(o)
 
@@ -33,7 +33,7 @@ func TestWithReadTimeout(t *testing.T) {
 }
 
 func TestWithWriteTimeout(t *testing.T) {
-	o := &redis.Options{}
+	o := &redis.UniversalOptions{}
 
 	WithWriteTimeout(time.Second)(o)
 
@@ -42,10 +42,32 @@ func TestWithWriteTimeout(t *testing.T) {
 
 func TestNewRedis(t *testing.T) {
 	v, err := NewRedis("redis://test", WithPoolSize(12))
-	c := v.(*redisCache)
-
 	assert.NoError(t, err)
-	assert.Equal(t, 12, c.client.Options().PoolSize)
+
+	c := v.(*redisCache)
+	client := c.client.(*redis.Client)
+	assert.IsType(t, &redis.Client{}, client)
+	assert.Equal(t, 12, client.Options().PoolSize)
+}
+
+func TestNewRedisUniversal_Cluster(t *testing.T) {
+	v, err := NewRedisUniversal([]string{"test:8179", "test2:8179"}, WithPoolSize(12))
+	assert.NoError(t, err)
+
+	c := v.(*redisCache)
+	clusterClient := c.client.(*redis.ClusterClient)
+	assert.IsType(t, &redis.ClusterClient{}, clusterClient)
+	assert.Equal(t, 12, clusterClient.Options().PoolSize)
+}
+
+func TestNewRedisUniversal_NonCluster(t *testing.T) {
+	v, err := NewRedisUniversal([]string{"test:8179"}, WithPoolSize(12))
+	assert.NoError(t, err)
+
+	c := v.(*redisCache)
+	client := c.client.(*redis.Client)
+	assert.IsType(t, &redis.Client{}, client)
+	assert.Equal(t, 12, client.Options().PoolSize)
 }
 
 func TestNewRedis_InvalidUri(t *testing.T) {
