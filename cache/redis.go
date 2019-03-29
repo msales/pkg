@@ -66,9 +66,9 @@ func NewRedis(uri string, opts ...RedisOptionsFunc) (Cache, error) {
 	}, nil
 }
 
-func NewRedisUniversal(uri []string, opts ...RedisOptionsFunc) (Cache, error) {
+func NewRedisUniversal(addrs []string, opts ...RedisOptionsFunc) (Cache, error) {
 	uo := &redis.UniversalOptions{
-		Addrs:         uri,
+		Addrs:         addrs,
 		RouteRandomly: true,
 	}
 
