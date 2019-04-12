@@ -147,6 +147,13 @@ func TestPKCS7Unpad(t *testing.T) {
 			wantErr:   true,
 		},
 		{
+			name:      "no padding byte at the end",
+			blocksize: 4,
+			in:        []byte{'t', 'e', 's', 't'},
+			want:      nil,
+			wantErr:   true,
+		},
+		{
 			name:      "non-identical padding bytes",
 			blocksize: 4,
 			in:        []byte{'t', 'e', 0x3, 0x4},
