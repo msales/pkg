@@ -168,3 +168,23 @@ func TestPKCS7Unpad(t *testing.T) {
 		})
 	}
 }
+
+func BenchmarkPKCS7Pad(b *testing.B) {
+	var data = []byte("12345678")
+
+	b.ReportAllocs()
+
+	for i := 0; i < b.N; i++ {
+		_, _ = cryptox.PKCS7Pad(data, 4)
+	}
+}
+
+func BenchmarkPKCS7Unpad(b *testing.B) {
+	var data = []byte{'1', '2', '3', '4', '5', '6', '7', '8', 0x4, 0x4, 0x4, 0x4}
+
+	b.ReportAllocs()
+
+	for i := 0; i < b.N; i++ {
+		_, _ = cryptox.PKCS7Unpad(data, 4)
+	}
+}
