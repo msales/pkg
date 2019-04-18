@@ -44,12 +44,12 @@ func recoveryFunc(ctx context.Context, withStack bool) {
 			err = v
 		}
 
-		var extra []interface{}
+		var logCtx []interface{}
 		if withStack {
-			extra = append(extra, "stack", string(debug.Stack()))
+			logCtx = append(logCtx, "stack", string(debug.Stack()))
 		}
 
-		log.Error(ctx, err.Error(), extra...)
+		log.Error(ctx, err.Error(), logCtx...)
 	}
 }
 

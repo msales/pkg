@@ -37,12 +37,12 @@ func (m *Recovery) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				err = v
 			}
 
-			var extra []interface{}
+			var logCtx []interface{}
 			if m.withStack {
-				extra = append(extra, "stack", string(debug.Stack()))
+				logCtx = append(logCtx, "stack", string(debug.Stack()))
 			}
 
-			log.Error(r.Context(), err.Error(), extra...)
+			log.Error(r.Context(), err.Error(), logCtx...)
 			w.WriteHeader(500)
 		}
 	}()
