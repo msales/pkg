@@ -3,24 +3,33 @@ package middleware
 import (
 	"fmt"
 	"net/http"
+	"runtime/debug"
 
 	"github.com/msales/pkg/v3/log"
 )
 
 // Recovery is a middleware that will recover from panics and logs the error.
 type Recovery struct {
-	handler http.Handler
+	handler   http.Handler
+	withStack bool
 }
 
 // WithRecovery recovers from panics and log the error.
-func WithRecovery(h http.Handler) http.Handler {
-	return &Recovery{
-		handler: h,
+func WithRecovery(h http.Handler, opts ...func(r *Recovery)) http.Handler {
+	r := &Recovery{
+		handler:   h,
+		withStack: true,
 	}
+
+	for _, fn := range opts {
+		fn(r)
+	}
+
+	return r
 }
 
 // ServeHTTP serves the request.
-func (m Recovery) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (m *Recovery) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	defer func() {
 		if v := recover(); v != nil {
 			err := fmt.Errorf("%v", v)
@@ -28,10 +37,22 @@ func (m Recovery) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				err = v
 			}
 
-			log.Error(r.Context(), err.Error())
+			var extra []interface{}
+			if m.withStack {
+				extra = append(extra, "stack", string(debug.Stack()))
+			}
+
+			log.Error(r.Context(), err.Error(), extra...)
 			w.WriteHeader(500)
 		}
 	}()
 
 	m.handler.ServeHTTP(w, r)
+}
+
+// WithoutStack disables the stack trace dump from the recovery log.
+func WithoutStack() func(r *Recovery) {
+	return func(r *Recovery) {
+		r.withStack = false
+	}
 }
