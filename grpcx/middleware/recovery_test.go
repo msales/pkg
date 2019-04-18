@@ -7,6 +7,7 @@ import (
 
 	"github.com/msales/pkg/v3/grpcx/middleware"
 	"github.com/msales/pkg/v3/log"
+	"github.com/msales/pkg/v3/mocks"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"google.golang.org/grpc"
@@ -20,7 +21,7 @@ func TestWithUnaryServerRecovery(t *testing.T) {
 	}()
 
 	ctx := context.Background()
-	logger := new(MockLogger)
+	logger := new(mocks.Logger)
 	logger.On("Error", "test", "stack", mock.AnythingOfType("string"))
 
 	interceptor := middleware.WithUnaryServerRecovery()
@@ -42,7 +43,7 @@ func TestWithUnaryServerRecovery_WithoutStack(t *testing.T) {
 	}()
 
 	ctx := context.Background()
-	logger := new(MockLogger)
+	logger := new(mocks.Logger)
 	logger.On("Error", "test")
 
 	interceptor := middleware.WithUnaryServerRecovery(middleware.WithoutStack())
@@ -81,7 +82,7 @@ func TestWithStreamServerRecovery(t *testing.T) {
 	}()
 
 	ctx := context.Background()
-	logger := new(MockLogger)
+	logger := new(mocks.Logger)
 	logger.On("Error", "test", "stack", mock.AnythingOfType("string"))
 
 	interceptor := middleware.WithStreamServerRecovery()
@@ -103,7 +104,7 @@ func TestWithStreamServerRecovery_WithoutStack(t *testing.T) {
 	}()
 
 	ctx := context.Background()
-	logger := new(MockLogger)
+	logger := new(mocks.Logger)
 	logger.On("Error", "test")
 
 	interceptor := middleware.WithStreamServerRecovery(middleware.WithoutStack())
@@ -134,24 +135,3 @@ func TestWithStreamServerRecovery_WithError(t *testing.T) {
 	assert.NoError(t, err)
 }
 
-type MockLogger struct {
-	mock.Mock
-}
-
-func (m *MockLogger) Debug(msg string, ctx ...interface{}) {
-	args := []interface{}{msg}
-	args = append(args, ctx...)
-	m.Called(args...)
-}
-
-func (m *MockLogger) Info(msg string, ctx ...interface{}) {
-	args := []interface{}{msg}
-	args = append(args, ctx...)
-	m.Called(args...)
-}
-
-func (m *MockLogger) Error(msg string, ctx ...interface{}) {
-	args := []interface{}{msg}
-	args = append(args, ctx...)
-	m.Called(args...)
-}

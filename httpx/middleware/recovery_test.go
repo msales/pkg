@@ -9,6 +9,7 @@ import (
 
 	"github.com/msales/pkg/v3/httpx/middleware"
 	"github.com/msales/pkg/v3/log"
+	"github.com/msales/pkg/v3/mocks"
 	"github.com/stretchr/testify/mock"
 )
 
@@ -18,7 +19,7 @@ func TestWithRecovery(t *testing.T) {
 	}))
 
 	ctx := context.Background()
-	logger := new(MockLogger)
+	logger := new(mocks.Logger)
 	logger.On("Error", "panic", "stack", mock.AnythingOfType("string"))
 
 	req, _ := http.NewRequest("GET", "/", nil)
@@ -42,7 +43,7 @@ func TestWithRecovery_WithoutStack(t *testing.T) {
 	}), middleware.WithoutStack())
 
 	ctx := context.Background()
-	logger := new(MockLogger)
+	logger := new(mocks.Logger)
 	logger.On("Error", "panic")
 
 	req, _ := http.NewRequest("GET", "/", nil)
@@ -76,26 +77,4 @@ func TestWithRecovery_Error(t *testing.T) {
 	}()
 
 	h.ServeHTTP(resp, req)
-}
-
-type MockLogger struct {
-	mock.Mock
-}
-
-func (m *MockLogger) Debug(msg string, ctx ...interface{}) {
-	args := []interface{}{msg}
-	args = append(args, ctx...)
-	m.Called(args...)
-}
-
-func (m *MockLogger) Info(msg string, ctx ...interface{}) {
-	args := []interface{}{msg}
-	args = append(args, ctx...)
-	m.Called(args...)
-}
-
-func (m *MockLogger) Error(msg string, ctx ...interface{}) {
-	args := []interface{}{msg}
-	args = append(args, ctx...)
-	m.Called(args...)
 }

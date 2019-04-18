@@ -8,6 +8,17 @@ import (
 	"github.com/msales/pkg/v3/log"
 )
 
+
+// RecoveryFunc is used to configure the recovery handler.
+type RecoveryFunc func(*Recovery)
+
+// WithoutStack disables the stack trace dump from the recovery log.
+func WithoutStack() RecoveryFunc {
+	return func(r *Recovery) {
+		r.withStack = false
+	}
+}
+
 // Recovery is a middleware that will recover from panics and logs the error.
 type Recovery struct {
 	handler   http.Handler
@@ -15,7 +26,7 @@ type Recovery struct {
 }
 
 // WithRecovery recovers from panics and log the error.
-func WithRecovery(h http.Handler, opts ...func(r *Recovery)) http.Handler {
+func WithRecovery(h http.Handler, opts ...RecoveryFunc) http.Handler {
 	r := &Recovery{
 		handler:   h,
 		withStack: true,
@@ -48,11 +59,4 @@ func (m *Recovery) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}()
 
 	m.handler.ServeHTTP(w, r)
-}
-
-// WithoutStack disables the stack trace dump from the recovery log.
-func WithoutStack() func(r *Recovery) {
-	return func(r *Recovery) {
-		r.withStack = false
-	}
 }
