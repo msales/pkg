@@ -16,7 +16,7 @@ func NewStats(c *cli.Context, l log.Logger) (stats.Stats, error) {
 	var s stats.Stats
 	var err error
 
-	dsn := c.String(FlagStatsDSN)
+	dsn := c.GlobalString(FlagStatsDSN)
 	if dsn == "" {
 		return stats.Null, nil
 	}
@@ -43,7 +43,7 @@ func NewStats(c *cli.Context, l log.Logger) (stats.Stats, error) {
 		return nil, fmt.Errorf("Unknown scheme: %s", scheme)
 	}
 
-	tags, err := SplitTags(c.StringSlice(FlagStatsTags), "=")
+	tags, err := SplitTags(c.GlobalStringSlice(FlagStatsTags), "=")
 	if err != nil {
 		return nil, err
 	}
@@ -52,7 +52,7 @@ func NewStats(c *cli.Context, l log.Logger) (stats.Stats, error) {
 }
 
 func newStatsDStats(c *cli.Context, addr string) (stats.Stats, error) {
-	s, err := stats.NewBufferedStatsd(addr, c.String(FlagStatsPrefix), stats.WithFlushInterval(1*time.Second))
+	s, err := stats.NewBufferedStatsd(addr, c.GlobalString(FlagStatsPrefix), stats.WithFlushInterval(1*time.Second))
 	if err != nil {
 		return nil, err
 	}
@@ -61,11 +61,11 @@ func newStatsDStats(c *cli.Context, addr string) (stats.Stats, error) {
 }
 
 func newL2metStats(c *cli.Context, l log.Logger) stats.Stats {
-	return stats.NewL2met(l, c.String(FlagStatsPrefix))
+	return stats.NewL2met(l, c.GlobalString(FlagStatsPrefix))
 }
 
 func newPrometheusStats(c *cli.Context, addr string, l log.Logger) stats.Stats {
-	s := stats.NewPrometheus(c.String(FlagStatsPrefix))
+	s := stats.NewPrometheus(c.GlobalString(FlagStatsPrefix))
 
 	if addr != "" {
 		mux := http.NewServeMux()
