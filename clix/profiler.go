@@ -12,12 +12,12 @@ var profilerServer = &http.Server{}
 
 // RunProfiler runs a profiler server.
 func RunProfiler(c *cli.Context) error {
-	if !c.Bool(FlagProfiler) {
+	if !c.GlobalBool(FlagProfiler) {
 		return nil
 	}
 
 	profilerServer.Handler = newProfilerMux()
-	profilerServer.Addr = ":" + c.String(FlagProfilerPort)
+	profilerServer.Addr = ":" + c.GlobalString(FlagProfilerPort)
 
 	go func() {
 		err := profilerServer.ListenAndServe()
