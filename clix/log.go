@@ -11,7 +11,7 @@ import (
 
 // NewLogger creates a new logger.
 func NewLogger(c *cli.Context) (logged.Logger, error) {
-	levelStr := c.GlobalString(FlagLogLevel)
+	levelStr := c.String(FlagLogLevel)
 	if levelStr == "" {
 		levelStr = "info"
 	}
@@ -29,7 +29,7 @@ func NewLogger(c *cli.Context) (logged.Logger, error) {
 	h := logged.BufferedStreamHandler(os.Stdout, 2000, 1*time.Second, format)
 	h = logged.LevelFilterHandler(level, h)
 
-	tags, err := SplitTags(c.GlobalStringSlice(FlagLogTags), "=")
+	tags, err := SplitTags(c.StringSlice(FlagLogTags), "=")
 	if err != nil {
 		return nil, err
 	}
@@ -40,7 +40,7 @@ func NewLogger(c *cli.Context) (logged.Logger, error) {
 }
 
 func newLogFormat(c *cli.Context) (logged.Formatter, error) {
-	format := c.GlobalString(FlagLogFormat)
+	format := c.String(FlagLogFormat)
 	switch format {
 	case "terminal":
 		fmt.Println("clix: terminal format depreciated, using logfmt instead")
