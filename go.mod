@@ -10,7 +10,7 @@ require (
 	github.com/msales/logged v0.2.0
 	github.com/onsi/ginkgo v1.7.0 // indirect
 	github.com/onsi/gomega v1.4.3 // indirect
-	github.com/prometheus/client_golang v0.9.2
+	github.com/prometheus/client_golang v0.9.3
 	github.com/ryanuber/go-glob v0.0.0-20170128012129-256dc444b735
 	github.com/stretchr/objx v0.1.1 // indirect
 	github.com/stretchr/testify v1.2.2
