@@ -13,7 +13,7 @@ require (
 	github.com/prometheus/client_golang v0.9.3
 	github.com/ryanuber/go-glob v0.0.0-20170128012129-256dc444b735
 	github.com/stretchr/objx v0.1.1 // indirect
-	github.com/stretchr/testify v1.2.2
+	github.com/stretchr/testify v1.3.0
 	golang.org/x/net v0.0.0-20181207154023-610586996380
 	golang.org/x/sys v0.0.0-20181210030007-2a47403f2ae5 // indirect
 	google.golang.org/grpc v1.17.0
