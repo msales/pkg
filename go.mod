@@ -6,7 +6,7 @@ require (
 	github.com/go-redis/redis v6.15.2+incompatible
 	github.com/grpc-ecosystem/go-grpc-middleware v1.0.0
 	github.com/kr/pretty v0.1.0 // indirect
-	github.com/magiconair/properties v1.8.0
+	github.com/magiconair/properties v1.8.1
 	github.com/msales/logged v0.2.0
 	github.com/onsi/ginkgo v1.7.0 // indirect
 	github.com/onsi/gomega v1.4.3 // indirect
