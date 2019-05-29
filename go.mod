@@ -3,7 +3,7 @@ module github.com/msales/pkg/v3
 require (
 	github.com/bradfitz/gomemcache v0.0.0-20180710155616-bc664df96737
 	github.com/cactus/go-statsd-client v3.1.1+incompatible
-	github.com/go-redis/redis v6.14.2+incompatible
+	github.com/go-redis/redis v6.15.2+incompatible
 	github.com/grpc-ecosystem/go-grpc-middleware v1.0.0
 	github.com/kr/pretty v0.1.0 // indirect
 	github.com/magiconair/properties v1.8.0
