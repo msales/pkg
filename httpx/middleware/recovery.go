@@ -2,13 +2,12 @@ package middleware
 
 import (
 	"fmt"
-	"github.com/msales/pkg/v3/stats"
 	"net/http"
 	"runtime/debug"
 
 	"github.com/msales/pkg/v3/log"
+	"github.com/msales/pkg/v3/stats"
 )
-
 
 // RecoveryFunc is used to configure the recovery handler.
 type RecoveryFunc func(*Recovery)
