@@ -10,6 +10,7 @@ import (
 	"github.com/msales/pkg/v3/httpx/middleware"
 	"github.com/msales/pkg/v3/log"
 	"github.com/msales/pkg/v3/mocks"
+	"github.com/msales/pkg/v3/stats"
 	"github.com/stretchr/testify/mock"
 )
 
@@ -21,9 +22,11 @@ func TestWithRecovery(t *testing.T) {
 	ctx := context.Background()
 	logger := new(mocks.Logger)
 	logger.On("Error", "panic", "stack", mock.AnythingOfType("string"))
+	s := new(MockStats)
+	s.On("Inc", "panic_recovery", int64(1), float32(1.0), mock.Anything).Return(nil).Once()
 
 	req, _ := http.NewRequest("GET", "/", nil)
-	req = req.WithContext(log.WithLogger(ctx, logger))
+	req = req.WithContext(stats.WithStats(log.WithLogger(ctx, logger), s))
 	resp := httptest.NewRecorder()
 
 	defer func() {
@@ -35,6 +38,7 @@ func TestWithRecovery(t *testing.T) {
 	h.ServeHTTP(resp, req)
 
 	logger.AssertExpectations(t)
+	s.AssertExpectations(t)
 }
 
 func TestWithRecovery_WithoutStack(t *testing.T) {
@@ -45,9 +49,11 @@ func TestWithRecovery_WithoutStack(t *testing.T) {
 	ctx := context.Background()
 	logger := new(mocks.Logger)
 	logger.On("Error", "panic")
+	s := new(MockStats)
+	s.On("Inc", "panic_recovery", int64(1), float32(1.0), mock.Anything).Return(nil).Once()
 
 	req, _ := http.NewRequest("GET", "/", nil)
-	req = req.WithContext(log.WithLogger(ctx, logger))
+	req = req.WithContext(stats.WithStats(log.WithLogger(ctx, logger), s))
 	resp := httptest.NewRecorder()
 
 	defer func() {
@@ -59,6 +65,7 @@ func TestWithRecovery_WithoutStack(t *testing.T) {
 	h.ServeHTTP(resp, req)
 
 	logger.AssertExpectations(t)
+	s.AssertExpectations(t)
 }
 
 func TestWithRecovery_Error(t *testing.T) {
@@ -67,7 +74,7 @@ func TestWithRecovery_Error(t *testing.T) {
 	}))
 
 	req, _ := http.NewRequest("GET", "/", nil)
-	req = req.WithContext(log.WithLogger(context.Background(), log.Null))
+	req = req.WithContext(stats.WithStats(log.WithLogger(context.Background(), log.Null), stats.Null))
 	resp := httptest.NewRecorder()
 
 	defer func() {

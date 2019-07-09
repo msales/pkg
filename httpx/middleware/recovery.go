@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"fmt"
+	"github.com/msales/pkg/v3/stats"
 	"net/http"
 	"runtime/debug"
 
@@ -54,6 +55,7 @@ func (m *Recovery) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			}
 
 			log.Error(r.Context(), err.Error(), logCtx...)
+			_ = stats.Inc(r.Context(), "panic_recovery", 1, 1)
 			w.WriteHeader(500)
 		}
 	}()
