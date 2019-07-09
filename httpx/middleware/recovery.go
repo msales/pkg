@@ -6,8 +6,8 @@ import (
 	"runtime/debug"
 
 	"github.com/msales/pkg/v3/log"
+	"github.com/msales/pkg/v3/stats"
 )
-
 
 // RecoveryFunc is used to configure the recovery handler.
 type RecoveryFunc func(*Recovery)
@@ -54,6 +54,7 @@ func (m *Recovery) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			}
 
 			log.Error(r.Context(), err.Error(), logCtx...)
+			_ = stats.Inc(r.Context(), "panic_recovery", 1, 1)
 			w.WriteHeader(500)
 		}
 	}()
