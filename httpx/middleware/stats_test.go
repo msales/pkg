@@ -18,8 +18,10 @@ func TestWithRequestStats(t *testing.T) {
 		tagFuncs     []middleware.TagsFunc
 		expectedTags []interface{}
 	}{
-		{"/test", nil, []interface{}{"method", "GET", "path", "/test"}},
-		{"", nil, []interface{}{"method", "GET", "path", ""}},
+		{"/test", nil, nil},
+		{"", nil, nil},
+		{"/test", []middleware.TagsFunc{middleware.DefaultTags}, []interface{}{"method", "GET", "path", "/test"}},
+		{"", []middleware.TagsFunc{middleware.DefaultTags}, []interface{}{"method", "GET", "path", ""}},
 		{"/test", []middleware.TagsFunc{testTags}, []interface{}{"method", "GET"}},
 		{"", []middleware.TagsFunc{testTags}, []interface{}{"method", "GET"}},
 	}
@@ -59,6 +61,10 @@ func TestWithResponseTime(t *testing.T) {
 	}{
 		{
 			tagFuncs:     nil,
+			expectedTags: nil,
+		},
+		{
+			tagFuncs:     []middleware.TagsFunc{middleware.DefaultTags},
 			expectedTags: []interface{}{"method", "GET", "path", "/"},
 		},
 		{

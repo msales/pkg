@@ -55,7 +55,7 @@ func WithResponseTime(h http.Handler, fns ...TagsFunc) http.Handler {
 // prepareTags resolves tags in accordance to provided functions and falls back to defaults in no custom tag functions were provided.
 func prepareTags(r *http.Request, fns []TagsFunc) []interface{} {
 	if len(fns) == 0 {
-		fns = []TagsFunc{DefaultTags}
+		return nil
 	}
 
 	var tags []interface{}
