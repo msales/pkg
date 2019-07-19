@@ -17,6 +17,11 @@ Install with:
 go get github.com/msales/pkg
 ```
 
+## Stats
+By default stats middleware function `WithCommon` won't add any tags if you don't pass `TagsFunc` as an argument.
+
+If you want to add default tags, you have to pass `middleware.DefaultTags` to `WithCommon` function.
+
 ## License
 
 MIT-License. As is. No warranties whatsoever. Mileage may vary. Batteries not included.
