@@ -47,7 +47,8 @@ type rpcStatsHandler struct {
 // TagRPC can attach some information to the given context.
 func (h *rpcStatsHandler) TagRPC(ctx context.Context, info *grpcstats.RPCTagInfo) context.Context {
 	if h.tagsFns != nil {
-		ctx = context.WithValue(ctx, tagsKey, &stats.Tags{})
+		tags := make([]interface{}, 0)
+		ctx = context.WithValue(ctx, tagsKey, &tags)
 	}
 	return context.WithValue(ctx, methodKey, info.FullMethodName)
 }
@@ -55,32 +56,35 @@ func (h *rpcStatsHandler) TagRPC(ctx context.Context, info *grpcstats.RPCTagInfo
 // HandleRPC processes the RPC stats.
 func (h *rpcStatsHandler) HandleRPC(ctx context.Context, rpcStats grpcstats.RPCStats) {
 	if in, ok := rpcStats.(*grpcstats.InPayload); ok && h.tagsFns != nil {
-		tags := make(stats.Tags)
+		tags := make([]interface{}, 0)
 
 		for _, fn := range h.tagsFns {
-			tags.Merge(fn(ctx, in.Payload))
+			for tag, val := range fn(ctx, in.Payload) {
+				tags = append(tags, tag, val)
+			}
 		}
 
-		ctxTags := ctx.Value(tagsKey).(*stats.Tags)
+		ctxTags := ctx.Value(tagsKey).(*[]interface{})
 		*ctxTags = tags
 
 		return
 	}
 
 	if end, ok := rpcStats.(*grpcstats.End); ok {
-		tags := stats.Tags{}
+		tags := make([]interface{}, 0)
 
-		t, ok := ctx.Value(tagsKey).(*stats.Tags)
+		t, ok := ctx.Value(tagsKey).(*[]interface{})
 		if ok {
 			tags = *t
 		}
 
-		tags.
-			With("method", h.methodFromContext(ctx)).
-			With("status", h.getStatus(end))
+		tags = append(tags,
+			"method", h.methodFromContext(ctx),
+			"status", h.getStatus(end),
+		)
 
-		h.stats.Inc("rpc.end", 1, 1, tags)
-		h.stats.Timing("rpc.time", end.EndTime.Sub(end.BeginTime), 1, tags)
+		_ = h.stats.Inc("rpc.end", 1, 1, tags...)
+		_ = h.stats.Timing("rpc.time", end.EndTime.Sub(end.BeginTime), 1, tags...)
 	}
 }
 
