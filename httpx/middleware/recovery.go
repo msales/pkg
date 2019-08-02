@@ -48,7 +48,7 @@ func (m *Recovery) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				err = v
 			}
 
-			var logCtx []interface{}
+			logCtx := []interface{}{"url", r.URL.String(),}
 			if m.withStack {
 				logCtx = append(logCtx, "stack", string(debug.Stack()))
 			}
