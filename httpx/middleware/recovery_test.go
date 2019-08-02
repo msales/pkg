@@ -21,7 +21,7 @@ func TestWithRecovery(t *testing.T) {
 
 	ctx := context.Background()
 	logger := new(mocks.Logger)
-	logger.On("Error", "panic", "stack", mock.AnythingOfType("string"))
+	logger.On("Error", "panic", "url", "/", "stack", mock.AnythingOfType("string"))
 	s := new(MockStats)
 	s.On("Inc", "panic_recovery", int64(1), float32(1.0), mock.Anything).Return(nil).Once()
 
@@ -48,7 +48,7 @@ func TestWithRecovery_WithoutStack(t *testing.T) {
 
 	ctx := context.Background()
 	logger := new(mocks.Logger)
-	logger.On("Error", "panic")
+	logger.On("Error", "panic", "url", "/")
 	s := new(MockStats)
 	s.On("Inc", "panic_recovery", int64(1), float32(1.0), mock.Anything).Return(nil).Once()
 
