@@ -1,5 +1,9 @@
 package redisx
 
+import (
+	"github.com/go-redis/redis"
+)
+
 // ScanIterator represents a generic redis scan iterator that works on both
 // redis Client and ClusterClient
 type ScanIterator interface {
@@ -10,12 +14,7 @@ type ScanIterator interface {
 
 // ClusterClient represents a redis ClusterClient
 type ClusterClient interface {
-	ForEachMaster(fn func(client Client) error) error
-}
-
-// Client represents a redis Client
-type Client interface {
-	Scan(cursor uint64, match string, count int64) ScanCmd
+	ForEachMaster(fn func(client *redis.Client) error) error
 }
 
 // ScanCmd represents redis ScanCmd
@@ -28,11 +27,11 @@ func NewScanIterator(c interface{}, cursor uint64, match string, count int64) (S
 	_, isCluster := c.(ClusterClient)
 
 	if !isCluster {
-		return c.(Client).Scan(cursor, match, count).Iterator(), nil
+		return c.(redis.Cmdable).Scan(cursor, match, count).Iterator(), nil
 	}
 
 	iterators := make([]ScanIterator, 0)
-	err := c.(ClusterClient).ForEachMaster(func(client Client) error {
+	err := c.(ClusterClient).ForEachMaster(func(client *redis.Client) error {
 		iterators = append(iterators, client.Scan(cursor, match, count).Iterator())
 
 		return nil
