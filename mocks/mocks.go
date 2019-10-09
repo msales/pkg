@@ -3,10 +3,9 @@ package mocks
 import (
 	"fmt"
 
+	"github.com/msales/pkg/v3/clix"
 	"github.com/stretchr/testify/mock"
 	"gopkg.in/urfave/cli.v1"
-
-	"github.com/msales/pkg/v3/clix"
 )
 
 type Logger struct {

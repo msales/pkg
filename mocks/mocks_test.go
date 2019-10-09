@@ -74,3 +74,27 @@ func TestInitContext_PanicsWrongLogLevel(t *testing.T) {
 		_ = mocks.InitContext(args, flags)
 	})
 }
+
+func TestLogger_Debug(t *testing.T) {
+	assert.NotPanics(t, func() {
+		l := new(mocks.Logger)
+		l.On("Debug", "test msg")
+		l.Debug("test msg")
+	})
+}
+
+func TestLogger_Info(t *testing.T) {
+	assert.NotPanics(t, func() {
+		l := new(mocks.Logger)
+		l.On("Info", "test msg")
+		l.Info("test msg")
+	})
+}
+
+func TestLogger_Error(t *testing.T) {
+	assert.NotPanics(t, func() {
+		l := new(mocks.Logger)
+		l.On("Error", "test msg")
+		l.Error("test msg")
+	})
+}
