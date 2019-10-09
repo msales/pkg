@@ -2,7 +2,6 @@ package mocks
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/stretchr/testify/mock"
 	"gopkg.in/urfave/cli.v1"
@@ -45,7 +44,7 @@ func InitContext(args map[string]string, flags []cli.Flag) *clix.Context {
 }
 
 func InitCliContext(args map[string]string, flags []cli.Flag) *cli.Context {
-	cliArgs := os.Args[0:1]
+	cliArgs := []string{"test"}
 	for k, v := range args {
 		cliArgs = append(cliArgs, fmt.Sprintf("-%s=%s", k, v))
 	}
