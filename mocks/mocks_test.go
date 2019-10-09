@@ -4,11 +4,10 @@ import (
 	"context"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-	"gopkg.in/urfave/cli.v1"
-
 	"github.com/msales/pkg/v3/clix"
 	"github.com/msales/pkg/v3/mocks"
+	"github.com/stretchr/testify/assert"
+	"gopkg.in/urfave/cli.v1"
 )
 
 func TestInitContext(t *testing.T) {
