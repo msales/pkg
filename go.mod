@@ -9,7 +9,7 @@ require (
 	github.com/cactus/go-statsd-client v3.1.1+incompatible
 	github.com/go-redis/redis v6.15.2+incompatible
 	github.com/gomodule/redigo v2.0.0+incompatible // indirect
-	github.com/grpc-ecosystem/go-grpc-middleware v1.0.0
+	github.com/grpc-ecosystem/go-grpc-middleware v1.1.0
 	github.com/kr/pretty v0.1.0 // indirect
 	github.com/magiconair/properties v1.8.0
 	github.com/msales/logged v0.2.0
