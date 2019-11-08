@@ -95,7 +95,7 @@ var KafkaConsumerFlags = Flags{
 	},
 	cli.StringFlag{
 		Name: FlagKafkaConsumerKafkaVersion,
-		Usage: "Kafka version (e.g. v0.10.2.0 or v2.3.0).",
+		Usage: "Kafka version (e.g. 0.10.2.0 or 2.3.0).",
 		EnvVar: "KAFKA_CONSUMER_KAFKA_VERSION",
 	},
 }
@@ -114,7 +114,7 @@ var KafkaProducerFlags = Flags{
 	},
 	cli.StringFlag{
 		Name: FlagKafkaProducerKafkaVersion,
-		Usage: "Kafka version (e.g. v0.10.2.0 or v2.3.0)..",
+		Usage: "Kafka version (e.g. 0.10.2.0 or 2.3.0).",
 		EnvVar: "KAFKA_PRODUCER_KAFKA_VERSION",
 	},
 }
