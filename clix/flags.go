@@ -21,11 +21,13 @@ const (
 	FlagProfiler     = "profiler"
 	FlagProfilerPort = "profiler-port"
 
-	FlagKafkaConsumerBrokers = "kafka-consumer-brokers"
-	FlagKafkaConsumerGroupID = "kafka-consumer-group-id"
-	FlagKafkaConsumerTopic   = "kafka-consumer-topic"
-	FlagKafkaProducerBrokers = "kafka-producer-brokers"
-	FlagKafkaProducerTopic   = "kafka-producer-topic"
+	FlagKafkaConsumerBrokers      = "kafka-consumer-brokers"
+	FlagKafkaConsumerGroupID      = "kafka-consumer-group-id"
+	FlagKafkaConsumerTopic        = "kafka-consumer-topic"
+	FlagKafkaConsumerKafkaVersion = "kafka-consumer-kafka-version"
+	FlagKafkaProducerBrokers      = "kafka-producer-brokers"
+	FlagKafkaProducerTopic        = "kafka-producer-topic"
+	FlagKafkaProducerKafkaVersion = "kafka-producer-kafka-version"
 
 	FlagCommitBatch    = "commit-batch"
 	FlagCommitInterval = "commit-interval"
@@ -91,6 +93,11 @@ var KafkaConsumerFlags = Flags{
 		Usage:  "Kafka topic to consume from.",
 		EnvVar: "KAFKA_CONSUMER_TOPIC",
 	},
+	cli.StringFlag{
+		Name: FlagKafkaConsumerKafkaVersion,
+		Usage: "Kafka version.",
+		EnvVar: "KAFKA_CONSUMER_KAFKA_VERSION",
+	},
 }
 
 // KafkaProducerFlags are flags that configure a Kafka producer.
@@ -104,6 +111,11 @@ var KafkaProducerFlags = Flags{
 		Name:   FlagKafkaProducerTopic,
 		Usage:  "Kafka topic to produce into.",
 		EnvVar: "KAFKA_PRODUCER_TOPIC",
+	},
+	cli.StringFlag{
+		Name: FlagKafkaProducerKafkaVersion,
+		Usage: "Kafka version.",
+		EnvVar: "KAFKA_PRODUCER_KAFKA_VERSION",
 	},
 }
 
