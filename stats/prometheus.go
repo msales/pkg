@@ -143,7 +143,7 @@ func (s *Prometheus) Timing(name string, value time.Duration, rate float32, tags
 				return err
 			}
 
-			m = existsErr.ExistingCollector.(*prometheus.SummaryVec)
+			m, ok = existsErr.ExistingCollector.(*prometheus.SummaryVec)
 			if !ok {
 				return fmt.Errorf("stats: expected the collector to be instance of *SummaryVec, got %T instead", existsErr.ExistingCollector)
 			}
