@@ -109,7 +109,6 @@ func (s *Prometheus) Gauge(name string, value float64, rate float32, tags ...int
 			if !ok {
 				return fmt.Errorf("stats: expected the collector to be instance of *GaugeVec, got %T instead", existsErr.ExistingCollector)
 			}
-
 		}
 	}
 
@@ -148,7 +147,6 @@ func (s *Prometheus) Timing(name string, value time.Duration, rate float32, tags
 			if !ok {
 				return fmt.Errorf("stats: expected the collector to be instance of *SummaryVec, got %T instead", existsErr.ExistingCollector)
 			}
-
 		}
 	}
 
