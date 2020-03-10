@@ -202,6 +202,7 @@ func formatPrometheusTags(tags []interface{}) ([]string, prometheus.Labels) {
 // the returned boolean and take the string (if true) or get data from the slice.
 // This is the optimization: filling the buffer allows to re-use the memory and avoid
 // allocations when converting floats. Returning the string directly avoids copying strings.
+// The function falls back to fmt.Sprintf to format unknown values.
 func toString(v interface{}, b []byte) (string, bool) {
 	switch vv := v.(type) {
 	case string:
@@ -233,7 +234,7 @@ func toString(v interface{}, b []byte) (string, bool) {
 	case uint64:
 		strconv.AppendUint(b, vv, 10)
 	default:
-		return fmt.Sprintf("STATS_ERROR: cannot convert value %v to string", vv), true
+		return fmt.Sprintf("%v", vv), true
 	}
 
 	return "", false
