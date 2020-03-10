@@ -152,9 +152,9 @@ func formatPrometheusTags(tags []interface{}) ([]string, prometheus.Labels) {
 	names := make([]string, 0, len(tags)/2)
 	lbls := make(prometheus.Labels, len(tags)/2)
 	for i := 0; i < len(tags); i += 2 {
-		key, ok := toString(tags[i], b)
+		key, ok := tags[i].(string) // The stats key must be a string.
 		if !ok {
-			key = string(b)
+			key = fmt.Sprintf("STATS_ERROR: key %v is not a string", tags[i])
 		}
 		names = append(names, key)
 

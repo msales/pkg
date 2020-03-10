@@ -63,6 +63,7 @@ func BenchmarkFormatPrometheusTags(b *testing.B) {
 	tags := []interface{}{"string", "test", "bool", true, "float", 1.0, "int", 2}
 
 	b.ReportAllocs()
+	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		formatPrometheusTags(tags)
 	}
