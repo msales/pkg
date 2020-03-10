@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -164,8 +163,6 @@ func formatPrometheusTags(tags []interface{}) ([]string, prometheus.Labels) {
 		}
 		lbls[key] = lbl
 	}
-
-	sort.Strings(names)
 
 	return names, lbls
 }
