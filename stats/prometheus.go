@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"sort"
+	"strconv"
 	"strings"
 	"time"
 
@@ -146,15 +147,67 @@ func (s *Prometheus) formatFQN(name string) string {
 func formatPrometheusTags(tags []interface{}) ([]string, prometheus.Labels) {
 	tags = deduplicateTags(normalizeTags(tags))
 
+	b := make([]byte, 0, 65) // The largest needed buffer is 65 bytes for a signed int64.
+
 	names := make([]string, 0, len(tags)/2)
 	lbls := make(prometheus.Labels, len(tags)/2)
 	for i := 0; i < len(tags); i += 2 {
-		key := fmt.Sprintf("%v", tags[i])
+		key, ok := toString(tags[i], b)
+		if !ok {
+			key = string(b)
+		}
 		names = append(names, key)
-		lbls[key] = fmt.Sprintf("%v", tags[i+1])
+
+		lbl, ok := toString(tags[i+1], b)
+		if !ok {
+			lbl = string(b)
+		}
+		lbls[key] = lbl
 	}
 
 	sort.Strings(names)
 
 	return names, lbls
+}
+
+// toString converts the given value to a string. It either returns the new string and true
+// or fills the passed byte slice and returns an empty string and false. The user needs to check
+// the returned boolean and take the string (if true) or get data from the slice.
+// This is the optimization: filling the buffer allows to re-use the memory and avoid
+// allocations when converting floats. Returning the string directly avoids copying strings.
+func toString(v interface{}, b []byte) (string, bool) {
+	switch vv := v.(type) {
+	case string:
+		return vv, true
+	case bool:
+		strconv.AppendBool(b, vv)
+	case float32:
+		strconv.AppendFloat(b, float64(vv), 'f', -1, 64)
+	case float64:
+		strconv.AppendFloat(b, vv, 'f', -1, 64)
+	case int:
+		strconv.AppendInt(b, int64(vv), 10)
+	case int8:
+		strconv.AppendInt(b, int64(vv), 10)
+	case int16:
+		strconv.AppendInt(b, int64(vv), 10)
+	case int32:
+		strconv.AppendInt(b, int64(vv), 10)
+	case int64:
+		strconv.AppendInt(b, vv, 10)
+	case uint:
+		strconv.AppendUint(b, uint64(vv), 10)
+	case uint8:
+		strconv.AppendUint(b, uint64(vv), 10)
+	case uint16:
+		strconv.AppendUint(b, uint64(vv), 10)
+	case uint32:
+		strconv.AppendUint(b, uint64(vv), 10)
+	case uint64:
+		strconv.AppendUint(b, vv, 10)
+	default:
+		return fmt.Sprintf("STATS_ERROR: cannot convert value %v to string", vv), true
+	}
+
+	return "", false
 }

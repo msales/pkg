@@ -58,3 +58,12 @@ func BenchmarkPrometheus_FormatFQN(b *testing.B) {
 		assert.NotNil(b, res)
 	}
 }
+
+func BenchmarkFormatPrometheusTags(b *testing.B) {
+	tags := []interface{}{"string", "test", "bool", true, "float", 1.0, "int", 2}
+
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		formatPrometheusTags(tags)
+	}
+}
