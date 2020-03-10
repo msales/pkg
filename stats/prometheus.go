@@ -54,10 +54,18 @@ func (s *Prometheus) Inc(name string, value int64, rate float32, tags ...interfa
 			lblNames,
 		)
 
-		if err := s.reg.Register(m); err != nil {
-			return err
+		err := s.reg.Register(m)
+		if err == nil {
+			s.counters[key] = m
+		} else {
+			var existsErr prometheus.AlreadyRegisteredError
+			if errors.As(err, &existsErr) {
+				m, ok = existsErr.ExistingCollector.(*prometheus.CounterVec)
+				if !ok {
+					return fmt.Errorf("stats: expected the collector to be instance of *CounterVec, got %T instead", existsErr.ExistingCollector)
+				}
+			}
 		}
-		s.counters[key] = m
 	}
 
 	m.With(lbls).Add(float64(value))
@@ -86,10 +94,18 @@ func (s *Prometheus) Gauge(name string, value float64, rate float32, tags ...int
 			lblNames,
 		)
 
-		if err := s.reg.Register(m); err != nil {
-			return err
+		err := s.reg.Register(m)
+		if err == nil {
+			s.gauges[key] = m
+		} else {
+			var existsErr prometheus.AlreadyRegisteredError
+			if errors.As(err, &existsErr) {
+				m, ok = existsErr.ExistingCollector.(*prometheus.GaugeVec)
+				if !ok {
+					return fmt.Errorf("stats: expected the collector to be instance of *GaugeVec, got %T instead", existsErr.ExistingCollector)
+				}
+			}
 		}
-		s.gauges[key] = m
 	}
 
 	m.With(lbls).Set(value)
@@ -114,10 +130,18 @@ func (s *Prometheus) Timing(name string, value time.Duration, rate float32, tags
 			lblNames,
 		)
 
-		if err := s.reg.Register(m); err != nil {
-			return err
+		err := s.reg.Register(m)
+		if err == nil {
+			s.timings[key] = m
+		} else {
+			var existsErr prometheus.AlreadyRegisteredError
+			if errors.As(err, &existsErr) {
+				m = existsErr.ExistingCollector.(*prometheus.SummaryVec)
+				if !ok {
+					return fmt.Errorf("stats: expected the collector to be instance of *SummaryVec, got %T instead", existsErr.ExistingCollector)
+				}
+			}
 		}
-		s.timings[key] = m
 	}
 
 	m.With(lbls).Observe(float64(value) / float64(time.Millisecond))
