@@ -58,11 +58,14 @@ func (s *Prometheus) Inc(name string, value int64, rate float32, tags ...interfa
 		if err == nil {
 			s.counters[key] = m
 		} else {
-			if existsErr, ok := err.(prometheus.AlreadyRegisteredError); ok {
-				m, ok = existsErr.ExistingCollector.(*prometheus.CounterVec)
-				if !ok {
-					return fmt.Errorf("stats: expected the collector to be instance of *CounterVec, got %T instead", existsErr.ExistingCollector)
-				}
+			existsErr, ok := err.(prometheus.AlreadyRegisteredError)
+			if !ok {
+				return err
+			}
+
+			m, ok = existsErr.ExistingCollector.(*prometheus.CounterVec)
+			if !ok {
+				return fmt.Errorf("stats: expected the collector to be instance of *CounterVec, got %T instead", existsErr.ExistingCollector)
 			}
 		}
 	}
@@ -97,12 +100,16 @@ func (s *Prometheus) Gauge(name string, value float64, rate float32, tags ...int
 		if err == nil {
 			s.gauges[key] = m
 		} else {
-			if existsErr, ok := err.(prometheus.AlreadyRegisteredError); ok {
-				m, ok = existsErr.ExistingCollector.(*prometheus.GaugeVec)
-				if !ok {
-					return fmt.Errorf("stats: expected the collector to be instance of *GaugeVec, got %T instead", existsErr.ExistingCollector)
-				}
+			existsErr, ok := err.(prometheus.AlreadyRegisteredError)
+			if !ok {
+				return err
 			}
+
+			m, ok = existsErr.ExistingCollector.(*prometheus.GaugeVec)
+			if !ok {
+				return fmt.Errorf("stats: expected the collector to be instance of *GaugeVec, got %T instead", existsErr.ExistingCollector)
+			}
+
 		}
 	}
 
@@ -132,12 +139,16 @@ func (s *Prometheus) Timing(name string, value time.Duration, rate float32, tags
 		if err == nil {
 			s.timings[key] = m
 		} else {
-			if existsErr, ok := err.(prometheus.AlreadyRegisteredError); ok {
-				m = existsErr.ExistingCollector.(*prometheus.SummaryVec)
-				if !ok {
-					return fmt.Errorf("stats: expected the collector to be instance of *SummaryVec, got %T instead", existsErr.ExistingCollector)
-				}
+			existsErr, ok := err.(prometheus.AlreadyRegisteredError)
+			if !ok {
+				return err
 			}
+
+			m = existsErr.ExistingCollector.(*prometheus.SummaryVec)
+			if !ok {
+				return fmt.Errorf("stats: expected the collector to be instance of *SummaryVec, got %T instead", existsErr.ExistingCollector)
+			}
+
 		}
 	}
 
