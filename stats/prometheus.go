@@ -187,8 +187,8 @@ func formatPrometheusTags(tags []interface{}) ([]string, prometheus.Labels) {
 		}
 		names = append(names, key)
 
-		lbl, ok := toString(tags[i+1], b)
-		if !ok {
+		b, lbl := toString(tags[i+1], b[:0])
+		if b != nil {
 			lbl = string(b)
 		}
 		lbls[key] = lbl
@@ -203,39 +203,37 @@ func formatPrometheusTags(tags []interface{}) ([]string, prometheus.Labels) {
 // This is the optimization: filling the buffer allows to re-use the memory and avoid
 // allocations when converting floats. Returning the string directly avoids copying strings.
 // The function falls back to fmt.Sprintf to format unknown values.
-func toString(v interface{}, b []byte) (string, bool) {
+func toString(v interface{}, b []byte) ([]byte, string) {
 	switch vv := v.(type) {
 	case string:
-		return vv, true
+		return nil, vv
 	case bool:
-		strconv.AppendBool(b, vv)
+		return strconv.AppendBool(b, vv), ""
 	case float32:
-		strconv.AppendFloat(b, float64(vv), 'f', -1, 64)
+		return strconv.AppendFloat(b, float64(vv), 'f', -1, 64), ""
 	case float64:
-		strconv.AppendFloat(b, vv, 'f', -1, 64)
+		return strconv.AppendFloat(b, vv, 'f', -1, 64), ""
 	case int:
-		strconv.AppendInt(b, int64(vv), 10)
+		return strconv.AppendInt(b, int64(vv), 10), ""
 	case int8:
-		strconv.AppendInt(b, int64(vv), 10)
+		return strconv.AppendInt(b, int64(vv), 10), ""
 	case int16:
-		strconv.AppendInt(b, int64(vv), 10)
+		return strconv.AppendInt(b, int64(vv), 10), ""
 	case int32:
-		strconv.AppendInt(b, int64(vv), 10)
+		return strconv.AppendInt(b, int64(vv), 10), ""
 	case int64:
-		strconv.AppendInt(b, vv, 10)
+		return strconv.AppendInt(b, vv, 10), ""
 	case uint:
-		strconv.AppendUint(b, uint64(vv), 10)
+		return strconv.AppendUint(b, uint64(vv), 10), ""
 	case uint8:
-		strconv.AppendUint(b, uint64(vv), 10)
+		return strconv.AppendUint(b, uint64(vv), 10), ""
 	case uint16:
-		strconv.AppendUint(b, uint64(vv), 10)
+		return strconv.AppendUint(b, uint64(vv), 10), ""
 	case uint32:
-		strconv.AppendUint(b, uint64(vv), 10)
+		return strconv.AppendUint(b, uint64(vv), 10), ""
 	case uint64:
-		strconv.AppendUint(b, vv, 10)
+		return strconv.AppendUint(b, vv, 10), ""
 	default:
-		return fmt.Sprintf("%v", vv), true
+		return nil, fmt.Sprintf("%v", vv)
 	}
-
-	return "", false
 }
