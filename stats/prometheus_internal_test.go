@@ -3,6 +3,7 @@ package stats
 import (
 	"testing"
 
+	"github.com/prometheus/client_golang/prometheus"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -48,6 +49,19 @@ func TestPrometheus_formatFQN(t *testing.T) {
 	}
 }
 
+func TestFormatPrometheusTags(t *testing.T) {
+	tags := []interface{}{"string", "test", "bool", true, "float", 1.1, "int", 2}
+	names, labels := formatPrometheusTags(tags)
+
+	assert.Equal(t, []string{"string", "bool", "float", "int"}, names)
+	assert.Equal(t, prometheus.Labels{
+		"string": "test",
+		"bool":   "true",
+		"float":  "1.1",
+		"int":    "2",
+	}, labels)
+}
+
 func BenchmarkPrometheus_FormatFQN(b *testing.B) {
 	testData := "test-test.asdf-test.test-test.asdf-test.test-test.asdf-test.test-test.asdf--test"
 
@@ -56,5 +70,15 @@ func BenchmarkPrometheus_FormatFQN(b *testing.B) {
 		res := prometheus.formatFQN(testData)
 
 		assert.NotNil(b, res)
+	}
+}
+
+func BenchmarkFormatPrometheusTags(b *testing.B) {
+	tags := []interface{}{"string", "test", "bool", true, "float", 1.0, "int", 2}
+
+	b.ReportAllocs()
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		formatPrometheusTags(tags)
 	}
 }
