@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"sort"
+	"strconv"
 	"strings"
 	"time"
 
@@ -54,10 +54,20 @@ func (s *Prometheus) Inc(name string, value int64, rate float32, tags ...interfa
 			lblNames,
 		)
 
-		if err := s.reg.Register(m); err != nil {
-			return err
+		err := s.reg.Register(m)
+		if err == nil {
+			s.counters[key] = m
+		} else {
+			existsErr, ok := err.(prometheus.AlreadyRegisteredError)
+			if !ok {
+				return err
+			}
+
+			m, ok = existsErr.ExistingCollector.(*prometheus.CounterVec)
+			if !ok {
+				return fmt.Errorf("stats: expected the collector to be instance of *CounterVec, got %T instead", existsErr.ExistingCollector)
+			}
 		}
-		s.counters[key] = m
 	}
 
 	m.With(lbls).Add(float64(value))
@@ -86,10 +96,20 @@ func (s *Prometheus) Gauge(name string, value float64, rate float32, tags ...int
 			lblNames,
 		)
 
-		if err := s.reg.Register(m); err != nil {
-			return err
+		err := s.reg.Register(m)
+		if err == nil {
+			s.gauges[key] = m
+		} else {
+			existsErr, ok := err.(prometheus.AlreadyRegisteredError)
+			if !ok {
+				return err
+			}
+
+			m, ok = existsErr.ExistingCollector.(*prometheus.GaugeVec)
+			if !ok {
+				return fmt.Errorf("stats: expected the collector to be instance of *GaugeVec, got %T instead", existsErr.ExistingCollector)
+			}
 		}
-		s.gauges[key] = m
 	}
 
 	m.With(lbls).Set(value)
@@ -114,10 +134,20 @@ func (s *Prometheus) Timing(name string, value time.Duration, rate float32, tags
 			lblNames,
 		)
 
-		if err := s.reg.Register(m); err != nil {
-			return err
+		err := s.reg.Register(m)
+		if err == nil {
+			s.timings[key] = m
+		} else {
+			existsErr, ok := err.(prometheus.AlreadyRegisteredError)
+			if !ok {
+				return err
+			}
+
+			m, ok = existsErr.ExistingCollector.(*prometheus.SummaryVec)
+			if !ok {
+				return fmt.Errorf("stats: expected the collector to be instance of *SummaryVec, got %T instead", existsErr.ExistingCollector)
+			}
 		}
-		s.timings[key] = m
 	}
 
 	m.With(lbls).Observe(float64(value) / float64(time.Millisecond))
@@ -146,15 +176,64 @@ func (s *Prometheus) formatFQN(name string) string {
 func formatPrometheusTags(tags []interface{}) ([]string, prometheus.Labels) {
 	tags = deduplicateTags(normalizeTags(tags))
 
+	b := make([]byte, 0, 65) // The largest needed buffer is 65 bytes for a signed int64.
+
 	names := make([]string, 0, len(tags)/2)
 	lbls := make(prometheus.Labels, len(tags)/2)
 	for i := 0; i < len(tags); i += 2 {
-		key := fmt.Sprintf("%v", tags[i])
+		key, ok := tags[i].(string) // The stats key must be a string.
+		if !ok {
+			key = fmt.Sprintf("STATS_ERROR: key %v is not a string", tags[i])
+		}
 		names = append(names, key)
-		lbls[key] = fmt.Sprintf("%v", tags[i+1])
+
+		b, lbl := toString(tags[i+1], b[:0])
+		if b != nil {
+			lbl = string(b)
+		}
+		lbls[key] = lbl
 	}
 
-	sort.Strings(names)
-
 	return names, lbls
+}
+
+// toString converts the given value to a string. It either returns the new string and true
+// or fills the passed byte slice and returns an empty string and false. The user needs to check
+// the returned boolean and take the string (if true) or get data from the slice.
+// This is the optimization: filling the buffer allows to re-use the memory and avoid
+// allocations when converting floats. Returning the string directly avoids copying strings.
+// The function falls back to fmt.Sprintf to format unknown values.
+func toString(v interface{}, b []byte) ([]byte, string) {
+	switch vv := v.(type) {
+	case string:
+		return nil, vv
+	case bool:
+		return strconv.AppendBool(b, vv), ""
+	case float32:
+		return strconv.AppendFloat(b, float64(vv), 'f', -1, 64), ""
+	case float64:
+		return strconv.AppendFloat(b, vv, 'f', -1, 64), ""
+	case int:
+		return strconv.AppendInt(b, int64(vv), 10), ""
+	case int8:
+		return strconv.AppendInt(b, int64(vv), 10), ""
+	case int16:
+		return strconv.AppendInt(b, int64(vv), 10), ""
+	case int32:
+		return strconv.AppendInt(b, int64(vv), 10), ""
+	case int64:
+		return strconv.AppendInt(b, vv, 10), ""
+	case uint:
+		return strconv.AppendUint(b, uint64(vv), 10), ""
+	case uint8:
+		return strconv.AppendUint(b, uint64(vv), 10), ""
+	case uint16:
+		return strconv.AppendUint(b, uint64(vv), 10), ""
+	case uint32:
+		return strconv.AppendUint(b, uint64(vv), 10), ""
+	case uint64:
+		return strconv.AppendUint(b, vv, 10), ""
+	default:
+		return nil, fmt.Sprintf("%v", vv)
+	}
 }
