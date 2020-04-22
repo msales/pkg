@@ -5,9 +5,9 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/msales/pkg/v3/grpcx/middleware"
-	"github.com/msales/pkg/v3/log"
-	"github.com/msales/pkg/v3/mocks"
+	"github.com/msales/pkg/v4/grpcx/middleware"
+	"github.com/msales/pkg/v4/log"
+	"github.com/msales/pkg/v4/mocks"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"google.golang.org/grpc"
@@ -134,4 +134,3 @@ func TestWithStreamServerRecovery_WithError(t *testing.T) {
 
 	assert.NoError(t, err)
 }
-

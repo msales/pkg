@@ -6,9 +6,9 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/msales/pkg/v3/log"
-	"github.com/msales/pkg/v3/stats"
-	"gopkg.in/urfave/cli.v1"
+	"github.com/msales/pkg/v4/log"
+	"github.com/msales/pkg/v4/stats"
+	"github.com/urfave/cli/v2"
 )
 
 // NewStats creates a new stats client.

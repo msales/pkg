@@ -1,7 +1,7 @@
 package grpcx
 
 import (
-	"github.com/msales/pkg/v3/stats"
+	"github.com/msales/pkg/v4/stats"
 	"golang.org/x/net/context"
 	grpcstats "google.golang.org/grpc/stats"
 )

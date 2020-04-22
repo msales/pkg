@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"runtime/debug"
 
-	"github.com/msales/pkg/v3/log"
+	"github.com/msales/pkg/v4/log"
 	"google.golang.org/grpc"
 )
 

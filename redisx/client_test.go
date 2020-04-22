@@ -8,7 +8,7 @@ import (
 	"github.com/go-redis/redis"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/msales/pkg/v3/redisx"
+	"github.com/msales/pkg/v4/redisx"
 )
 
 func TestClusterScanIterator_Next_StandardClient(t *testing.T) {

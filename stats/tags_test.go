@@ -3,8 +3,8 @@ package stats_test
 import (
 	"testing"
 
-	"github.com/magiconair/properties/assert"
-	"github.com/msales/pkg/v3/stats"
+	"github.com/msales/pkg/v4/stats"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestTags_With(t *testing.T) {

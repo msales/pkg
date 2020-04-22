@@ -4,7 +4,7 @@ import (
 	"net"
 	"testing"
 
-	"github.com/msales/pkg/v3/cache"
+	"github.com/msales/pkg/v4/cache"
 	"github.com/stretchr/testify/assert"
 )
 

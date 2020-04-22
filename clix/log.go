@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/msales/logged"
-	"gopkg.in/urfave/cli.v1"
+	"github.com/urfave/cli/v2"
 )
 
 // NewLogger creates a new logger.

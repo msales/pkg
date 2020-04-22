@@ -3,10 +3,10 @@ package clix_test
 import (
 	"testing"
 
-	"github.com/msales/pkg/v3/clix"
-	"github.com/msales/pkg/v3/log"
+	"github.com/msales/pkg/v4/clix"
+	"github.com/msales/pkg/v4/log"
 	"github.com/stretchr/testify/assert"
-	"gopkg.in/urfave/cli.v1"
+	"github.com/urfave/cli/v2"
 )
 
 func TestNewLogger(t *testing.T) {
@@ -17,14 +17,14 @@ func TestNewLogger(t *testing.T) {
 
 		shouldErr bool
 	}{
-		{"info", "json", &cli.StringSlice{}, false},
-		{"info", "terminal", &cli.StringSlice{}, false},
-		{"info", "logfmt", &cli.StringSlice{}, false},
-		{"", "json", &cli.StringSlice{}, false},
-		{"info", "", &cli.StringSlice{}, false},
-		{"invalid", "json", &cli.StringSlice{}, true},
-		{"info", "invalid", &cli.StringSlice{}, true},
-		{"info", "json", &cli.StringSlice{"single"}, true},
+		{"info", "json", cli.NewStringSlice(), false},
+		{"info", "terminal", cli.NewStringSlice(), false},
+		{"info", "logfmt", cli.NewStringSlice(), false},
+		{"", "json", cli.NewStringSlice(), false},
+		{"info", "", cli.NewStringSlice(), false},
+		{"invalid", "json", cli.NewStringSlice(), true},
+		{"info", "invalid", cli.NewStringSlice(), true},
+		{"info", "json", cli.NewStringSlice("string"), true},
 	}
 
 	for _, tt := range tests {

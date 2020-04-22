@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/msales/pkg/v3/httpx"
+	"github.com/msales/pkg/v4/httpx"
 	"github.com/stretchr/testify/assert"
 )
 

@@ -7,7 +7,7 @@ import (
 
 	"net/url"
 
-	"github.com/msales/pkg/v3/httpx/middleware"
+	"github.com/msales/pkg/v4/httpx/middleware"
 	"github.com/stretchr/testify/assert"
 )
 

@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/msales/pkg/v3/clix"
+	"github.com/msales/pkg/v4/clix"
 	"github.com/stretchr/testify/assert"
 )
 

@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/cactus/go-statsd-client/statsd"
-	"github.com/msales/pkg/v3/bytes"
+	"github.com/msales/pkg/v4/bytes"
 )
 
 // Statsd represents a statsd client.

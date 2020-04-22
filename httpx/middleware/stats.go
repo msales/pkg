@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/msales/pkg/v3/stats"
+	"github.com/msales/pkg/v4/stats"
 )
 
 // TagsFunc returns a set of tags from a request

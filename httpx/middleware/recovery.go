@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"runtime/debug"
 
-	"github.com/msales/pkg/v3/log"
-	"github.com/msales/pkg/v3/stats"
+	"github.com/msales/pkg/v4/log"
+	"github.com/msales/pkg/v4/stats"
 )
 
 // RecoveryFunc is used to configure the recovery handler.
@@ -48,7 +48,7 @@ func (m *Recovery) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				err = v
 			}
 
-			logCtx := []interface{}{"url", r.URL.String(),}
+			logCtx := []interface{}{"url", r.URL.String()}
 			if m.withStack {
 				logCtx = append(logCtx, "stack", string(debug.Stack()))
 			}

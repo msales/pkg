@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/msales/pkg/v3/grpcx"
+	"github.com/msales/pkg/v4/grpcx"
 	"github.com/stretchr/testify/assert"
 )
 

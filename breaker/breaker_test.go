@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/msales/pkg/v3/breaker"
+	"github.com/msales/pkg/v4/breaker"
 	"github.com/stretchr/testify/assert"
 )
 
