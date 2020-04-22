@@ -22,12 +22,14 @@ func TestWithStreamClientInterceptors(t *testing.T) {
 
 func TestWithUnaryServerInterceptors(t *testing.T) {
 	interceptor := middleware.WithUnaryServerInterceptors()
+	_, ok := interceptor.(grpc.ServerOption)
 
-	assert.IsType(t, (grpc.ServerOption)(nil), interceptor)
+	assert.True(t, ok)
 }
 
 func TestWithStreamServerInterceptors(t *testing.T) {
 	interceptor := middleware.WithStreamServerInterceptors()
+	_, ok := interceptor.(grpc.ServerOption)
 
-	assert.IsType(t, (grpc.ServerOption)(nil), interceptor)
+	assert.True(t, ok)
 }
