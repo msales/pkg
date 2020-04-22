@@ -15,7 +15,7 @@ require (
 	github.com/msales/logged v0.2.0
 	github.com/onsi/ginkgo v1.7.0 // indirect
 	github.com/onsi/gomega v1.4.3 // indirect
-	github.com/prometheus/client_golang v0.9.3
+	github.com/prometheus/client_golang v0.9.4
 	github.com/ryanuber/go-glob v0.0.0-20170128012129-256dc444b735
 	github.com/stretchr/testify v1.4.0
 	github.com/yuin/gopher-lua v0.0.0-20190514113301-1cd887cd7036 // indirect
