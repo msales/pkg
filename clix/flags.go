@@ -6,7 +6,7 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-// Flag constants declared for Context use.
+// Flag constants declared for CLI use.
 const (
 	FlagPort = "port"
 
@@ -52,7 +52,7 @@ var Defaults = defaults{
 	ProfilerPort: "8081",
 }
 
-// Flags represents a set of Context flags.
+// Flags represents a set of CLI flags.
 type Flags []cli.Flag
 
 // Merge joins one or more Flags together, making a new set.

@@ -37,7 +37,7 @@ type Context struct {
 	stats  stats.Stats
 }
 
-// NewContext creates a new Context from the Context Context.
+// NewContext creates a new Context from the CLI Context.
 func NewContext(c *cli.Context, opts ...ContextFunc) (*Context, error) {
 	ctx := &Context{
 		Context:    c,
