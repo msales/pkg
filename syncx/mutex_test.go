@@ -5,7 +5,7 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/msales/pkg/v3/syncx"
+	"github.com/msales/pkg/v4/syncx"
 	"github.com/stretchr/testify/assert"
 )
 

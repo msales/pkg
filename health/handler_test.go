@@ -6,7 +6,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/msales/pkg/v3/health"
+	"github.com/msales/pkg/v4/health"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -81,7 +81,7 @@ func (r *testReporter) IsHealthy() error {
 
 func TestReporterFunc_IsHealthy(t *testing.T) {
 	err := errors.New("test")
-	reporter := health.ReporterFunc(func() error { return err})
+	reporter := health.ReporterFunc(func() error { return err })
 	result := reporter.IsHealthy()
 
 	assert.True(t, err == result)

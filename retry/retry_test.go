@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/msales/pkg/v3/retry"
+	"github.com/msales/pkg/v4/retry"
 	"github.com/stretchr/testify/assert"
 )
 

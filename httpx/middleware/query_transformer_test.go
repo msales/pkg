@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/msales/pkg/v3/httpx/middleware"
+	"github.com/msales/pkg/v4/httpx/middleware"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -38,35 +38,35 @@ func TestWithQueryTransformer(t *testing.T) {
 func TestWithQueryTransformerFunc(t *testing.T) {
 	url := "/?a=va&b=vb&c=vc&d=vd"
 
-	tests := []struct{
-		name string
-		keys []string
-		seenVals []string
+	tests := []struct {
+		name      string
+		keys      []string
+		seenVals  []string
 		wantQuery string
 	}{
 		{
-			name: "some keys defined",
-			keys: []string{"a", "b", "c"},
-			seenVals: []string{"va", "vb", "vc"},
+			name:      "some keys defined",
+			keys:      []string{"a", "b", "c"},
+			seenVals:  []string{"va", "vb", "vc"},
 			wantQuery: "a=VA&b=VB&c=VC&d=vd",
 		},
 		{
-			name: "keys not in the query",
-			keys: []string{"x", "y", "z"},
-			seenVals: []string{},
-			wantQuery:"a=va&b=vb&c=vc&d=vd",
+			name:      "keys not in the query",
+			keys:      []string{"x", "y", "z"},
+			seenVals:  []string{},
+			wantQuery: "a=va&b=vb&c=vc&d=vd",
 		},
 		{
-			name: "no keys defined",
-			keys: []string{},
-			seenVals: []string{},
-			wantQuery:"a=va&b=vb&c=vc&d=vd",
+			name:      "no keys defined",
+			keys:      []string{},
+			seenVals:  []string{},
+			wantQuery: "a=va&b=vb&c=vc&d=vd",
 		},
 		{
-			name: "nil keys",
-			keys: nil,
-			seenVals: []string{},
-			wantQuery:"a=va&b=vb&c=vc&d=vd",
+			name:      "nil keys",
+			keys:      nil,
+			seenVals:  []string{},
+			wantQuery: "a=va&b=vb&c=vc&d=vd",
 		},
 	}
 

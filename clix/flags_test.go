@@ -3,15 +3,15 @@ package clix_test
 import (
 	"testing"
 
-	"github.com/msales/pkg/v3/clix"
+	"github.com/msales/pkg/v4/clix"
 	"github.com/stretchr/testify/assert"
-	"gopkg.in/urfave/cli.v1"
+	"github.com/urfave/cli/v2"
 )
 
 func TestFlags_Merge(t *testing.T) {
-	f1 := cli.StringFlag{}
-	f2 := cli.StringFlag{}
-	f3 := cli.StringFlag{}
+	f1 := &cli.StringFlag{}
+	f2 := &cli.StringFlag{}
+	f3 := &cli.StringFlag{}
 	flags1 := clix.Flags{f1}
 	flags2 := clix.Flags{f2}
 	flags3 := clix.Flags{f3}

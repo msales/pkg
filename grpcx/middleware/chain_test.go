@@ -3,7 +3,7 @@ package middleware_test
 import (
 	"testing"
 
-	"github.com/msales/pkg/v3/grpcx/middleware"
+	"github.com/msales/pkg/v4/grpcx/middleware"
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/grpc"
 )

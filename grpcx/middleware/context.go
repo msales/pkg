@@ -4,8 +4,8 @@ import (
 	"context"
 
 	"github.com/grpc-ecosystem/go-grpc-middleware"
-	"github.com/msales/pkg/v3/log"
-	"github.com/msales/pkg/v3/stats"
+	"github.com/msales/pkg/v4/log"
+	"github.com/msales/pkg/v4/stats"
 	"google.golang.org/grpc"
 )
 

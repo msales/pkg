@@ -6,12 +6,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/msales/pkg/v3/clix"
-	"github.com/msales/pkg/v3/log"
-	"github.com/msales/pkg/v3/stats"
+	"github.com/msales/pkg/v4/clix"
+	"github.com/msales/pkg/v4/log"
+	"github.com/msales/pkg/v4/stats"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
-	"gopkg.in/urfave/cli.v1"
+	"github.com/urfave/cli/v2"
 )
 
 func TestWithLogger(t *testing.T) {

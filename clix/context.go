@@ -4,9 +4,9 @@ import (
 	"context"
 	"io"
 
-	"github.com/msales/pkg/v3/log"
-	"github.com/msales/pkg/v3/stats"
-	"gopkg.in/urfave/cli.v1"
+	"github.com/msales/pkg/v4/log"
+	"github.com/msales/pkg/v4/stats"
+	"github.com/urfave/cli/v2"
 )
 
 // ContextFunc configures the Context.
@@ -70,6 +70,11 @@ func NewContext(c *cli.Context, opts ...ContextFunc) (*Context, error) {
 	ctx.ctxContext = stats.WithStats(ctx.ctxContext, ctx.stats)
 
 	return ctx, nil
+}
+
+// Value returns value with associated key for internal context that implements context.Context
+func (c *Context) Value(key interface{}) interface{} {
+	return c.ctxContext.Value(key)
 }
 
 // Close closes the context.

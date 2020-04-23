@@ -4,10 +4,10 @@ import (
 	"context"
 	"testing"
 
-	"github.com/msales/pkg/v3/clix"
-	"github.com/msales/pkg/v3/mocks"
+	"github.com/msales/pkg/v4/clix"
+	"github.com/msales/pkg/v4/mocks"
 	"github.com/stretchr/testify/assert"
-	"gopkg.in/urfave/cli.v1"
+	"github.com/urfave/cli/v2"
 )
 
 func TestInitContext(t *testing.T) {
@@ -17,13 +17,13 @@ func TestInitContext(t *testing.T) {
 	}
 
 	flags := clix.Flags{
-		cli.StringFlag{
-			Name:   "foo",
-			EnvVar: "ENV_FOO",
+		&cli.StringFlag{
+			Name:    "foo",
+			EnvVars: []string{"ENV_FOO"},
 		},
-		cli.IntFlag{
-			Name:   "faz",
-			EnvVar: "ENV_FAZ",
+		&cli.IntFlag{
+			Name:    "faz",
+			EnvVars: []string{"ENV_FAZ"},
 		},
 	}
 	ctx := mocks.InitContext(args, flags)
@@ -38,13 +38,13 @@ func TestInitContext_PanicsBadFlag(t *testing.T) {
 	}
 
 	flags := clix.Flags{
-		cli.StringFlag{
-			Name:   "foo",
-			EnvVar: "ENV_FOO",
+		&cli.StringFlag{
+			Name:    "foo",
+			EnvVars: []string{"ENV_FOO"},
 		},
-		cli.IntFlag{
-			Name:   "faz",
-			EnvVar: "ENV_FAZ",
+		&cli.IntFlag{
+			Name:    "faz",
+			EnvVars: []string{"ENV_FAZ"},
 		},
 	}
 	assert.Panics(t, func() {
@@ -60,13 +60,13 @@ func TestInitContext_PanicsWrongLogLevel(t *testing.T) {
 	}
 
 	flags := clix.Flags{
-		cli.StringFlag{
-			Name:   "foo",
-			EnvVar: "ENV_FOO",
+		&cli.StringFlag{
+			Name:    "foo",
+			EnvVars: []string{"ENV_FOO"},
 		},
-		cli.IntFlag{
-			Name:   "faz",
-			EnvVar: "ENV_FAZ",
+		&cli.IntFlag{
+			Name:    "faz",
+			EnvVars: []string{"ENV_FAZ"},
 		},
 	}.Merge(clix.CommonFlags)
 	assert.Panics(t, func() {

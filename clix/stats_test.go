@@ -3,11 +3,11 @@ package clix_test
 import (
 	"testing"
 
-	"github.com/msales/pkg/v3/clix"
-	"github.com/msales/pkg/v3/log"
-	"github.com/msales/pkg/v3/stats"
+	"github.com/msales/pkg/v4/clix"
+	"github.com/msales/pkg/v4/log"
+	"github.com/msales/pkg/v4/stats"
 	"github.com/stretchr/testify/assert"
-	"gopkg.in/urfave/cli.v1"
+	"github.com/urfave/cli/v2"
 )
 
 func TestNewStats(t *testing.T) {
@@ -18,16 +18,16 @@ func TestNewStats(t *testing.T) {
 
 		shouldErr bool
 	}{
-		{"statsd://localhost:8125", "test", &cli.StringSlice{}, false},
-		{"", "test", &cli.StringSlice{}, false},
-		{"l2met://", "test", &cli.StringSlice{}, false},
-		{"prometheus://", "test", &cli.StringSlice{}, false},
-		{"prometheus://:51234", "test", &cli.StringSlice{}, false},
-		{"l2met://", "", &cli.StringSlice{}, false},
-		{"invalid-scheme", "", &cli.StringSlice{}, true},
-		{"unknownscheme://", "", &cli.StringSlice{}, true},
-		{":/", "", &cli.StringSlice{}, true},
-		{"l2met://", "", &cli.StringSlice{"a"}, true},
+		{"statsd://localhost:8125", "test", cli.NewStringSlice(), false},
+		{"", "test", cli.NewStringSlice(), false},
+		{"l2met://", "test", cli.NewStringSlice(), false},
+		{"prometheus://", "test", cli.NewStringSlice(), false},
+		{"prometheus://:51234", "test", cli.NewStringSlice(), false},
+		{"l2met://", "", cli.NewStringSlice(), false},
+		{"invalid-scheme", "", cli.NewStringSlice(), true},
+		{"unknownscheme://", "", cli.NewStringSlice(), true},
+		{":/", "", cli.NewStringSlice(), true},
+		{"l2met://", "", cli.NewStringSlice("a"), true},
 	}
 
 	for _, tt := range tests {
