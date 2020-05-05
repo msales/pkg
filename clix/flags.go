@@ -32,7 +32,8 @@ const (
 	FlagCommitBatch    = "commit-batch"
 	FlagCommitInterval = "commit-interval"
 
-	FlagRedisDSN = "redis-dsn"
+	FlagRedisDSN   = "redis-dsn"
+	FlagRedisAddrs = "redis-addrs"
 )
 
 type defaults struct {
@@ -148,6 +149,16 @@ var RedisFlags = Flags{
 		Name:     FlagRedisDSN,
 		Usage:    "The DSN of Redis.",
 		EnvVars:  []string{"REDIS_DSN"},
+		Required: true,
+	},
+}
+
+// RedisClusterFlags are flags that configure redis cluster.
+var RedisClusterFlags = Flags{
+	&cli.StringSliceFlag{
+		Name:     FlagRedisAddrs,
+		Usage:    "Adresses of Redis cluster.",
+		EnvVars:  []string{"REDIS_ADDRS"},
 		Required: true,
 	},
 }
