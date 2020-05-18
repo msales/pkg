@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"context"
+	"time"
 
 	"github.com/grpc-ecosystem/go-grpc-middleware"
 	"github.com/msales/pkg/v3/log"
@@ -40,5 +41,29 @@ func WithStreamServerStats(s stats.Stats) grpc.StreamServerInterceptor {
 		ws.WrappedContext = stats.WithStats(ss.Context(), s)
 
 		return handler(srv, ws)
+	}
+}
+
+// WithUnaryClientContextTimeout adds timeout to unary client request context.
+func WithUnaryClientContextTimeout(d time.Duration) grpc.UnaryClientInterceptor {
+	return func(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error {
+		ctx, cancel := context.WithTimeout(ctx, d)
+		defer cancel()
+
+		return invoker(ctx, method, req, reply, cc, opts...)
+	}
+}
+
+// WithUnaryClientLogger adds the logger instance to the unary client request context.
+func WithUnaryClientLogger(l log.Logger) grpc.UnaryClientInterceptor {
+	return func(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error {
+		return invoker(log.WithLogger(ctx, l), method, req, reply, cc, opts...)
+	}
+}
+
+// WithUnaryClientStats adds the stats instance to the unary client request context.
+func WithUnaryClientStats(s stats.Stats) grpc.UnaryClientInterceptor {
+	return func(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error {
+		return invoker(stats.WithStats(ctx, s), method, req, reply, cc, opts...)
 	}
 }

@@ -2,11 +2,13 @@ package grpcx
 
 import (
 	"context"
+	"time"
 
 	"github.com/msales/pkg/v3/grpcx/middleware"
 	"github.com/msales/pkg/v3/log"
 	"github.com/msales/pkg/v3/stats"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/balancer/roundrobin"
 )
 
 // UnaryServerCommonOpts returns commonly options for an unary server.
@@ -38,6 +40,25 @@ func StreamServerCommonOpts(ctx context.Context, statsTagsFns ...TagsFunc) []grp
 		grpc.StatsHandler(
 			WithRPCStats(s, statsTagsFns...),
 		),
+	}
+}
+
+// UnaryClientCommonOpts returns commonly options for an unary client.
+func UnaryClientCommonOpts(ctx context.Context, timeout time.Duration, additional ...grpc.UnaryClientInterceptor) []grpc.DialOption {
+	l, s := getLoggerAndStats(ctx)
+
+	interceptors := []grpc.UnaryClientInterceptor{
+		middleware.WithUnaryClientLogger(l),
+		middleware.WithUnaryClientStats(s),
+		middleware.WithUnaryClientContextTimeout(timeout),
+	}
+
+	interceptors = append(interceptors, additional...)
+
+	return []grpc.DialOption{
+		grpc.WithInsecure(),
+		grpc.WithBalancerName(roundrobin.Name),
+		middleware.WithUnaryClientInterceptors(interceptors...),
 	}
 }
 
