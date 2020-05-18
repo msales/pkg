@@ -94,6 +94,23 @@ func TestWithUnaryClientContextTimeout(t *testing.T) {
 	assert.Equal(t, testErr, err)
 }
 
+func TestWithUnaryClientContextTimeout_DeadlineExceeded(t *testing.T) {
+	ctx := context.Background()
+
+	interceptor := middleware.WithUnaryClientContextTimeout(1 * time.Nanosecond)
+	_ = interceptor(ctx, "method", nil, nil, nil, func(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, opts ...grpc.CallOption) error {
+		_, ok := ctx.Deadline()
+
+		assert.True(t, ok)
+		time.Sleep(5 * time.Nanosecond)
+
+		assert.Error(t, ctx.Err())
+		assert.EqualError(t, ctx.Err(), context.DeadlineExceeded.Error())
+
+		return nil
+	})
+}
+
 func TestWithUnaryClientLogger(t *testing.T) {
 	interceptor := middleware.WithUnaryClientLogger(log.Null)
 
