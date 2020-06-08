@@ -14,7 +14,7 @@ const (
 	stateTag        = "state"
 )
 
-// WithBreaker adds breaker to client request.
+// WithClientBreaker adds breaker to client request.
 func WithClientBreaker(br *breaker.Breaker) grpc.UnaryClientInterceptor {
 	return func(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error {
 		err := br.Run(func() error {
