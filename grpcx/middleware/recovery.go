@@ -39,6 +39,17 @@ func (cfg *recoveryConfig) applyOpts(opts []RecoveryFunc) {
 }
 
 // WithUnaryServerRecovery returns an interceptor that recovers from panics.
+func WithUnaryClientRecovery(recoveryOpts ...RecoveryFunc) grpc.UnaryClientInterceptor {
+	return func(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error {
+		cfg := newRecoveryConfig(recoveryOpts...)
+
+		defer recoveryFunc(ctx, cfg.withStack)
+
+		return invoker(ctx, method, req, reply, cc, opts...)
+	}
+}
+
+// WithUnaryServerRecovery returns an interceptor that recovers from panics.
 func WithUnaryServerRecovery(opts ...RecoveryFunc) grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req interface{}, _ *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (resp interface{}, err error) {
 		cfg := newRecoveryConfig(opts...)

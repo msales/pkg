@@ -18,6 +18,7 @@ func UnaryClientCommonOpts(ctx context.Context, timeout time.Duration, additiona
 	interceptors := []grpc.UnaryClientInterceptor{
 		middleware.WithUnaryClientLogger(l),
 		middleware.WithUnaryClientStats(s),
+		middleware.WithUnaryClientRecovery(),
 		middleware.WithUnaryClientContextTimeout(timeout),
 	}
 
