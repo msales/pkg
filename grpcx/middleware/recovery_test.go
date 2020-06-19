@@ -134,3 +134,60 @@ func TestWithStreamServerRecovery_WithError(t *testing.T) {
 
 	assert.NoError(t, err)
 }
+
+func TestWithUnaryClientRecovery(t *testing.T) {
+	defer func() {
+		if err := recover(); err != nil {
+			t.Fatal("Expected the panic to be handled.")
+		}
+	}()
+
+	ctx := context.Background()
+	logger := new(mocks.Logger)
+	logger.On("Error", "test", "stack", mock.AnythingOfType("string"))
+
+	interceptor := middleware.WithUnaryClientRecovery()
+
+	err := interceptor(log.WithLogger(ctx, logger), "method", nil, nil, nil, func(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, opts ...grpc.CallOption) error {
+		panic("test")
+	})
+
+	assert.NoError(t, err)
+	logger.AssertExpectations(t)
+}
+
+func TestWithUnaryClientRecovery_WithoutStack(t *testing.T) {
+	defer func() {
+		if err := recover(); err != nil {
+			t.Fatal("Expected the panic to be handled.")
+		}
+	}()
+
+	ctx := context.Background()
+	logger := new(mocks.Logger)
+	logger.On("Error", "test")
+
+	interceptor := middleware.WithUnaryClientRecovery(middleware.WithoutStack())
+
+	err := interceptor(log.WithLogger(ctx, logger), "method", nil, nil, nil, func(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, opts ...grpc.CallOption) error {
+		panic("test")
+	})
+
+	assert.NoError(t, err)
+	logger.AssertExpectations(t)
+}
+
+func TestWithUnaryClientRecovery_WithError(t *testing.T) {
+	defer func() {
+		if err := recover(); err != nil {
+			t.Fatal("Expected the panic to be handled.")
+		}
+	}()
+
+	interceptor := middleware.WithUnaryClientRecovery()
+	err := interceptor(context.Background(), "method", nil, nil, nil, func(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, opts ...grpc.CallOption) error {
+		panic(errors.New("test: error"))
+	})
+
+	assert.NoError(t, err)
+}
