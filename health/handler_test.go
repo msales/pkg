@@ -10,6 +10,10 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func Test_NullHealthReporter(t *testing.T) {
+	assert.NoError(t, health.Null().IsHealthy())
+}
+
 func TestHandler_With(t *testing.T) {
 	h := health.NewHandler()
 	r1 := &testReporter{}
@@ -81,7 +85,7 @@ func (r *testReporter) IsHealthy() error {
 
 func TestReporterFunc_IsHealthy(t *testing.T) {
 	err := errors.New("test")
-	reporter := health.ReporterFunc(func() error { return err})
+	reporter := health.ReporterFunc(func() error { return err })
 	result := reporter.IsHealthy()
 
 	assert.True(t, err == result)

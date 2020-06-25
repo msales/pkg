@@ -4,6 +4,13 @@ import (
 	"net/http"
 )
 
+// Null is the null Health reporter.
+func Null() ReporterFunc {
+	return func() error {
+		return nil
+	}
+}
+
 // Reporter represents an a health reporter.
 type Reporter interface {
 	// IsHealthy emits error if application is not healthy.
