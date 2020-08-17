@@ -9,7 +9,7 @@ require (
 	github.com/cactus/go-statsd-client/statsd v0.0.0-20200322202804-24fc78943200
 	github.com/go-redis/redis v6.15.7+incompatible
 	github.com/gomodule/redigo v2.0.0+incompatible // indirect
-	github.com/grpc-ecosystem/go-grpc-middleware v1.2.0
+	github.com/grpc-ecosystem/go-grpc-middleware v1.2.1
 	github.com/kr/pretty v0.1.0 // indirect
 	github.com/msales/logged v0.2.0
 	github.com/onsi/ginkgo v1.7.0 // indirect
@@ -19,7 +19,7 @@ require (
 	github.com/stretchr/testify v1.4.0
 	github.com/urfave/cli/v2 v2.2.0
 	github.com/yuin/gopher-lua v0.0.0-20190514113301-1cd887cd7036 // indirect
-	golang.org/x/net v0.0.0-20190311183353-d8887717615a
-	google.golang.org/grpc v1.29.0
+	golang.org/x/net v0.0.0-20200421231249-e086a090c8fd
+	google.golang.org/grpc v1.29.1
 	gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127 // indirect
 )
