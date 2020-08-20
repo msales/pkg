@@ -66,6 +66,7 @@ func NewRedis(uri string, opts ...RedisOptionsFunc) (Cache, error) {
 	}, nil
 }
 
+// NewRedisUniversal create a new Redis cache instance.
 func NewRedisUniversal(addrs []string, opts ...RedisOptionsFunc) (Cache, error) {
 	uo := &redis.UniversalOptions{
 		Addrs:         addrs,
