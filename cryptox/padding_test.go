@@ -3,7 +3,7 @@ package cryptox_test
 import (
 	"testing"
 
-	"github.com/msales/pkg/v4/cryptox"
+	"github.com/msales/pkg/v5/cryptox"
 	"github.com/stretchr/testify/assert"
 )
 
