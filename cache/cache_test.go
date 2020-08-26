@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/msales/pkg/v4/cache"
+	"github.com/msales/pkg/v5/cache"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )

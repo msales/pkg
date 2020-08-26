@@ -1,4 +1,4 @@
-module github.com/msales/pkg/v4
+module github.com/msales/pkg/v5
 
 go 1.14
 

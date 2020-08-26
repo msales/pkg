@@ -3,7 +3,7 @@ package utils_test
 import (
 	"testing"
 
-	"github.com/msales/pkg/v4/utils"
+	"github.com/msales/pkg/v5/utils"
 	"github.com/stretchr/testify/assert"
 )
 
