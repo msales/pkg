@@ -1,9 +1,10 @@
 package cache
 
 import (
+	"context"
 	"time"
 
-	"github.com/go-redis/redis"
+	"github.com/go-redis/redis/v8"
 )
 
 // RedisOptionsFunc represents an configuration function for Redis.
@@ -86,7 +87,7 @@ func NewRedisUniversal(addrs []string, opts ...RedisOptionsFunc) (Cache, error) 
 
 // Get gets the item for the given key.
 func (c redisCache) Get(key string) *Item {
-	b, err := c.client.Get(key).Bytes()
+	b, err := c.client.Get(context.Background(), key).Bytes()
 	if err == redis.Nil {
 		err = ErrCacheMiss
 	}
@@ -100,7 +101,7 @@ func (c redisCache) Get(key string) *Item {
 
 // GetMulti gets the items for the given keys.
 func (c redisCache) GetMulti(keys ...string) ([]*Item, error) {
-	val, err := c.client.MGet(keys...).Result()
+	val, err := c.client.MGet(context.Background(), keys...).Result()
 	if err != nil {
 		return nil, err
 	}
@@ -126,12 +127,12 @@ func (c redisCache) GetMulti(keys ...string) ([]*Item, error) {
 
 // Set sets the item in the cache.
 func (c redisCache) Set(key string, value interface{}, expire time.Duration) error {
-	return c.client.Set(key, value, expire).Err()
+	return c.client.Set(context.Background(), key, value, expire).Err()
 }
 
 // Add sets the item in the cache, but only if the key does not already exist.
 func (c redisCache) Add(key string, value interface{}, expire time.Duration) error {
-	if !c.client.SetNX(key, value, expire).Val() {
+	if !c.client.SetNX(context.Background(), key, value, expire).Val() {
 		return ErrNotStored
 	}
 	return nil
@@ -139,7 +140,7 @@ func (c redisCache) Add(key string, value interface{}, expire time.Duration) err
 
 // Replace sets the item in the cache, but only if the key already exists.
 func (c redisCache) Replace(key string, value interface{}, expire time.Duration) error {
-	if !c.client.SetXX(key, value, expire).Val() {
+	if !c.client.SetXX(context.Background(), key, value, expire).Val() {
 		return ErrNotStored
 	}
 	return nil
@@ -147,15 +148,15 @@ func (c redisCache) Replace(key string, value interface{}, expire time.Duration)
 
 // Delete deletes the item with the given key.
 func (c redisCache) Delete(key string) error {
-	return c.client.Del(key).Err()
+	return c.client.Del(context.Background(), key).Err()
 }
 
 // Inc increments a key by the value.
 func (c redisCache) Inc(key string, value uint64) (int64, error) {
-	return c.client.IncrBy(key, int64(value)).Result()
+	return c.client.IncrBy(context.Background(), key, int64(value)).Result()
 }
 
 // Dec decrements a key by the value.
 func (c redisCache) Dec(key string, value uint64) (int64, error) {
-	return c.client.DecrBy(key, int64(value)).Result()
+	return c.client.DecrBy(context.Background(), key, int64(value)).Result()
 }

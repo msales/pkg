@@ -1,11 +1,12 @@
 package redisx_test
 
 import (
+	"context"
 	"errors"
 	"testing"
 
 	"github.com/alicebob/miniredis"
-	"github.com/go-redis/redis"
+	"github.com/go-redis/redis/v8"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/msales/pkg/v3/redisx"
@@ -18,7 +19,7 @@ func TestClusterScanIterator_Next_StandardClient(t *testing.T) {
 	scanIterator, err := redisx.NewScanIterator(client, 0, match, 0)
 	assert.NoError(t, err)
 
-	n := scanIterator.Next()
+	n := scanIterator.Next(context.Background())
 	assert.False(t, n)
 }
 
@@ -26,9 +27,9 @@ func TestClusterScanIterator_Next_ClusterClient(t *testing.T) {
 	client1 := getClient()
 	client2 := getClient()
 
-	client1.Set("test1", 1, 0)
-	client2.Set("test2", 2, 0)
-	client2.Set("test3", 3, 0)
+	client1.Set(context.Background(), "test1", 1, 0)
+	client2.Set(context.Background(), "test2", 2, 0)
+	client2.Set(context.Background(), "test3", 3, 0)
 
 	client := &clusterClientMock{
 		Masters: []*redis.Client{
@@ -41,16 +42,16 @@ func TestClusterScanIterator_Next_ClusterClient(t *testing.T) {
 	scanIterator, err := redisx.NewScanIterator(client, 0, match, 0)
 	assert.NoError(t, err)
 
-	n := scanIterator.Next()
+	n := scanIterator.Next(context.Background())
 	assert.True(t, n)
 
-	n = scanIterator.Next()
+	n = scanIterator.Next(context.Background())
 	assert.True(t, n)
 
-	n = scanIterator.Next()
+	n = scanIterator.Next(context.Background())
 	assert.True(t, n)
 
-	n = scanIterator.Next()
+	n = scanIterator.Next(context.Background())
 	assert.False(t, n)
 }
 
@@ -80,9 +81,9 @@ func TestClusterScanIterator_Val(t *testing.T) {
 	client1 := getClient()
 	client2 := getClient()
 
-	client1.Set("test1", 1, 0)
-	client2.Set("test2", 2, 0)
-	client2.Set("test3", 3, 0)
+	client1.Set(context.Background(), "test1", 1, 0)
+	client2.Set(context.Background(), "test2", 2, 0)
+	client2.Set(context.Background(), "test3", 3, 0)
 
 	client := &clusterClientMock{
 		Masters: []*redis.Client{
@@ -95,13 +96,13 @@ func TestClusterScanIterator_Val(t *testing.T) {
 	scanIterator, err := redisx.NewScanIterator(client, 0, match, 0)
 	assert.NoError(t, err)
 
-	assert.True(t, scanIterator.Next())
+	assert.True(t, scanIterator.Next(context.Background()))
 	assert.Equal(t, "test1", scanIterator.Val())
-	assert.True(t, scanIterator.Next())
+	assert.True(t, scanIterator.Next(context.Background()))
 	assert.Equal(t, "test2", scanIterator.Val())
-	assert.True(t, scanIterator.Next())
+	assert.True(t, scanIterator.Next(context.Background()))
 	assert.Equal(t, "test3", scanIterator.Val())
-	assert.False(t, scanIterator.Next())
+	assert.False(t, scanIterator.Next(context.Background()))
 
 }
 

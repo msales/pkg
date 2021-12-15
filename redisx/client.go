@@ -1,14 +1,16 @@
 package redisx
 
 import (
-	"github.com/go-redis/redis"
+	"context"
+
+	"github.com/go-redis/redis/v8"
 )
 
 // ScanIterator represents a generic redis scan iterator that works on both
 // redis Client and ClusterClient
 type ScanIterator interface {
 	Val() string
-	Next() bool
+	Next(ctx context.Context) bool
 	Err() error
 }
 
@@ -27,12 +29,12 @@ func NewScanIterator(c interface{}, cursor uint64, match string, count int64) (S
 	_, isCluster := c.(ClusterClient)
 
 	if !isCluster {
-		return c.(redis.Cmdable).Scan(cursor, match, count).Iterator(), nil
+		return c.(redis.Cmdable).Scan(context.Background(), cursor, match, count).Iterator(), nil
 	}
 
 	iterators := make([]ScanIterator, 0)
 	err := c.(ClusterClient).ForEachMaster(func(client *redis.Client) error {
-		iterators = append(iterators, client.Scan(cursor, match, count).Iterator())
+		iterators = append(iterators, client.Scan(context.Background(), cursor, match, count).Iterator())
 
 		return nil
 	})
@@ -60,17 +62,17 @@ func (cs *ClusterScanIterator) Val() string {
 }
 
 // Next returns true if there is at least one more value in iterator
-func (cs *ClusterScanIterator) Next() bool {
+func (cs *ClusterScanIterator) Next(ctx context.Context) bool {
 	i := cs.getCurrentIterator()
 
-	if i.Next() {
+	if i.Next(ctx) {
 		return true
 	}
 
 	for cs.nextIterator() {
 		i = cs.getCurrentIterator()
 
-		if i.Next() {
+		if i.Next(ctx) {
 			return true
 		}
 	}
