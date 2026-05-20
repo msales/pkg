@@ -7,7 +7,7 @@ require (
 	github.com/alicebob/miniredis v2.5.0+incompatible
 	github.com/bradfitz/gomemcache v0.0.0-20180710155616-bc664df96737
 	github.com/davecgh/go-spew v1.1.1 // indirect
-	github.com/go-redis/redis v6.15.7+incompatible
+	github.com/go-redis/redis v6.15.9+incompatible
 	github.com/golang/protobuf v1.3.3 // indirect
 	github.com/gomodule/redigo v2.0.0+incompatible // indirect
 	github.com/kr/pretty v0.1.0 // indirect
